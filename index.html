@@ -58,7 +58,17 @@ h3{font-weight:700;font-size:18px;margin:0 0 6px}
 /* 頂列 */
 .top{display:flex;align-items:center;justify-content:space-between;padding:16px 0}
 .brand{font-weight:500;font-size:14px;display:flex;align-items:center;gap:8px;color:var(--ink);text-decoration:none}
-.brand svg{width:18px;height:18px}
+.brand .sa{width:22px;height:22px;color:var(--green)}
+body:has(#home:not(.hidden)) .brand .sa{color:var(--gold-l)}
+.presents{display:flex;align-items:center;gap:8px;justify-content:flex-end;margin:0 0 10px;font-size:13px;color:#D9DED6;letter-spacing:.04em}
+.presents .sa{width:26px;height:26px;color:var(--gold-l)}
+.stub .smark{width:12px;height:12px;vertical-align:-1px;margin-right:3px;color:var(--green)}
+.closing{position:relative;overflow:hidden}
+.closing .wmark{position:absolute;right:-40px;bottom:-60px;width:min(420px,70vw);height:auto;color:var(--gold-l);opacity:.07;pointer-events:none}
+.closing .wrap{position:relative}
+.fmark{width:40px;height:40px;flex:none;color:var(--gold-l)}
+body:has(#home.hidden) .fmark{color:var(--green)}
+.ticket .tmark{width:30px;height:30px;color:var(--green);margin-bottom:6px;display:block}
 .toplink{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--ink);text-decoration:none;padding:8px 12px;border-radius:var(--r);border:1px solid var(--line)}
 .toplink:hover{border-color:var(--green)}
 
@@ -183,7 +193,6 @@ body:has(#home:not(.hidden)) .toplink:hover{border-color:var(--gold-l)}
 .foot .tiles{background:var(--night)}
 .fin{display:flex;flex-wrap:wrap;gap:18px 32px;align-items:center;justify-content:space-between;padding-top:28px;padding-bottom:calc(40px + env(safe-area-inset-bottom))}
 .fbrand{display:flex;gap:12px;align-items:center}.fbrand b{display:block;color:var(--cream);font-size:16px}
-.fglyph{width:40px;height:40px;flex:none}
 .flinks{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center}
 .flinks a{display:inline-flex;align-items:center;gap:6px;color:var(--gold-l);text-decoration:none;font-weight:700}
 .flinks a:hover{text-decoration:underline}
@@ -455,6 +464,7 @@ fieldset.field{border:none;margin:0 0 22px;padding:0}
   .hero-copy{text-align:left;margin:0;padding:118px 0 40px;align-items:flex-start;max-width:none}
   .screen{padding:18px 20px 16px;background:rgba(12,33,27,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);margin-bottom:18px;width:100%}
   .facts-inline{justify-items:start;margin:14px 0 22px}.facts-inline li{flex-direction:row}
+  .presents{justify-content:flex-start}
   .cta{justify-content:flex-start}
   .film,.food-intro{grid-template-columns:1fr;gap:32px}
   .poster{aspect-ratio:4/3;transform:rotate(-1.5deg);max-width:520px}
@@ -492,7 +502,7 @@ fieldset.field{border:none;margin:0 0 22px;padding:0}
 
 <div class="topwrap"><div class="wrap">
   <div class="top">
-    <a class="brand" href="./"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 4 L22 22 H2Z" fill="#004E3B"/></svg>國立政治大學學生會</a>
+    <a class="brand" href="./"><span data-sa="brandmark"></span>國立政治大學學生會</a>
     <a href="#" class="toplink" id="lookupLink"></a>
   </div>
 </div></div>
@@ -507,10 +517,11 @@ fieldset.field{border:none;margin:0 0 22px;padding:0}
       <div id="resume" class="resume hidden" role="region" aria-label="上次的進度"></div>
       <div class="hero-copy">
         <div class="screen">
+          <p class="presents"><span data-sa="pmark"></span><span>政大學生會 presents</span></p>
           <p class="eyebrow">TONIGHT'S SCREENING</p>
           <h1 id="evTitle">聖誕<br>露天電影院</h1>
         </div>
-        <div class="stub" id="evDate"><b class="num">12/9</b><span class="wk">週三</span><span class="cut" aria-hidden="true"></span><span class="lbl">冬夜場<br><small>國立政治大學</small></span></div>
+        <div class="stub" id="evDate"><b class="num">12/9</b><span class="wk">週三</span><span class="cut" aria-hidden="true"></span><span class="lbl">冬夜場<br><small><span data-sa="smark"></span>政大學生會</small></span></div>
         <ul class="facts-inline" id="evMeta"><li><span data-icon="clock"></span><span class="tbd">時間待公布</span></li><li><span data-icon="map-pin"></span><span class="tbd">地點待公布</span></li></ul>
         <div class="cta"><button class="btn hero-cta" type="button" id="startBtn" disabled>報名＋預訂餐點</button></div>
         <div class="cta-note" id="openNote">載入中…</div>
@@ -560,6 +571,7 @@ fieldset.field{border:none;margin:0 0 22px;padding:0}
 
   <div class="tiles" aria-hidden="true"></div>
   <section class="closing night">
+    <span data-sa="wmark"></span>
     <div class="wrap">
       <p class="eyebrow">SEE YOU UNDER THE STARS</p>
       <h2>一起來看場冬夜電影</h2>
@@ -646,7 +658,7 @@ fieldset.field{border:none;margin:0 0 22px;padding:0}
 <section class="sheet" id="cartSheet" role="dialog" aria-modal="true" aria-labelledby="cartT"><div class="grab"></div><h3 id="cartT">你的訂單</h3><ul class="sum-list" id="cartList"></ul><div class="sum-total"><span>總金額</span><span class="num" id="cartTotal"></span></div></section>
 
 <footer class="foot"><div class="tiles" aria-hidden="true"></div><div class="wrap fin">
-  <div class="fbrand"><svg viewBox="0 0 64 64" aria-hidden="true" id="footGlyph"></svg><div><b>聖誕露天電影院</b><span id="footDate">2026/12/9（三）</span></div></div>
+  <div class="fbrand"><span data-sa="fmark" aria-label="國立政治大學學生會"></span><div><b>聖誕露天電影院</b><span id="footDate">2026/12/9（三）</span></div></div>
   <div class="flinks"><a href="https://www.instagram.com/nccu_sa/" target="_blank" rel="noopener" id="footIg"><span data-icon="camera"></span>IG @nccu_sa</a><span id="footContact"></span></div>
   <p class="fsmall">主辦：國立政治大學學生會</p>
 </div></footer>
@@ -657,6 +669,10 @@ fieldset.field{border:none;margin:0 0 22px;padding:0}
 (function(){
   const $ = id => document.getElementById(id);
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // 政大學生會 SA 標誌（只取上半部的 SA，不含 NCCU 字樣），顏色用 currentColor 配合版面
+  const SA_D = 'M256.9 767.8C257.4 766.5 269.4 737.6 283.5 703.5C297.6 669.4 311.6 635.4 314.6 628.0L320.1 614.5L327.7 610.0C375.5 581.6 407.5 535.2 417.0 480.5C419.6 465.0 420.1 460.5 420.4 443.5C420.8 425.6 419.8 411.5 416.9 396.4L414.8 385.2L429.8 348.9C438.1 328.9 450.7 298.1 458.0 280.5C465.3 262.9 473.4 243.3 476.0 237.0C478.6 230.7 486.2 212.0 493.0 195.5C499.8 179.0 505.8 164.9 506.3 164.2C507.0 163.3 509.3 163.0 513.3 163.2L519.3 163.5L528.2 185.0C533.1 196.8 561.4 265.2 591.0 337.0C620.6 408.8 653.4 488.2 663.8 513.5C674.2 538.8 699.3 599.5 719.5 648.5C739.7 697.5 759.1 744.4 762.6 752.9C766.1 761.4 769.0 768.7 769.0 769.2C769.0 769.6 749.0 770.0 724.6 770.0L680.2 770.0L672.2 749.8C667.8 738.6 659.6 717.7 654.0 703.2L643.7 677.0L512.7 677.2L381.8 677.5L368.8 710.5C361.7 728.6 353.6 749.5 350.8 756.8L345.6 770.0L300.8 770.0L256.0 770.0L256.9 767.8ZM173.0 608.5C119.8 601.9 69.7 579.1 29.3 543.1C20.8 535.6 6.5 520.3 2.0 514.0L0.1 511.4L29.1 482.4L58.2 453.5L59.8 456.0C71.8 473.9 91.1 494.8 105.8 505.7C132.4 525.7 160.2 535.3 195.0 536.7C243.6 538.6 284.4 518.9 301.9 485.1C308.7 471.8 311.4 459.9 311.2 442.9C310.9 419.0 303.5 402.4 284.8 384.4C267.5 367.6 245.1 355.1 191.5 332.2C128.4 305.2 105.1 292.6 81.3 272.7C44.2 241.5 27.1 198.8 31.0 146.8C34.1 104.9 49.5 71.5 78.1 44.6C108.5 16.0 150.0 0.8 198.0 0.7C234.8 0.6 264.1 7.2 295.5 22.5C323.0 35.8 350.4 57.3 370.5 81.3L375.3 87.1L362.9 99.8C356.1 106.8 344.9 118.3 338.1 125.3L325.8 138.1L311.1 123.8C280.1 93.4 255.9 80.1 223.5 75.5C173.2 68.3 130.9 85.7 114.4 120.5C108.7 132.5 107.5 138.6 107.6 156.0C107.6 169.9 107.9 172.3 110.2 179.2C121.2 212.1 146.0 230.4 222.8 262.0C258.7 276.7 270.6 282.1 288.0 291.2C337.4 316.9 366.6 347.8 379.9 388.6C393.2 429.4 389.9 480.6 371.4 518.6C357.5 547.2 333.7 571.5 304.0 587.3C283.6 598.1 256.8 606.2 231.8 608.9C218.8 610.4 186.1 610.1 173.0 608.5ZM613.1 598.8C610.4 591.7 516.8 352.4 513.8 345.0C512.9 342.8 512.0 344.6 505.4 361.5C501.3 371.9 495.3 387.2 492.0 395.5C488.8 403.8 478.4 430.3 469.0 454.5C459.5 478.7 442.8 521.4 431.9 549.4C421.0 577.4 412.0 600.4 412.0 600.6C412.0 600.8 457.4 601.0 513.0 601.0L614.0 601.0L613.1 598.8Z', SA_VB = '0 0 769 770';
+  const saMark = (cls, label) => `<svg class="sa ${cls || ''}" viewBox="${SA_VB}" ${label ? `role="img" aria-label="${label}"` : 'aria-hidden="true"'}><path fill="currentColor" fill-rule="evenodd" d="${SA_D}"/></svg>`;
+  document.querySelectorAll('[data-sa]').forEach(el => el.outerHTML = saMark(el.dataset.sa, el.getAttribute('aria-label')));
   const C = { cream:'#F2EFE5', green:'#004E3B', green2:'#009B7A', red:'#D9141A', gold:'#B18B35' };
   document.querySelectorAll('.ipt > span[data-icon]').forEach(el => el.outerHTML = icon(el.dataset.icon));
   hydrateIcons();
@@ -694,7 +710,6 @@ fieldset.field{border:none;margin:0 0 22px;padding:0}
     return `<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="${G}"/><path d="M14 28h36v22H14z" fill="${W}"/><path d="M10 28l6-12h32l6 12z" fill="${R}"/><rect x="28" y="36" width="8" height="14" fill="${Y}"/></svg>`;
   }
   document.querySelectorAll('.tiles').forEach(t => t.innerHTML = `<svg viewBox="0 0 1680 28" preserveAspectRatio="xMinYMid slice">${tileBand(60, 28)}</svg>`);
-  $('footGlyph').outerHTML = glyph('fglyph');
   let canRegister = false;
   // 瀏覽器頂端顏色：首頁夜空用深色，其他頁用米白
   new MutationObserver(() => { const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = $('home').classList.contains('hidden') ? '#F2EFE5' : '#0C211B'; }).observe($('home'), { attributes: true, attributeFilter: ['class'] });
@@ -1079,12 +1094,12 @@ fieldset.field{border:none;margin:0 0 22px;padding:0}
       <div class="status-line"><span class="pill done">${icon('circle-check')}${done ? '已完成報到與取餐' : '付款已確認'}</span>${r.is_test ? `<span class="pill test">${icon('flask-conical')}測試訂單</span>` : ''}<span>訂單 <span class="num">${esc(r.order_no)}</span></span></div>
       <h2 tabindex="-1" id="payT" style="margin:0">${done ? '祝你觀影愉快' : '報名完成，活動當天見'}</h2>
       ${!done ? (guest ? `<div class="ticket"><svg class="band" viewBox="0 0 432 36" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${tileBand(12, 36)}</svg>
-        <div class="tin"><div><div class="who">${esc(r.name)}</div><div class="meta"><span>校外人士</span><span>${itemCount(r)}</span></div><p class="muted" style="margin:12px 0 0">活動當天到報到櫃檯出示這個 QR Code，報到後到取餐區取餐。</p></div>
+        <div class="tin"><div>${saMark('tmark', '國立政治大學學生會')}<div class="who">${esc(r.name)}</div><div class="meta"><span>校外人士</span><span>${itemCount(r)}</span></div><p class="muted" style="margin:12px 0 0">活動當天到報到櫃檯出示這個 QR Code，報到後到取餐區取餐。</p></div>
         <div class="qr" aria-label="報到用 QR Code">${qr}</div></div></div>
       ${r.qr_token ? `<div class="saveqr"><button type="button" class="btn" id="saveQr">${icon('download')}把 QR Code 存到手機</button>${linkBtn}</div>
       <p class="muted" style="font-size:14px;margin:0">這是你的報到憑證，建議現在就存進相簿。之後也可以點付款完成信裡的連結，或在報名網站用「查詢訂單」找回來。</p>` : ''}`
       : `<div class="ticket"><svg class="band" viewBox="0 0 432 36" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${tileBand(12, 36)}</svg>
-        <div class="tin"><div><div class="who">${esc(r.name)}</div><div class="meta"><span>學號 <span class="num">${esc(r.student_id)}</span></span><span>${itemCount(r)}</span></div>
+        <div class="tin"><div>${saMark('tmark', '國立政治大學學生會')}<div class="who">${esc(r.name)}</div><div class="meta"><span>學號 <span class="num">${esc(r.student_id)}</span></span><span>${itemCount(r)}</span></div>
         <p style="margin:12px 0 0;display:flex;gap:8px;align-items:flex-start">${icon('id-card')}<span><b>活動當天帶學生證報到就好</b><br><span class="muted">工作人員掃你的學生證，就會看到你的餐點，不需要另外出示 QR Code。</span></span></p></div></div></div>
       ${r.qr_token ? `<div class="more"><details><summary>忘了帶學生證？備用 QR Code${icon('chevron-down')}</summary><div class="in" style="text-align:center"><div class="qr" style="display:inline-block" aria-label="備用報到 QR Code">${qr}</div>
         <p class="muted" style="font-size:14px">沒帶學生證時，出示這個 QR Code 也能報到。</p><div class="saveqr" style="justify-content:center"><button type="button" class="btn line" id="saveQr">${icon('download')}存到手機</button>${linkBtn}</div></div></details></div>` : ''}`) : ''}
@@ -1105,6 +1120,7 @@ fieldset.field{border:none;margin:0 0 22px;padding:0}
     g.fillStyle = INK; g.textAlign = 'right';
     g.font = `900 64px ${F}`; g.fillText('聖誕', W - 70, 150); g.fillText('露天電影院', W - 70, 230);
     g.font = `500 30px ${F}`; g.fillStyle = C.green; g.fillText('報到憑證', W - 70, 285);
+    try { const sv = SA_VB.split(' ').map(Number), k = 96 / sv[3]; g.save(); g.translate(W - 70 - sv[2] * k, 320); g.scale(k, k); g.fillStyle = C.green; g.fill(new Path2D(SA_D), 'evenodd'); g.restore(); g.textAlign = 'right'; g.font = `500 24px ${F}`; g.fillStyle = '#5E646A'; g.fillText('國立政治大學學生會', W - 70 - sv[2] * k - 16, 380); } catch (e) {}
     g.textAlign = 'left'; g.fillStyle = INK;
     g.font = `700 52px ${F}`; g.fillText(String(r.name || '').slice(0, 14), 70, 610);
     g.font = `500 30px ${F}`; g.fillStyle = '#5E646A';
