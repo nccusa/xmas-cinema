@@ -9,13 +9,22 @@ const CFG = {
 const Api = {
   session: null,
   storeKey: 'xc_session',
+  // 「記住這台裝置」：登入資料存在 localStorage（關掉 App 也不用重登）；沒勾就只存到關閉分頁為止
+  remember: false,
+  store() { return this.remember ? localStorage : sessionStorage; },
   loadSession() {
-    try { this.session = JSON.parse(sessionStorage.getItem(this.storeKey)); } catch (e) { this.session = null; }
+    try {
+      const l = localStorage.getItem(this.storeKey), s = sessionStorage.getItem(this.storeKey);
+      this.remember = !!l; this.session = JSON.parse(l || s);
+    } catch (e) { this.session = null; }
     return this.session;
   },
   saveSession(s) {
     this.session = s;
-    try { s ? sessionStorage.setItem(this.storeKey, JSON.stringify(s)) : sessionStorage.removeItem(this.storeKey); } catch (e) {}
+    try {
+      localStorage.removeItem(this.storeKey); sessionStorage.removeItem(this.storeKey);
+      if (s) this.store().setItem(this.storeKey, JSON.stringify(s));
+    } catch (e) {}
   },
   headers(json = true, extra = {}) {
     const h = { apikey: CFG.key, Authorization: 'Bearer ' + (this.session ? this.session.access_token : CFG.key), ...extra };
@@ -100,4 +109,6 @@ async function copyText(text) {
     t.remove(); return ok;
   }
 }
-const STATUS_TEXT = { pending_payment: '待付款', paid: '已付款', picked_up: '已取餐', cancelled: '已取消' };
+const STATUS_TEXT = { pending_payment: '待付款', paid: '已付款', picked_up: '全部完成', cancelled: '已取消' };
+// 註冊 Service Worker（讓後台和掃描頁可以加到主畫面、斷線時還打得開）
+function registerSW(){ if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {}); }

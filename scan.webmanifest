@@ -1,0 +1,18 @@
+{
+  "id": "./scan.html",
+  "name": "露天電影院 現場報到",
+  "short_name": "現場報到",
+  "description": "政大學生會聖誕露天電影院：現場報到與取餐掃描",
+  "lang": "zh-Hant",
+  "start_url": "./scan.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0F1B17",
+  "theme_color": "#0F1B17",
+  "icons": [
+    { "src": "icons/scan-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/scan-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/scan-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -2,121 +2,320 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <title>管理後台｜聖誕露天電影院</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#00382A">
+<link rel="manifest" href="admin.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="電影院後台">
+<link rel="apple-touch-icon" href="icons/admin-apple-180.png">
+<link rel="icon" href="icons/admin-64.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <style>
-:root{--navy:#004E3B;--bg:#F2EFE5;--card:#fff;--line:#e6e0d2;--ink:#182026;--muted:#6b7090;--gold:#B18B35;--red:#D9141A;--green:#23855a;--orange:#c77714;--blue:#2f6fd0}
+:root{
+  --rail:#00382A; --rail2:#0B4A39; --railink:#E7EFE9; --raildim:#9FB8AD;
+  --bg:#F5F2EA; --surface:#FFFFFF; --sunk:#FAF8F3; --rule:#E7E1D3; --rule2:#D9D2C1;
+  --ink:#182026; --ink2:#4B5359; --dim:#737B80;
+  --green:#004E3B; --green2:#009B7A; --red:#D9141A; --gold:#B18B35;
+  --ok-bg:#E3F2EA; --ok:#0B6B47; --caution-bg:#FCF0D4; --caution:#7A4F00; --crit-bg:#FCE6E5; --crit:#A3141A; --info-bg:#E2EEF0; --info:#0D5560; --neu-bg:#EEEBE3; --neu:#5A5F63;
+  --r:10px; --font:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif; --num:"Inter","Noto Sans TC",system-ui,sans-serif;
+}
 *{box-sizing:border-box}
-body{margin:0;font-family:"Noto Sans TC",system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:15px}
-header{background:var(--navy);color:#fff;display:flex;align-items:center;gap:14px;padding:12px 20px;position:sticky;top:0;z-index:20}
-header h1{font-size:17px;margin:0}
-header h1 span{color:#f3c56b}
-nav{display:flex;gap:4px;flex-wrap:wrap;flex:1}
-nav button{background:transparent;border:none;color:#c8cde6;font:inherit;padding:8px 12px;border-radius:8px;cursor:pointer;position:relative}
-nav button.on{background:rgba(255,255,255,.12);color:#fff;font-weight:700}
-nav .n{background:var(--red);color:#fff;border-radius:99px;font-size:11px;padding:0 6px;margin-left:4px}
-main{max-width:1200px;margin:0 auto;padding:20px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
-h2{font-size:19px;margin:0 0 12px}
-h3{font-size:16px;margin:16px 0 8px}
-.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
-.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
-.kpi .v{font-size:28px;font-weight:700}
-.kpi .k{color:var(--muted);font-size:13px}
-.kpi.alert{border-color:var(--orange);background:#fff8ec}
-table{width:100%;border-collapse:collapse}
-th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
-th{font-size:13px;color:var(--muted);font-weight:500;background:#faf8f2;position:sticky;top:0}
-tr.click{cursor:pointer}tr.click:hover{background:#fbf6e9}
-.tag{display:inline-block;border-radius:99px;padding:1px 9px;font-size:12.5px;font-weight:700;white-space:nowrap}
-.t-pending_payment{background:#fff0d9;color:var(--orange)}.t-paid{background:#e1f4ea;color:var(--green)}.t-picked_up{background:#e7ecf8;color:var(--blue)}.t-cancelled{background:#eee;color:#888}
-.t-suggested{background:#fff0d9;color:var(--orange)}.t-unmatched{background:#fde8e6;color:var(--red)}.t-matched{background:#e1f4ea;color:var(--green)}.t-ignored{background:#eee;color:#888}
-.t-pending_approval{background:#fff0d9;color:var(--orange)}.t-approved{background:#e7ecf8;color:var(--blue)}.t-sent{background:#e1f4ea;color:var(--green)}.t-failed,.t-blocked{background:#fde8e6;color:var(--red)}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.grow{flex:1}
-input,select,textarea{font:inherit;border:1px solid #d6cfbd;border-radius:9px;padding:9px 10px;background:#fff;color:var(--ink)}
-textarea{width:100%;min-height:90px;resize:vertical}
-label.f{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
-label.f input,label.f textarea,label.f select{width:100%}
-.btn{border:none;border-radius:9px;padding:9px 16px;font:inherit;font-weight:700;cursor:pointer;background:var(--navy);color:#fff}
-.btn.gold{background:var(--gold)}.btn.green{background:var(--green)}.btn.red{background:var(--red)}
-.btn.line{background:#fff;color:var(--ink);border:1px solid #d6cfbd}
-.btn.sm{padding:5px 10px;font-size:13px}
-.btn:disabled{opacity:.5;cursor:not-allowed}
-.muted{color:var(--muted)}
-.small{font-size:13px}
-.banner{border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:14px}
-.banner.warn{background:#fff6e5;border:1px solid #f0d199}
-.banner.info{background:#eef3fc;border:1px solid #c9d8f3}
-.drawer{position:fixed;top:0;right:0;bottom:0;width:min(560px,100%);background:#fff;box-shadow:-10px 0 40px rgba(0,0,0,.15);z-index:40;overflow:auto;padding:20px;transform:translateX(105%);transition:transform .2s}
-.drawer.open{transform:none}
-.shade{position:fixed;inset:0;background:rgba(10,15,40,.35);z-index:39;display:none}
-.shade.open{display:block}
-.items-ed .it{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line)}
-.items-ed .it .nm{flex:1}
-.stp button{width:34px;height:34px;border-radius:8px;border:1px solid #d6cfbd;background:#fff;font-size:18px;cursor:pointer}
-.stp span{display:inline-block;min-width:26px;text-align:center;font-weight:700}
-pre.mail{white-space:pre-wrap;background:#faf8f2;border:1px solid var(--line);border-radius:10px;padding:12px;font:inherit;font-size:14px;max-height:360px;overflow:auto}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 18px;border-radius:10px;z-index:60;display:none}
-.login{max-width:380px;margin:12vh auto}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
 .hidden{display:none!important}
-.vars code{background:#f1ecdf;border-radius:5px;padding:1px 5px;margin:2px;display:inline-block;font-size:13px;cursor:pointer}
-.menu-row input{width:100%}
+.num{font-family:var(--num);font-variant-numeric:tabular-nums}
+.i{width:18px;height:18px;flex:none;vertical-align:-4px}
+.muted{color:var(--dim)}.small{font-size:13px}
+:focus-visible{outline:2px solid var(--green2);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+.spin{animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- 版面 ---------- */
+.shell{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100vh}
+.rail{background:var(--rail);color:var(--railink);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;padding:18px 12px}
+.brand{display:flex;gap:10px;align-items:center;padding:4px 8px 18px}
+.brand img{width:36px;height:36px;border-radius:9px}
+.brand b{display:block;font-size:15px;line-height:1.2}
+.brand small{color:var(--raildim);font-size:12px}
+.nav{display:flex;flex-direction:column;gap:2px;flex:1;overflow:auto}
+.nav button{display:flex;align-items:center;gap:12px;width:100%;min-height:42px;padding:0 12px;border:0;border-radius:9px;background:none;color:var(--raildim);cursor:pointer;text-align:left;font-size:15px;transition:background .12s,color .12s}
+.nav button:hover{background:rgba(255,255,255,.06);color:var(--railink)}
+.nav button[aria-current="page"]{background:var(--railink);color:var(--rail);font-weight:700}
+.nav .cnt{margin-left:auto;min-width:22px;height:22px;padding:0 7px;border-radius:99px;background:var(--red);color:#fff;font-size:12px;font-weight:700;display:inline-grid;place-items:center;font-family:var(--num)}
+.nav hr{border:0;border-top:1px solid rgba(255,255,255,.1);margin:10px 4px}
+.who{padding:12px 8px 0;border-top:1px solid rgba(255,255,255,.1);font-size:13px;color:var(--raildim);display:grid;gap:8px}
+.who b{display:block;color:var(--railink);font-weight:500;word-break:break-all}
+.railbtn{display:flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.16);background:none;color:var(--railink);border-radius:9px;min-height:36px;padding:0 10px;cursor:pointer;font-size:13px}
+.railbtn:hover{background:rgba(255,255,255,.06)}
+.main{min-width:0}
+.tape{display:flex;align-items:center;gap:12px;padding:10px 28px;background:repeating-linear-gradient(-45deg,#FCE6E5 0 14px,#FFF6F5 14px 28px);border-bottom:1px solid #F1C6C4;color:var(--crit);font-size:14px}
+.tape b{font-weight:700}
+.tape button{margin-left:auto}
+.top{display:flex;align-items:flex-end;gap:16px;padding:26px 28px 6px}
+.top h1{font-size:26px;font-weight:900;margin:0;line-height:1.2}
+.top p{margin:4px 0 0;color:var(--dim)}
+.top .acts{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.page{padding:18px 28px 64px;max-width:1280px}
+
+/* ---------- 元件 ---------- */
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:20px;margin-bottom:16px}
+.card > h2{font-size:17px;margin:0 0 4px;display:flex;align-items:center;gap:8px}
+.card > h2 + p{margin:0 0 14px;color:var(--dim);font-size:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:40px;padding:0 16px;border-radius:9px;border:1px solid var(--green);background:var(--green);color:#fff;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .12s,transform .1s}
+.btn:hover{background:#003B2D}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.sec{background:var(--surface);color:var(--ink);border-color:var(--rule2)}
+.btn.sec:hover{background:var(--sunk)}
+.btn.danger{background:var(--crit);border-color:var(--crit)}
+.btn.quiet{background:none;border-color:transparent;color:var(--green)}
+.btn.quiet:hover{background:rgba(0,78,59,.06)}
+.btn.sm{min-height:32px;padding:0 10px;font-size:13px;border-radius:8px}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:2px 10px 2px 8px;border-radius:99px;font-size:12.5px;font-weight:700;white-space:nowrap;line-height:1.6}
+.badge::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.b-ok{background:var(--ok-bg);color:var(--ok)}.b-caution{background:var(--caution-bg);color:var(--caution)}.b-crit{background:var(--crit-bg);color:var(--crit)}.b-info{background:var(--info-bg);color:var(--info)}.b-neu{background:var(--neu-bg);color:var(--neu)}
+.badge.flat::before{display:none}
+.field{display:block;margin-bottom:14px}
+.field > span{display:block;font-size:13px;font-weight:500;color:var(--ink2);margin-bottom:5px}
+.field small{display:block;color:var(--dim);font-size:12.5px;margin-top:4px}
+.in,.field input,.field select,.field textarea{width:100%;min-height:40px;padding:8px 11px;border:1px solid var(--rule2);border-radius:9px;background:#fff}
+.field textarea{min-height:96px;resize:vertical}
+.in:focus,.field :is(input,select,textarea):focus{outline:none;border-color:var(--green2);box-shadow:0 0 0 3px rgba(0,155,122,.15)}
+input[type=checkbox]{width:17px;height:17px;accent-color:var(--green)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.grow{flex:1;min-width:0}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 16px}
+.seg{display:inline-flex;flex-wrap:wrap;gap:4px;padding:4px;background:var(--neu-bg);border-radius:11px}
+.seg button{border:0;background:none;border-radius:8px;min-height:32px;padding:0 12px;cursor:pointer;color:var(--ink2);font-size:14px;display:inline-flex;gap:6px;align-items:center}
+.seg button[aria-pressed="true"]{background:#fff;color:var(--ink);font-weight:700;box-shadow:0 1px 2px rgba(24,32,38,.12)}
+.seg .c{font-family:var(--num);font-size:12px;color:var(--dim)}
+.searchbox{position:relative}
+.searchbox .i{position:absolute;left:11px;top:11px;color:var(--dim)}
+.searchbox input{padding-left:36px}
+.note{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:11px;font-size:14px;margin-bottom:14px}
+.note .i{margin-top:1px}
+.note.caution{background:var(--caution-bg);color:#5C3B00}.note.info{background:var(--info-bg);color:#0A444C}.note.crit{background:var(--crit-bg);color:#7E0F14}
+.empty{text-align:center;padding:36px 16px;color:var(--dim)}
+.empty .i{width:36px;height:36px;color:var(--rule2);display:block;margin:0 auto 8px}
+
+/* 表格 */
+.tbl{width:100%;border-collapse:separate;border-spacing:0}
+.tbl th{position:sticky;top:0;background:var(--sunk);text-align:left;font-size:12.5px;font-weight:500;color:var(--dim);padding:9px 12px;border-bottom:1px solid var(--rule);white-space:nowrap;z-index:1}
+.tbl td{padding:11px 12px;border-bottom:1px solid var(--rule);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tr.click{cursor:pointer;transition:background .1s}
+.tbl tr.click:hover td{background:#FBF8F0}
+.tbl .r{text-align:right}
+.tblwrap{border:1px solid var(--rule);border-radius:12px;overflow:auto;background:#fff;max-height:70vh}
+.namecell b{font-weight:700}
+.namecell .tags{display:inline-flex;gap:4px;margin-left:6px;vertical-align:1px}
+.mini{display:inline-flex;align-items:center;gap:3px;font-size:11.5px;font-weight:700;padding:0 6px;border-radius:5px;background:var(--neu-bg);color:var(--neu)}
+.mini .i{width:12px;height:12px}
+.mini.test{background:#FCE6E5;color:var(--crit)}
+.mini.guest{background:var(--info-bg);color:var(--info)}
+.prog{display:flex;gap:4px}
+.prog span{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;background:var(--neu-bg);color:#B5B0A3}
+.prog span.on{background:var(--ok-bg);color:var(--ok)}
+.prog .i{width:14px;height:14px}
+
+/* 總覽 */
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden}
+.kpi .k{display:flex;align-items:center;gap:7px;color:var(--ink2);font-size:13.5px}
+.kpi .k .i{color:var(--green2)}
+.kpi .v{font-family:var(--num);font-size:30px;font-weight:700;line-height:1.2;margin-top:6px;letter-spacing:-.01em}
+.kpi .v small{font-size:14px;color:var(--dim);font-weight:500;margin-left:4px}
+.bar{height:6px;border-radius:9px;background:var(--neu-bg);margin-top:10px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--green2);border-radius:9px;transition:width .5s}
+.todo{display:grid;gap:8px}
+.todo button{display:grid;grid-template-columns:36px 1fr auto;gap:12px;align-items:center;text-align:left;padding:12px 14px;border-radius:12px;border:1px solid var(--rule);background:#fff;cursor:pointer;transition:border-color .12s}
+.todo button:hover{border-color:var(--green2)}
+.todo button:disabled{opacity:.5;cursor:not-allowed;border-color:var(--rule)}
+.todo .ic{width:36px;height:36px;border-radius:10px;display:grid;place-items:center}
+.todo .ic.crit{background:var(--crit-bg);color:var(--crit)}.todo .ic.caution{background:var(--caution-bg);color:var(--caution)}.todo .ic.info{background:var(--info-bg);color:var(--info)}
+.todo b{display:block}
+.todo small{color:var(--dim)}
+.cols{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;align-items:start}
+.prep h3{font-size:14px;margin:14px 0 6px;display:flex;align-items:center;gap:8px}
+.prep h3:first-child{margin-top:0}
+.prep .it{display:grid;grid-template-columns:1fr 60px 60px 60px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px dashed var(--rule)}
+.prep .it .num{text-align:right}
+.prep .hd{font-size:12px;color:var(--dim);border:0}
+
+/* 抽屜 */
+.scrim{position:fixed;inset:0;background:rgba(24,32,38,.38);opacity:0;pointer-events:none;transition:opacity .2s;z-index:40}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(620px,100%);background:var(--bg);z-index:41;transform:translateX(102%);transition:transform .24s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;box-shadow:-18px 0 50px rgba(24,32,38,.18)}
+.drawer.on{transform:none}
+.dhead{padding:18px 22px 14px;background:#fff;border-bottom:1px solid var(--rule)}
+.dhead .row{align-items:flex-start}
+.dhead h2{margin:0;font-size:22px;font-weight:900}
+.dhead .sub{color:var(--dim);font-size:13.5px;margin-top:2px}
+.dbody{padding:16px 22px 40px;overflow:auto;flex:1}
+.dbody .card{padding:16px 18px}
+.dbody .card > h2{font-size:15px}
+.timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:14px}
+.timeline div{position:relative;padding-top:12px;font-size:12.5px;color:var(--dim)}
+.timeline div::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;border-radius:9px;background:var(--neu-bg)}
+.timeline div.on{color:var(--ink)}
+.timeline div.on::before{background:var(--green2)}
+.timeline b{display:block;font-weight:700;font-size:13px}
+.money{display:flex;gap:18px;margin-top:12px}
+.money div{font-size:13px;color:var(--dim)}
+.money b{display:block;font-family:var(--num);font-size:20px;color:var(--ink)}
+.stepper{display:inline-flex;align-items:center;border:1px solid var(--rule2);border-radius:9px;overflow:hidden;background:#fff}
+.stepper button{width:34px;height:34px;border:0;background:none;cursor:pointer;display:grid;place-items:center}
+.stepper button:hover{background:var(--sunk)}
+.stepper output{min-width:30px;text-align:center;font-family:var(--num);font-weight:700}
+.ied{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--rule)}
+.ied:last-child{border-bottom:0}
+
+/* 對話框與通知 */
+.dialog{position:fixed;inset:0;display:grid;place-items:center;z-index:60;padding:16px;background:rgba(24,32,38,.42);opacity:0;pointer-events:none;transition:opacity .15s}
+.dialog.on{opacity:1;pointer-events:auto}
+.dialog .box{background:#fff;border-radius:16px;width:min(440px,100%);padding:22px;box-shadow:0 24px 60px rgba(24,32,38,.25);transform:translateY(8px);transition:transform .15s}
+.dialog.on .box{transform:none}
+.dialog h3{margin:0 0 6px;font-size:18px}
+.dialog p{margin:0 0 14px;color:var(--ink2);white-space:pre-line}
+.toasts{position:fixed;right:20px;bottom:20px;display:grid;gap:8px;z-index:70;max-width:min(380px,calc(100vw - 40px))}
+.toast{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:12px;background:var(--ink);color:#fff;box-shadow:0 10px 30px rgba(24,32,38,.25);font-size:14px;animation:tin .2s ease-out}
+.toast.ok .i{color:#6BE0B2}.toast.err .i{color:#FF9C95}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}}
+pre.mail{white-space:pre-wrap;background:var(--sunk);border:1px solid var(--rule);border-radius:10px;padding:12px;font:inherit;font-size:14px;max-height:360px;overflow:auto;margin:8px 0 0}
+.vars{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 14px}
+.vars button{border:1px solid var(--rule2);background:var(--sunk);border-radius:7px;padding:2px 8px;font-size:12.5px;cursor:pointer}
+.drop{border:2px dashed var(--rule2);border-radius:14px;padding:26px;text-align:center;background:var(--sunk);cursor:pointer;transition:border-color .12s,background .12s}
+.drop.over,.drop:hover{border-color:var(--green2);background:#F0F7F3}
+.drop .i{width:32px;height:32px;color:var(--green2)}
+.drop b{display:block;margin-top:8px}
+.qrs{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.qrs figure{margin:0;background:#fff;border:1px solid var(--rule);border-radius:12px;padding:12px;text-align:center}
+.qrs svg{width:100%;height:auto;display:block}
+.qrs figcaption{font-size:13px;margin-top:6px}
+.switch{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:12px;border:1px solid var(--rule);background:var(--sunk);cursor:pointer}
+.switch input{display:none}
+.switch .sw{width:48px;height:28px;border-radius:99px;background:#CFC8B8;position:relative;flex:none;transition:background .15s}
+.switch .sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .15s}
+.switch input:checked + .sw{background:var(--crit)}
+.switch input:checked + .sw::after{transform:translateX(20px)}
+.switch b{display:block}
+.switch small{color:var(--dim)}
+.savebar{position:sticky;bottom:0;display:flex;justify-content:flex-end;gap:8px;padding:12px 0;background:linear-gradient(to top,var(--bg) 70%,rgba(245,242,234,0))}
+.login{min-height:100vh;display:grid;place-items:center;padding:20px}
+.login .card{width:min(400px,100%);padding:28px}
+.login img{width:48px;height:48px;border-radius:12px;margin-bottom:14px}
+.login h1{font-size:22px;margin:0 0 4px}
+
+@media (max-width:980px){
+  .shell{grid-template-columns:1fr}
+  .rail{position:sticky;height:auto;flex-direction:row;align-items:center;padding:8px 10px;z-index:20;gap:6px}
+  .brand{padding:0 6px 0 0}.brand div{display:none}
+  .nav{flex-direction:row;overflow-x:auto;scrollbar-width:none}
+  .nav button{white-space:nowrap;min-height:38px;padding:0 10px;width:auto}
+  .nav hr,.who{display:none}
+  .top{padding:18px 16px 4px;flex-wrap:wrap}.page{padding:14px 16px 64px}.tape{padding:10px 16px}
+  .cols{grid-template-columns:1fr}
+  .grid2{grid-template-columns:1fr}
+  .timeline{grid-template-columns:repeat(2,1fr)}
+}
 </style>
 </head>
 <body>
-<div id="loginView" class="login card hidden">
-  <h2>管理後台登入</h2>
-  <form id="loginForm">
-    <label class="f">Email<input type="email" id="lEmail" autocomplete="username" required></label>
-    <label class="f">密碼<input type="password" id="lPass" autocomplete="current-password" required></label>
-    <p class="small" id="lErr" style="color:var(--red)"></p>
-    <button class="btn" type="submit" style="width:100%">登入</button>
-  </form>
+<div id="loginView" class="login hidden">
+  <div class="card">
+    <img src="icons/admin-192.png" alt="">
+    <h1>管理後台</h1>
+    <p class="muted" style="margin:0 0 20px">聖誕露天電影院・管理員登入</p>
+    <form id="loginForm">
+      <label class="field"><span>Email</span><input type="email" id="lEmail" autocomplete="username" required></label>
+      <label class="field"><span>密碼</span><input type="password" id="lPass" autocomplete="current-password" required></label>
+      <label class="row small" style="margin:-4px 0 14px;color:var(--ink2)"><input type="checkbox" id="lRemember">記住這台裝置（自己的電腦才勾）</label>
+      <p class="small" id="lErr" style="color:var(--crit);min-height:20px;margin:0 0 6px" role="alert"></p>
+      <button class="btn" type="submit" id="lBtn" style="width:100%;min-height:46px">登入</button>
+    </form>
+  </div>
 </div>
 
-<div id="app" class="hidden">
-  <header>
-    <h1>🎄 <span>聖誕露天電影院</span> 後台</h1>
-    <nav id="nav">
-      <button data-v="dash" class="on">總覽</button>
-      <button data-v="orders">訂單</button>
-      <button data-v="recon">對帳<span class="n hidden" id="nRecon"></span></button>
-      <button data-v="mail">信件<span class="n hidden" id="nMail"></span></button>
-      <button data-v="menu">菜單</button>
-      <button data-v="settings">設定</button>
-      <button data-v="staff">工作人員</button>
-    </nav>
-    <button class="btn line sm" id="outBtn">登出</button>
-  </header>
-  <main>
-    <section data-view="dash"></section>
-    <section data-view="orders" class="hidden"></section>
-    <section data-view="recon" class="hidden"></section>
-    <section data-view="mail" class="hidden"></section>
-    <section data-view="menu" class="hidden"></section>
-    <section data-view="settings" class="hidden"></section>
-    <section data-view="staff" class="hidden"></section>
-  </main>
+<div id="app" class="shell hidden">
+  <aside class="rail">
+    <div class="brand"><img src="icons/admin-64.png" alt=""><div><b>聖誕露天電影院</b><small>管理後台</small></div></div>
+    <nav class="nav" id="nav" aria-label="後台頁面"></nav>
+    <div class="who">
+      <span>登入身分<b id="whoEmail"></b></span>
+      <div class="row">
+        <button class="railbtn" id="installBtn" type="button" title="加到主畫面或安裝成 App"></button>
+        <button class="railbtn" id="outBtn" type="button"></button>
+      </div>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="tape hidden" id="tape"></div>
+    <header class="top"><div><h1 id="pageTitle"></h1><p id="pageSub"></p></div><div class="acts" id="pageActs"></div></header>
+    <main class="page" id="page"></main>
+  </div>
 </div>
-<div class="shade" id="shade"></div>
-<aside class="drawer" id="drawer"></aside>
-<div class="toast" id="toast"></div>
 
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="dTitle"></aside>
+<div class="dialog" id="dialog" role="alertdialog" aria-modal="true"><div class="box" id="dialogBox"></div></div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="assets/icons.js"></script>
 <script src="assets/api.js"></script>
 <script>
 (function(){
   Api.storeKey = 'xc_admin_session';
+  registerSW();
   const $ = id => document.getElementById(id);
-  const V = n => document.querySelector(`[data-view="${n}"]`);
-  let regs = [], menu = { vendors: [], items: [] }, settings = null, view = 'dash';
-  function toast(m){ const t = $('toast'); t.textContent = m; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(() => t.style.display = 'none', 2600); }
-  async function run(fn, okMsg){ try { const r = await fn(); if (okMsg) toast(okMsg); return r; } catch (e) { toast('⚠ ' + e.message); if (/登入|JWT|權限/.test(e.message) && !Api.session) showLogin(e.message); throw e; } }
-  // 台北時間 <-> datetime-local
-  function toLocalInput(iso){ if (!iso) return ''; const p = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Taipei', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false }).format(new Date(iso)); return p.replace(' ', 'T'); }
+  let regs = [], menu = { vendors: [], items: [] }, settings = null, dash = null, view = 'dash';
+  const PAGES = [
+    ['dash', '總覽', 'layout-dashboard', '報名、付款與現場進度一眼看完'],
+    ['orders', '訂單', 'receipt-text', '查詢、修改餐點、人工入帳、取消'],
+    ['recon', '對帳', 'landmark', '匯入郵局明細，處理對不上的款項'],
+    ['mail', '信件', 'mail', '核准寄出、修改信件範本'],
+    ['menu', '菜單', 'utensils-crossed', '店家、品項、價格、限量與上下架'],
+    ['settings', '設定', 'settings', '活動資訊、報名時間、收款帳號'],
+    ['staff', '工作人員', 'users', '誰可以登入後台和掃描頁'],
+    ['test', '測試工具', 'flask-conical', '不用轉帳就能把整個流程跑一遍'],
+  ];
+
+  // ---------- 通知與對話框（取代瀏覽器的 alert／confirm／prompt） ----------
+  function toast(msg, tone = 'ok'){
+    const t = document.createElement('div'); t.className = 'toast ' + tone;
+    t.innerHTML = icon(tone === 'err' ? 'circle-alert' : 'circle-check') + `<span>${esc(msg)}</span>`;
+    $('toasts').appendChild(t); setTimeout(() => t.remove(), tone === 'err' ? 6000 : 3200);
+  }
+  function ask({ title, body = '', input = null, ok = '確定', danger = false, cancel = '取消' }){
+    return new Promise(res => {
+      $('dialogBox').innerHTML = `<h3>${esc(title)}</h3>${body ? `<p>${esc(body)}</p>` : ''}${input ? `<label class="field"><span>${esc(input.label)}</span>${input.type === 'datetime-local' ? `<input id="dlgIn" type="datetime-local">` : `<input id="dlgIn" placeholder="${esc(input.placeholder || '')}">`}</label>` : ''}
+        <div class="row" style="justify-content:flex-end"><button class="btn sec" type="button" data-a="0">${esc(cancel)}</button><button class="btn ${danger ? 'danger' : ''}" type="button" data-a="1">${esc(ok)}</button></div>`;
+      $('dialog').classList.add('on');
+      const inp = $('dlgIn'); setTimeout(() => (inp || $('dialogBox').querySelector('[data-a="1"]')).focus(), 50);
+      const done = v => { $('dialog').classList.remove('on'); document.removeEventListener('keydown', key); res(v); };
+      const key = e => { if (e.key === 'Escape') done(null); if (e.key === 'Enter' && inp && document.activeElement === inp) $('dialogBox').querySelector('[data-a="1"]').click(); };
+      document.addEventListener('keydown', key);
+      $('dialogBox').onclick = e => { const b = e.target.closest('[data-a]'); if (!b) return;
+        if (b.dataset.a === '0') return done(null);
+        if (inp) { const v = inp.value.trim(); if (!v) { inp.focus(); inp.style.borderColor = 'var(--crit)'; return; } return done(v); }
+        done(true); };
+    });
+  }
+  async function run(fn, okMsg){
+    try { const r = await fn(); if (okMsg) toast(okMsg); return r; }
+    catch (e) { toast(e.message, 'err'); if (!Api.session) showLogin(e.message); throw e; }
+  }
+  async function busy(btn, fn){ const old = btn.innerHTML; btn.disabled = true; btn.innerHTML = icon('loader-circle', 'spin') + '處理中…'; try { return await fn(); } finally { btn.disabled = false; btn.innerHTML = old; } }
+  function toLocalInput(iso){ if (!iso) return ''; return new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(iso)).replace(' ', 'T'); }
   function fromLocalInput(v){ return v ? new Date(v + ':00+08:00').toISOString() : null; }
+  const overdue = r => r.status === 'pending_payment' && new Date(r.payment_deadline) < new Date();
+  const ST_TONE = { pending_payment: 'caution', paid: 'info', picked_up: 'ok', cancelled: 'neu' };
+  const stBadge = r => overdue(r) ? '<span class="badge b-crit">逾期未付</span>' : `<span class="badge b-${ST_TONE[r.status]}">${STATUS_TEXT[r.status]}</span>`;
 
   // ---------- 登入 ----------
   async function boot(){
@@ -125,13 +324,23 @@ pre.mail{white-space:pre-wrap;background:#faf8f2;border:1px solid var(--line);bo
     try { const ok = await Api.rpc('is_admin'); if (!ok) throw new Error('這個帳號不是管理員'); }
     catch (e) { await Api.logout(); return showLogin(e.message); }
     $('loginView').classList.add('hidden'); $('app').classList.remove('hidden');
-    await loadAll(); show('dash');
+    $('whoEmail').textContent = (Api.session.user && Api.session.user.email) || '';
+    buildNav(); await loadAll(); show(location.hash.slice(1) || 'dash');
   }
   function showLogin(m){ $('app').classList.add('hidden'); $('loginView').classList.remove('hidden'); $('lErr').textContent = m || ''; }
-  $('loginForm').onsubmit = async e => { e.preventDefault(); try { await Api.login($('lEmail').value.trim(), $('lPass').value); $('lPass').value = ''; boot(); } catch (err) { $('lErr').textContent = '登入失敗：' + err.message; } };
+  $('loginForm').onsubmit = async e => {
+    e.preventDefault(); Api.remember = $('lRemember').checked;
+    await busy($('lBtn'), async () => { try { await Api.login($('lEmail').value.trim(), $('lPass').value); $('lPass').value = ''; await boot(); } catch (err) { $('lErr').textContent = /Invalid login/i.test(err.message) ? 'Email 或密碼不正確' : '登入失敗：' + err.message; } });
+  };
+  function buildNav(){
+    $('nav').innerHTML = PAGES.map(([k, n, ic], i) => `${i === 7 ? '<hr>' : ''}<button type="button" data-v="${k}">${icon(ic)}<span>${n}</span><span class="cnt hidden" id="cnt_${k}"></span></button>`).join('');
+    $('outBtn').innerHTML = icon('log-out') + '登出'; $('installBtn').innerHTML = icon('square-plus') + '安裝';
+  }
   $('outBtn').onclick = async () => { await Api.logout(); showLogin(); };
   $('nav').onclick = e => { const b = e.target.closest('[data-v]'); if (b) show(b.dataset.v); };
-  function show(v){ view = v; document.querySelectorAll('#nav [data-v]').forEach(b => b.classList.toggle('on', b.dataset.v === v)); document.querySelectorAll('[data-view]').forEach(s => s.classList.toggle('hidden', s.dataset.view !== v)); ({ dash: renderDash, orders: renderOrders, recon: renderRecon, mail: renderMail, menu: renderMenu, settings: renderSettings, staff: renderStaff })[v](); }
+  addEventListener('hashchange', () => { const v = location.hash.slice(1); if (v && v !== view && $('app').offsetParent !== null) show(v); });
+  let deferred = null; addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; });
+  $('installBtn').onclick = async () => { if (deferred) { deferred.prompt(); deferred = null; return; } await ask({ title: '安裝成 App', body: /iPhone|iPad/.test(navigator.userAgent) ? 'iPhone／iPad：用 Safari 打開，點「分享」→「加入主畫面」。' : '電腦版 Chrome／Edge：點網址列右邊的「安裝」圖示。\n手機 Chrome：右上角選單 →「安裝應用程式」。', ok: '知道了', cancel: '關閉' }); };
 
   async function loadAll(){
     const [r, v, i, s] = await Promise.all([
@@ -141,129 +350,186 @@ pre.mail{white-space:pre-wrap;background:#faf8f2;border:1px solid var(--line);bo
       Api.select('settings', 'select=*&id=eq.1')
     ]);
     regs = r; menu = { vendors: v, items: i }; settings = s[0];
+    try { dash = await Api.rpc('admin_dashboard'); } catch (e) { dash = null; }
+    paintChrome();
   }
-  async function badges(){
-    try { const d = await Api.rpc('admin_dashboard'); setBadge('nRecon', d.txn_review); setBadge('nMail', d.email_pending + d.email_blocked); return d; } catch (e) { return null; }
+  function paintChrome(){
+    const setCnt = (k, n) => { const el = $('cnt_' + k); if (!el) return; el.textContent = n; el.classList.toggle('hidden', !n); };
+    if (dash) { setCnt('recon', dash.txn_review); setCnt('mail', dash.email_pending + dash.email_blocked); }
+    setCnt('orders', regs.filter(overdue).length);
+    const tests = regs.filter(r => r.is_test).length;
+    $('tape').classList.toggle('hidden', !settings.test_mode && !tests);
+    $('tape').innerHTML = settings.test_mode
+      ? `${icon('flask-conical')}<span><b>測試模式開啟中</b>：報名不受開放時間限制，付款頁可以模擬付款。目前有 ${tests} 筆測試資料。</span><button class="btn sm sec" type="button" data-go="test">測試工具</button>`
+      : `${icon('triangle-alert')}<span>測試模式已關閉，但還有 <b>${tests}</b> 筆測試資料，正式開放前請清除。</span><button class="btn sm sec" type="button" data-go="test">去清除</button>`;
   }
-  function setBadge(id, n){ $(id).textContent = n; $(id).classList.toggle('hidden', !n); }
+  document.addEventListener('click', e => { const g = e.target.closest('[data-go]'); if (g) { e.preventDefault(); show(g.dataset.go); } });
+
+  function show(v){
+    if (!PAGES.find(p => p[0] === v)) v = 'dash';
+    view = v; if (location.hash.slice(1) !== v) history.replaceState(null, '', '#' + v);
+    document.querySelectorAll('#nav [data-v]').forEach(b => { if (b.dataset.v === v) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+    const p = PAGES.find(x => x[0] === v); $('pageTitle').textContent = p[1]; $('pageSub').textContent = p[3]; $('pageActs').innerHTML = '';
+    closeDrawer();
+    ({ dash: renderDash, orders: renderOrders, recon: renderRecon, mail: renderMail, menu: renderMenu, settings: renderSettings, staff: renderStaff, test: renderTest })[v]();
+  }
+  const page = () => $('page');
+  function acts(html){ $('pageActs').innerHTML = html; }
+  async function refresh(){ await run(loadAll); show(view); }
 
   // ---------- 總覽 ----------
-  async function renderDash(){
-    const d = await badges(); if (!d) return;
-    const overdue = regs.filter(r => r.status === 'pending_payment' && new Date(r.payment_deadline) < new Date()).length;
-    V('dash').innerHTML = `
-      ${settings.account_no.includes('尚未') ? '<div class="banner warn">⚠ 收款帳號還沒設定，請到「設定」填寫。</div>' : ''}
-      ${!settings.site_url ? '<div class="banner warn">⚠ 報名頁網址還沒設定，信件裡的查詢連結會缺少，系統會擋下信件。請到「設定」填寫。</div>' : ''}
-      <div class="banner info">寄信程式尚未啟用：信件會先排在佇列裡，等 Gmail 授權設定完成後才會實際寄出。</div>
+  function renderDash(){
+    acts(`<button class="btn sec" type="button" id="rf">${icon('refresh-cw')}重新整理</button>`); $('rf').onclick = e => busy(e.currentTarget, refresh);
+    const d = dash || {}; const cap = settings.capacity || 1;
+    const od = regs.filter(overdue).length;
+    const todo = [];
+    if (/展示|尚未/.test(settings.account_no)) todo.push(['crit', 'wallet', '收款帳號還是展示資料', '正式開放前要換成學生會的郵局帳號', 'settings']);
+    if (!settings.site_url) todo.push(['crit', 'globe', '還沒設定報名頁網址', '信件裡的查詢連結會缺少，系統會擋下信件', 'settings']);
+    if (d.txn_review) todo.push(['caution', 'landmark', `${d.txn_review} 筆款項需要人工確認`, '建議配對或找不到對應訂單', 'recon']);
+    if (d.email_pending) todo.push(['caution', 'mail', `${d.email_pending} 封信等你核准`, '核准後才會寄出', 'mail']);
+    if (d.email_blocked) todo.push(['crit', 'mail-warning', `${d.email_blocked} 封信寄送失敗或被擋下`, '通常是範本變數沒代入或 Email 錯誤', 'mail']);
+    if (od) todo.push(['crit', 'clock', `${od} 筆逾期未付款`, '先匯入最新明細，確認沒付再設定新期限', 'orders']);
+    const kpi = (ic, k, v, sub, bar) => `<div class="kpi"><div class="k">${icon(ic)}${k}</div><div class="v">${v}${sub ? `<small>${sub}</small>` : ''}</div>${bar != null ? `<div class="bar"><i style="width:${Math.min(100, bar)}%"></i></div>` : ''}</div>`;
+    const prepBy = {}; (d.prep || []).forEach(p => (prepBy[p.vendor] = prepBy[p.vendor] || []).push(p));
+    page().innerHTML = `
       <div class="kpis">
-        <div class="kpi"><div class="v">${d.total}</div><div class="k">有效報名／上限 ${settings.capacity}</div></div>
-        <div class="kpi"><div class="v">${d.pending}</div><div class="k">待付款</div></div>
-        <div class="kpi"><div class="v">${d.paid}</div><div class="k">已付款（待取餐）</div></div>
-        <div class="kpi"><div class="v">${d.checked_in}</div><div class="k">已報到</div></div>
-        <div class="kpi"><div class="v">${d.picked_up}</div><div class="k">全部完成（報到＋取餐）</div></div>
-        <div class="kpi"><div class="v">${d.guests}</div><div class="k">校外人士</div></div>
-        <div class="kpi"><div class="v">${money(d.revenue)}</div><div class="k">已收金額</div></div>
-        <div class="kpi ${d.txn_review ? 'alert' : ''}"><div class="v">${d.txn_review}</div><div class="k">對帳待處理</div></div>
-        <div class="kpi ${d.email_pending ? 'alert' : ''}"><div class="v">${d.email_pending}</div><div class="k">信件待核准</div></div>
-        <div class="kpi ${overdue ? 'alert' : ''}"><div class="v">${overdue}</div><div class="k">逾期未付款</div></div>
+        ${kpi('users', '有效報名', d.total ?? 0, '／' + cap, (d.total || 0) / cap * 100)}
+        ${kpi('hourglass', '待付款', d.pending ?? 0)}
+        ${kpi('circle-dollar-sign', '已收金額', '<span style="font-size:22px">' + money(d.revenue) + '</span>')}
+        ${kpi('user-check', '已報到', d.checked_in ?? 0, '／' + ((d.paid || 0) + (d.picked_up || 0)) + ' 已付款', ((d.checked_in || 0) / Math.max(1, (d.paid || 0) + (d.picked_up || 0))) * 100)}
+        ${kpi('package-check', '全部完成', d.picked_up ?? 0, '報到＋取餐')}
+        ${kpi('globe', '校外人士', d.guests ?? 0)}
       </div>
-      <div class="card" style="margin-top:16px"><h2>備餐統計（給店家）</h2>
-        <table><thead><tr><th>店家</th><th>品項</th><th>總份數（含待付款）</th><th>已付款份數</th><th>已取餐</th></tr></thead><tbody>
-        ${d.prep.map(p => `<tr><td>${esc(p.vendor)}</td><td>${esc(p.item)}</td><td>${p.qty}</td><td><b>${p.qty_paid || 0}</b></td><td>${p.qty_picked || 0}</td></tr>`).join('') || '<tr><td colspan="5" class="muted">還沒有訂單</td></tr>'}
-        </tbody></table>
-        <p class="small muted">報名截止後以「已付款份數」為準提供給店家。</p>
+      <div class="cols">
+        <div class="card"><h2>${icon('list-checks')}需要你處理</h2><p>點一下直接過去處理。</p>
+          ${todo.length ? `<div class="todo">${todo.map(([t, ic, b, s, go]) => `<button type="button" data-go="${go}"><span class="ic ${t}">${icon(ic)}</span><span><b>${esc(b)}</b><small>${esc(s)}</small></span>${icon('chevron-right')}</button>`).join('')}</div>` : `<div class="empty">${icon('circle-check')}目前沒有待處理的事</div>`}
+        </div>
+        <div class="card prep"><h2>${icon('store')}備餐統計</h2><p>報名截止後，以「已付款」份數通知店家。</p>
+          ${Object.keys(prepBy).length ? Object.entries(prepBy).map(([v, list]) => `<h3>${icon('store')}${esc(v)}</h3><div class="it hd"><span>品項</span><span class="num">全部</span><span class="num">已付款</span><span class="num">已取</span></div>${list.map(p => `<div class="it"><span>${esc(p.item)}</span><span class="num">${p.qty}</span><span class="num"><b>${p.qty_paid || 0}</b></span><span class="num">${p.qty_picked || 0}</span></div>`).join('')}`).join('') : `<div class="empty">${icon('utensils-crossed')}還沒有人點餐</div>`}
+        </div>
       </div>`;
   }
 
   // ---------- 訂單 ----------
-  let oq = '', ost = '';
+  let oq = '', ost = 'all', onlyTest = false;
+  function orderFilter(r){
+    if (onlyTest && !r.is_test) return false;
+    if (ost === 'overdue') return overdue(r);
+    if (ost === 'balance') return r.status !== 'cancelled' && r.status !== 'pending_payment' && r.total_amount !== r.paid_amount;
+    if (ost === 'checked') return !!r.checked_in_at && r.status !== 'cancelled';
+    if (ost !== 'all' && r.status !== ost) return false;
+    return true;
+  }
   function renderOrders(){
+    acts(`<button class="btn sec" type="button" id="rf">${icon('refresh-cw')}重新整理</button>`); $('rf').onclick = e => busy(e.currentTarget, refresh);
     const q = oq.toLowerCase();
-    const list = regs.filter(r => (!ost || r.status === ost || (ost === 'overdue' && r.status === 'pending_payment' && new Date(r.payment_deadline) < new Date()) || (ost === 'balance' && r.status !== 'cancelled' && r.total_amount !== r.paid_amount && r.status !== 'pending_payment'))
-      && (!q || [r.name, r.student_id || '', r.phone, r.order_no, r.email].some(x => String(x).toLowerCase().includes(q))));
-    V('orders').innerHTML = `<div class="card">
-      <div class="row"><input id="oq" class="grow" placeholder="搜尋姓名、學號、手機、Email、訂單編號" value="${esc(oq)}">
-      <select id="ost"><option value="">全部狀態</option>${Object.entries(STATUS_TEXT).map(([k,v]) => `<option value="${k}" ${ost===k?'selected':''}>${v}</option>`).join('')}<option value="overdue" ${ost==='overdue'?'selected':''}>逾期未付款</option><option value="balance" ${ost==='balance'?'selected':''}>需補／退差額</option></select>
-      <button class="btn line" id="reload">重新整理</button></div>
-      ${ost === 'overdue' && list.length ? `<div class="banner warn" style="margin-top:12px">這些同學已超過付款期限。<b>請先匯出並上傳最新明細</b>，確認仍未付款後，再設定新期限（會產生「延長期限通知」信，需核准才寄出）。<div class="row" style="margin-top:8px"><input type="datetime-local" id="newDl"><button class="btn gold" id="extendAll">為下方 ${list.length} 人設定新期限</button></div></div>` : ''}
-      <p class="small muted">共 ${list.length} 筆</p>
-      <div style="overflow:auto"><table><thead><tr><th>訂單</th><th>姓名</th><th>學號</th><th>手機</th><th>應付／已付</th><th>狀態</th><th>報名時間</th></tr></thead><tbody>
-      ${list.map(r => `<tr class="click" data-id="${r.id}"><td>${esc(r.order_no)}</td><td>${esc(r.name)}${r.internal_note ? ' 📝' : ''}</td><td>${r.participant_type === 'guest' ? '<span class="tag t-approved">校外</span>' : esc(r.student_id)}</td><td>${esc(r.phone)}</td><td>${r.total_amount}／${r.paid_amount}${r.status !== 'pending_payment' && r.total_amount !== r.paid_amount && r.status !== 'cancelled' ? ' <span class="tag t-unmatched">差額</span>' : ''}</td><td><span class="tag t-${r.status}">${STATUS_TEXT[r.status]}</span></td><td class="small">${esc(fmtTime(r.created_at))}</td></tr>`).join('')}
-      </tbody></table></div></div>`;
-    $('oq').oninput = e => { oq = e.target.value; clearTimeout($('oq')._t); $('oq')._t = setTimeout(() => { renderOrders(); const el = $('oq'); el.focus(); el.setSelectionRange(el.value.length, el.value.length); }, 250); };
-    $('ost').onchange = e => { ost = e.target.value; renderOrders(); };
-    $('reload').onclick = async () => { await run(loadAll, '已更新'); renderOrders(); };
-    V('orders').querySelector('tbody').onclick = e => { const tr = e.target.closest('[data-id]'); if (tr) openOrder(tr.dataset.id); };
+    const base = regs.filter(r => !q || [r.name, r.student_id || '', r.phone, r.order_no, r.email].some(x => String(x).toLowerCase().includes(q)));
+    const segs = [['all', '全部'], ['pending_payment', '待付款'], ['overdue', '逾期'], ['paid', '已付款'], ['checked', '已報到'], ['picked_up', '全部完成'], ['balance', '差額'], ['cancelled', '已取消']];
+    const cnt = k => { const o = ost; ost = k; const n = base.filter(orderFilter).length; ost = o; return n; };
+    const list = base.filter(orderFilter);
+    page().innerHTML = `
+      <div class="row" style="margin-bottom:12px">
+        <label class="searchbox grow" style="max-width:420px">${icon('search')}<input class="in" id="oq" placeholder="姓名、學號、手機、Email、訂單編號" value="${esc(oq)}" aria-label="搜尋訂單"></label>
+        ${regs.some(r => r.is_test) ? `<label class="row small"><input type="checkbox" id="onlyTest" ${onlyTest ? 'checked' : ''}>只看測試資料</label>` : ''}
+      </div>
+      <div class="seg" role="group" aria-label="狀態篩選" style="margin-bottom:14px">${segs.map(([k, n]) => `<button type="button" data-st="${k}" aria-pressed="${ost === k}">${n}<span class="c">${cnt(k)}</span></button>`).join('')}</div>
+      ${ost === 'overdue' && list.length ? `<div class="note caution">${icon('triangle-alert')}<div class="grow">這些人已經超過付款期限。<b>先匯入最新的郵局明細</b>，確認還是沒付，再設定新期限（會產生「延長期限通知」信，核准後才寄出）。</div><button class="btn sm" type="button" id="extendAll">為 ${list.length} 人設定新期限</button></div>` : ''}
+      ${list.length ? `<div class="tblwrap"><table class="tbl"><thead><tr><th>訂單</th><th>姓名</th><th>學號／身分</th><th>手機</th><th class="r">應付／已付</th><th>狀態</th><th>報到・取餐</th><th>報名時間</th></tr></thead><tbody>
+        ${list.map(r => { const vendors = new Set((r.order_items || []).map(o => o.vendor_name)).size; return `<tr class="click" data-id="${r.id}" tabindex="0">
+          <td class="num">${esc(r.order_no)}</td>
+          <td class="namecell"><b>${esc(r.name)}</b><span class="tags">${r.is_test ? `<span class="mini test">${icon('flask-conical')}測試</span>` : ''}${r.internal_note ? `<span class="mini" title="有備註">${icon('sticky-note')}</span>` : ''}</span></td>
+          <td>${r.participant_type === 'guest' ? `<span class="mini guest">${icon('globe')}校外</span>` : `<span class="num">${esc(r.student_id)}</span>`}</td>
+          <td class="num">${esc(r.phone)}</td>
+          <td class="r num">${r.total_amount}／${r.paid_amount}${r.status !== 'pending_payment' && r.status !== 'cancelled' && r.total_amount !== r.paid_amount ? ' <span class="badge b-crit flat">差額</span>' : ''}</td>
+          <td>${stBadge(r)}</td>
+          <td><span class="prog"><span class="${r.checked_in_at ? 'on' : ''}" title="報到">${icon('user-check')}</span><span class="${r.status === 'picked_up' || (!vendors && r.checked_in_at) ? 'on' : ''}" title="取餐">${icon('hand-platter')}</span></span></td>
+          <td class="small muted">${esc(fmtTime(r.created_at))}</td></tr>`; }).join('')}
+      </tbody></table></div>` : `<div class="card empty">${icon('inbox')}${regs.length ? '沒有符合條件的訂單' : '還沒有人報名。可以到「測試工具」產生一批測試報名。'}</div>`}`;
+    $('oq').oninput = e => { oq = e.target.value; clearTimeout(renderOrders._t); renderOrders._t = setTimeout(() => { renderOrders(); const el = $('oq'); el.focus(); el.setSelectionRange(el.value.length, el.value.length); }, 220); };
+    page().querySelector('.seg').onclick = e => { const b = e.target.closest('[data-st]'); if (b) { ost = b.dataset.st; renderOrders(); } };
+    if ($('onlyTest')) $('onlyTest').onchange = e => { onlyTest = e.target.checked; renderOrders(); };
+    const tb = page().querySelector('tbody');
+    if (tb) { tb.onclick = e => { const tr = e.target.closest('[data-id]'); if (tr) openOrder(tr.dataset.id); }; tb.onkeydown = e => { if (e.key === 'Enter') { const tr = e.target.closest('[data-id]'); if (tr) openOrder(tr.dataset.id); } }; }
     if ($('extendAll')) $('extendAll').onclick = async () => {
-      const dl = fromLocalInput($('newDl').value); if (!dl) return toast('請先選新期限');
-      if (!confirm(`確定為 ${list.length} 位同學設定新期限 ${fmtTime(dl)}？`)) return;
+      const v = await ask({ title: `為 ${list.length} 人設定新的付款期限`, body: '每個人都會產生一封「延長期限通知」信，要到「信件」核准才會寄出。', input: { label: '新的付款期限（台北時間）', type: 'datetime-local' }, ok: '設定' });
+      if (!v) return; const dl = fromLocalInput(v);
       for (const r of list) await run(() => Api.rpc('admin_update_registration', { p_reg: r.id, p: { payment_deadline: dl } }));
-      await loadAll(); toast('已設定，請到「信件」核准延長通知'); renderOrders();
+      toast('已設定，請到「信件」核准延長通知'); refresh();
     };
   }
-  function openDrawer(html){ $('drawer').innerHTML = html; $('drawer').classList.add('open'); $('shade').classList.add('open'); }
-  function closeDrawer(){ $('drawer').classList.remove('open'); $('shade').classList.remove('open'); }
-  $('shade').onclick = closeDrawer;
+  function openDrawer(html){ $('drawer').innerHTML = html; $('drawer').classList.add('on'); $('scrim').classList.add('on'); }
+  function closeDrawer(){ $('drawer').classList.remove('on'); $('scrim').classList.remove('on'); }
+  $('scrim').onclick = closeDrawer;
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('dialog').classList.contains('on')) closeDrawer(); });
+
   function openOrder(id){
     const r = regs.find(x => x.id === id); if (!r) return;
     const qty = {}; (r.order_items || []).forEach(oi => { if (oi.menu_item_id) qty[oi.menu_item_id] = oi.qty; });
-    const editable = !['cancelled','picked_up'].includes(r.status);
-    const itemsEd = menu.vendors.map(v => `<h3>${esc(v.name)}</h3>` + menu.items.filter(i => i.vendor_id === v.id).map(i => `<div class="it"><span class="nm">${esc(i.name)} <span class="muted small">$${i.price}${i.active ? '' : '（已下架）'}</span></span><span class="stp"><button type="button" data-m="${i.id}">−</button><span id="q_${i.id}">${qty[i.id] || 0}</span><button type="button" data-p="${i.id}">＋</button></span></div>`).join('')).join('');
+    const editable = !['cancelled', 'picked_up'].includes(r.status);
+    const owe = r.total_amount - r.paid_amount;
+    const steps = [['報名', r.created_at, true], ['付款', r.paid_at, !!r.paid_at], ['報到', r.checked_in_at, !!r.checked_in_at], ['取餐', r.picked_up_at, r.status === 'picked_up']];
     openDrawer(`
-      <div class="row"><h2 class="grow" style="margin:0">${esc(r.order_no)}　${esc(r.name)}</h2><button class="btn line sm" id="dClose">關閉</button></div>
-      <p><span class="tag t-${r.status}">${STATUS_TEXT[r.status]}</span>　應付 ${money(r.total_amount)}／已付 ${money(r.paid_amount)}
-      ${r.status !== 'pending_payment' && r.total_amount > r.paid_amount ? `<b style="color:var(--red)">　需補 ${r.total_amount - r.paid_amount} 元</b>` : ''}
-      ${r.paid_amount > r.total_amount ? `<b style="color:var(--red)">　需退 ${r.paid_amount - r.total_amount} 元</b>` : ''}</p>
-      <p class="small muted">報名 ${esc(fmtTime(r.created_at))}${r.paid_at ? '｜付款確認 ' + esc(fmtTime(r.paid_at)) + '（' + esc(r.paid_method) + '）' : ''}${r.checked_in_at ? '｜報到 ' + esc(fmtTime(r.checked_in_at)) : ''}${r.picked_up_at ? '｜全部取餐 ' + esc(fmtTime(r.picked_up_at)) : ''}</p>
-      <h3>內部備註（工作人員掃描時也看得到）</h3>
-      <textarea id="dNote">${esc(r.internal_note)}</textarea>
-      <button class="btn sm" id="saveNote">儲存備註</button>
-      <h3>基本資料</h3>
-      <label class="f">姓名<input id="dName" value="${esc(r.name)}"></label>
-      <label class="f">身分／學號（不可修改）<input value="${r.participant_type === 'guest' ? '校外人士（附言代碼 ' + esc(r.order_no) + '）' : esc(r.student_id)}" disabled></label>
-      <label class="f">手機<input id="dPhone" value="${esc(r.phone)}"></label>
-      <label class="f">Email<input id="dEmail" value="${esc(r.email)}"></label>
-      <label class="f">付款帳號後五碼<input id="dLast5" value="${esc(r.payer_last5)}" maxlength="5"></label>
-      <label class="f">付款期限<input type="datetime-local" id="dDl" value="${toLocalInput(r.payment_deadline)}"></label>
-      <button class="btn sm" id="saveInfo">儲存基本資料</button>
-      ${editable ? `<h3>修改餐點</h3><div class="items-ed" id="itemsEd">${itemsEd}</div>
-      <label class="f">修改原因（必填，例如：同學 IG 私訊要求換成熱拿鐵）<input id="dReason"></label>
-      <button class="btn gold sm" id="saveItems">儲存餐點修改</button>` : ''}
-      <h3>其他操作</h3>
-      <div class="row">
-        ${r.status === 'pending_payment' || r.total_amount > r.paid_amount ? `<input id="payAmt" type="number" placeholder="金額" style="width:100px" value="${r.total_amount - r.paid_amount}"><input id="payNote" class="grow" placeholder="人工入帳原因（必填）"><button class="btn green sm" id="markPaid">人工入帳</button>` : ''}
+      <div class="dhead">
+        <div class="row"><div class="grow"><h2 id="dTitle">${esc(r.name)}</h2><div class="sub"><span class="num">${esc(r.order_no)}</span>・${r.participant_type === 'guest' ? '校外人士' : '學號 <span class="num">' + esc(r.student_id) + '</span>'}・${esc(r.email)}</div></div>
+        <button class="btn quiet sm" type="button" id="dClose" aria-label="關閉">${icon('x')}</button></div>
+        <div class="row" style="margin-top:10px">${stBadge(r)}${r.is_test ? `<span class="badge b-crit flat">${icon('flask-conical')}測試資料</span>` : ''}${r.paid_method ? `<span class="small muted">付款方式：${esc({ memo: '附言自動對帳', last5_amount: '後五碼自動對帳', manual_confirm: '人工確認配對', manual: '人工入帳', test: '測試模擬付款', no_payment_needed: '不需付款' }[r.paid_method] || r.paid_method)}</span>` : ''}</div>
+        <div class="timeline">${steps.map(([n, t, on]) => `<div class="${on ? 'on' : ''}"><b>${n}</b>${t && on ? esc(fmtTime(t).slice(5)) : '—'}</div>`).join('')}</div>
       </div>
-      <div class="row" style="margin-top:10px">
-        ${r.checked_in_at || r.status === 'picked_up' ? '<button class="btn line sm" id="undoPick">撤銷報到與取餐紀錄</button>' : ''}
-        ${r.status !== 'cancelled' && r.status !== 'picked_up' ? '<button class="btn red sm" id="cancelReg">取消這筆報名</button>' : ''}
+      <div class="dbody">
+        <div class="card"><h2>${icon('circle-dollar-sign')}金額</h2>
+          <div class="money"><div>應付<b>${money(r.total_amount)}</b></div><div>已付<b>${money(r.paid_amount)}</b></div>${r.status !== 'pending_payment' && owe > 0 ? `<div style="color:var(--crit)">需補<b style="color:var(--crit)">${money(owe)}</b></div>` : ''}${owe < 0 ? `<div style="color:var(--crit)">需退<b style="color:var(--crit)">${money(-owe)}</b></div>` : ''}</div>
+          ${r.status === 'pending_payment' || owe > 0 ? `<div class="row" style="margin-top:14px"><input class="in num" id="payAmt" type="number" style="width:110px" value="${Math.max(owe, 0)}" aria-label="入帳金額"><input class="in grow" id="payNote" placeholder="人工入帳原因（必填），例如：現金補繳"><button class="btn" type="button" id="markPaid">${icon('check')}人工入帳</button></div>` : ''}
+        </div>
+        <div class="card"><h2>${icon('utensils-crossed')}餐點</h2>
+          ${editable ? `<p>直接調整數量，填寫原因後儲存。金額會重新計算。</p>${menu.vendors.map(v => `<h3 class="small" style="margin:10px 0 2px;color:var(--ink2)">${esc(v.name)}</h3>` + menu.items.filter(i => i.vendor_id === v.id).map(i => `<div class="ied"><span>${esc(i.name)} <span class="small muted num">$${i.price}${i.active ? '' : '・已下架'}</span></span><span class="stepper"><button type="button" data-m="${i.id}" aria-label="減少">${icon('minus')}</button><output id="q_${i.id}">${qty[i.id] || 0}</output><button type="button" data-p="${i.id}" aria-label="增加">${icon('plus')}</button></span></div>`).join('')).join('')}
+            <label class="field" style="margin-top:12px"><span>修改原因（必填）</span><input id="dReason" placeholder="例如：IG 私訊要求把冰紅茶換成熱拿鐵"></label>
+            <button class="btn" type="button" id="saveItems">儲存餐點修改</button>`
+          : ((r.order_items || []).map(o => `<div class="ied"><span>${esc(o.item_name)} <span class="small muted">${esc(o.vendor_name)}</span></span><b class="num">× ${o.qty}</b></div>`).join('') || '<p class="muted">沒有點餐</p>')}
+        </div>
+        <div class="card"><h2>${icon('sticky-note')}內部備註</h2><p>現場工作人員掃描時也看得到。</p>
+          <label class="field"><textarea id="dNote" aria-label="內部備註">${esc(r.internal_note)}</textarea></label>
+          <button class="btn sec" type="button" id="saveNote">儲存備註</button></div>
+        <div class="card"><h2>${icon('user')}基本資料</h2>
+          <div class="grid2">
+            <label class="field"><span>姓名</span><input id="dName" value="${esc(r.name)}"></label>
+            <label class="field"><span>手機</span><input id="dPhone" class="num" value="${esc(r.phone)}"></label>
+            <label class="field"><span>Email</span><input id="dEmail" value="${esc(r.email)}"></label>
+            <label class="field"><span>付款帳號後五碼</span><input id="dLast5" class="num" value="${esc(r.payer_last5)}" maxlength="5"></label>
+            <label class="field"><span>付款期限</span><input type="datetime-local" id="dDl" value="${toLocalInput(r.payment_deadline)}"></label>
+            <label class="field"><span>${r.participant_type === 'guest' ? '附言代碼（訂單編號）' : '學號'}</span><input value="${esc(r.memo_code || r.student_id || r.order_no)}" disabled></label>
+          </div>
+          <button class="btn sec" type="button" id="saveInfo">儲存基本資料</button></div>
+        <div class="card"><h2>${icon('triangle-alert')}其他操作</h2>
+          <div class="row">
+            ${r.checked_in_at || r.status === 'picked_up' ? `<button class="btn sec" type="button" id="undoPick">${icon('rotate-ccw')}撤銷報到與取餐紀錄</button>` : ''}
+            ${r.status !== 'cancelled' && r.status !== 'picked_up' ? `<button class="btn danger" type="button" id="cancelReg">${icon('ban')}取消這筆報名</button>` : ''}
+          </div>
+          <p class="small muted" style="margin:10px 0 0">報名 ${esc(fmtTime(r.created_at))}・最後更新 ${esc(fmtTime(r.updated_at))}</p></div>
       </div>`);
-    $('dClose').onclick = closeDrawer;
-    const after = async msg => { await loadAll(); toast(msg); renderOrders(); openOrder(id); };
-    $('saveNote').onclick = async () => { await run(() => Api.rpc('admin_update_registration', { p_reg: id, p: { internal_note: $('dNote').value } })); after('備註已儲存'); };
-    $('saveInfo').onclick = async () => {
-      const p = { name: $('dName').value, phone: $('dPhone').value.replace(/[\s-]/g,''), email: $('dEmail').value.trim(), payer_last5: $('dLast5').value.trim() };
-      const dl = fromLocalInput($('dDl').value); if (dl && dl !== new Date(r.payment_deadline).toISOString()) { p.payment_deadline = dl; if (r.status === 'pending_payment' && !confirm('變更付款期限會產生一封「延長期限通知」信（需核准才寄出），確定？')) return; }
-      await run(() => Api.rpc('admin_update_registration', { p_reg: id, p })); after('基本資料已儲存');
+    $('dClose').onclick = closeDrawer; setTimeout(() => $('dClose').focus(), 60);
+    const after = async msg => { await loadAll(); toast(msg); if (view === 'orders') renderOrders(); openOrder(id); };
+    $('saveNote').onclick = e => busy(e.currentTarget, async () => { await run(() => Api.rpc('admin_update_registration', { p_reg: id, p: { internal_note: $('dNote').value } })); after('備註已儲存'); });
+    $('saveInfo').onclick = async e => {
+      const p = { name: $('dName').value.trim(), phone: $('dPhone').value.replace(/[\s-]/g, ''), email: $('dEmail').value.trim(), payer_last5: $('dLast5').value.trim() };
+      const dl = fromLocalInput($('dDl').value);
+      if (dl && dl !== new Date(r.payment_deadline).toISOString()) { if (r.status === 'pending_payment' && !(await ask({ title: '變更付款期限？', body: '會產生一封「延長期限通知」信，核准後才會寄出。', ok: '變更' }))) return; p.payment_deadline = dl; }
+      busy(e.currentTarget, async () => { await run(() => Api.rpc('admin_update_registration', { p_reg: id, p })); after('基本資料已儲存'); });
     };
-    if ($('itemsEd')) {
-      $('itemsEd').onclick = e => { const m = e.target.dataset.m, p = e.target.dataset.p, k = m || p; if (!k) return; qty[k] = Math.max(0, Math.min(20, (qty[k] || 0) + (p ? 1 : -1))); $('q_' + k).textContent = qty[k]; };
-      $('saveItems').onclick = async () => {
-        const reason = $('dReason').value.trim(); if (!reason) return toast('請填寫修改原因');
-        const items = Object.entries(qty).filter(([,q]) => q > 0).map(([id, q]) => ({ id, qty: q }));
-        const res = await run(() => Api.rpc('admin_update_order', { p_reg: id, p_items: items, p_reason: reason }));
-        after(res.balance > 0 ? `已修改，需補 ${res.balance} 元` : res.balance < 0 ? `已修改，需退 ${-res.balance} 元` : '餐點已修改');
-      };
+    if ($('saveItems')) {
+      $('drawer').querySelector('.dbody').addEventListener('click', e => { const b = e.target.closest('[data-m],[data-p]'); if (!b) return; const k = b.dataset.m || b.dataset.p; qty[k] = Math.max(0, Math.min(20, (qty[k] || 0) + (b.dataset.p ? 1 : -1))); $('q_' + k).textContent = qty[k]; });
+      $('saveItems').onclick = e => { const reason = $('dReason').value.trim(); if (!reason) { $('dReason').focus(); return toast('請填寫修改原因', 'err'); }
+        busy(e.currentTarget, async () => { const items = Object.entries(qty).filter(([, q]) => q > 0).map(([id, q]) => ({ id, qty: q })); const res = await run(() => Api.rpc('admin_update_order', { p_reg: id, p_items: items, p_reason: reason })); after(res.balance > 0 ? `已修改，需補 ${res.balance} 元` : res.balance < 0 ? `已修改，需退 ${-res.balance} 元` : '餐點已修改'); }); };
     }
-    if ($('markPaid')) $('markPaid').onclick = async () => { const amt = parseInt($('payAmt').value, 10); const note = $('payNote').value.trim(); if (!amt || !note) return toast('請填金額和原因'); await run(() => Api.rpc('admin_mark_paid', { p_reg: id, p_amount: amt, p_note: note })); after('已入帳'); };
-    if ($('undoPick')) $('undoPick').onclick = async () => { const n = prompt('撤銷原因'); if (!n) return; await run(() => Api.rpc('admin_undo_pickup', { p_reg: id, p_note: n })); after('已撤銷取餐狀態'); };
-    if ($('cancelReg')) $('cancelReg').onclick = async () => { if (!confirm('確定取消這筆報名？名額與限量餐點會釋出。')) return; await run(() => Api.rpc('admin_update_registration', { p_reg: id, p: { status: 'cancelled' } })); closeDrawer(); await loadAll(); renderOrders(); toast('已取消'); };
+    if ($('markPaid')) $('markPaid').onclick = e => { const amt = parseInt($('payAmt').value, 10), note = $('payNote').value.trim(); if (!amt || !note) return toast('請填金額和原因', 'err'); busy(e.currentTarget, async () => { await run(() => Api.rpc('admin_mark_paid', { p_reg: id, p_amount: amt, p_note: note })); after('已入帳'); }); };
+    if ($('undoPick')) $('undoPick').onclick = async () => { const n = await ask({ title: '撤銷報到與取餐紀錄', input: { label: '原因', placeholder: '例如：掃錯人' }, ok: '撤銷' }); if (!n) return; await run(() => Api.rpc('admin_undo_pickup', { p_reg: id, p_note: n })); after('已撤銷'); };
+    if ($('cancelReg')) $('cancelReg').onclick = async () => { if (!(await ask({ title: `取消 ${r.name} 的報名？`, body: '名額和限量餐點會釋出。已付款的話，記得另外處理退款。', ok: '取消報名', danger: true, cancel: '先不要' }))) return; await run(() => Api.rpc('admin_update_registration', { p_reg: id, p: { status: 'cancelled' } })); closeDrawer(); await loadAll(); renderOrders(); toast('已取消'); };
   }
 
   // ---------- 對帳 ----------
   function parseLine(line){
     const out = []; let cur = '', q = false;
     for (let i = 0; i < line.length; i++) { const ch = line[i];
-      if (q) { if (ch === '"') { if (line[i+1] === '"') { cur += '"'; i++; } else q = false; } else cur += ch; }
+      if (q) { if (ch === '"') { if (line[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += ch; }
       else if (ch === '"') q = true; else if (ch === ',') { out.push(cur); cur = ''; } else cur += ch; }
     out.push(cur); return out.map(c => c.replace(/^=/, '').trim());
   }
@@ -286,7 +552,7 @@ pre.mail{white-space:pre-wrap;background:#faf8f2;border:1px solid var(--line);bo
       if (/利息|薪資|委發款項|票證/.test(summary)) { skipped++; continue; }
       const tok = (note.split(/\s+/)[0] || '').replace(/[^0-9*]/g, '');
       const last5 = /\d{5}$/.test(tok) ? tok.slice(-5) : null;
-      const iso = `${parseInt(m[1],10) + 1911}-${m[2]}-${m[3]}T${m[4]}+08:00`;
+      const iso = `${parseInt(m[1], 10) + 1911}-${m[2]}-${m[3]}T${m[4]}+08:00`;
       last = { txn_at: iso, amount: dep, last5, memo, bank: '', summary };
       rows.push(last);
     }
@@ -294,179 +560,240 @@ pre.mail{white-space:pre-wrap;background:#faf8f2;border:1px solid var(--line);bo
   }
   let parsed = null;
   async function renderRecon(){
-    await badges();
+    acts(settings.test_mode ? `<button class="btn sec" type="button" id="simBtn">${icon('flask-conical')}模擬一份明細</button>` : '');
+    if ($('simBtn')) $('simBtn').onclick = e => busy(e.currentTarget, simulate);
+    page().innerHTML = `<div class="card empty">${icon('loader-circle', 'spin')}載入中…</div>`;
     const [txns, batches] = await Promise.all([
       Api.select('bank_txns', 'select=*&status=in.(suggested,unmatched)&order=txn_at.desc'),
       Api.select('import_batches', 'select=*&order=created_at.desc&limit=8')
     ]);
     const byId = Object.fromEntries(regs.map(r => [r.id, r]));
-    V('recon').innerHTML = `
-      <div class="card"><h2>匯入郵局交易明細</h2>
-        <p class="small muted">從電腦版網路郵局匯出 CSV 後選擇檔案。檔案只會在這台電腦的瀏覽器裡解析，只上傳「時間、金額、帳號後五碼、附言」，完整帳號與餘額不會離開你的電腦。重複匯入同一段期間沒關係，系統會自動略過已匯入的交易。</p>
-        <div class="row"><input type="file" id="csv" accept=".csv,text/csv"><button class="btn gold" id="doImport" disabled>匯入並比對</button></div>
-        <div id="preview" class="small" style="margin-top:8px"></div>
+    page().innerHTML = `
+      <div class="card"><h2>${icon('file-up')}匯入郵局交易明細</h2><p>從電腦版網路郵局匯出 CSV，拖進來或點一下選檔。檔案只在這台電腦解析，只上傳時間、金額、帳號後五碼和附言；同一段期間重複匯入沒關係，系統會略過已經匯入的交易。</p>
+        <label class="drop" id="drop">${icon('file-spreadsheet')}<b>拖曳 CSV 到這裡，或點一下選擇檔案</b><span class="small muted" id="preview">支援郵局匯出的 UTF-8 或 Big5 格式</span><input type="file" id="csv" accept=".csv,text/csv" hidden></label>
+        <div class="row" style="margin-top:12px;justify-content:flex-end"><button class="btn" type="button" id="doImport" disabled>${icon('upload')}匯入並比對</button></div>
       </div>
-      <div class="card"><h2>待人工處理（${txns.length}）</h2>
-        ${txns.length ? `<div style="overflow:auto"><table><thead><tr><th>入帳時間</th><th>金額</th><th>後五碼</th><th>附言</th><th>狀態／說明</th><th>建議訂單</th><th>處理</th></tr></thead><tbody>
-        ${txns.map(t => { const s = byId[t.suggested_registration_id]; return `<tr data-t="${t.id}"><td class="small">${esc(fmtTime(t.txn_at))}</td><td><b>${t.amount}</b></td><td>${esc(t.account_last5 || '—')}</td><td>${esc(t.memo || '—')}</td><td><span class="tag t-${t.status}">${t.status === 'suggested' ? '建議配對' : '找不到'}</span><div class="small muted">${esc(t.match_note || '')}</div></td><td class="small">${s ? `${esc(s.order_no)} ${esc(s.name)}<br>${esc(s.student_id || '校外')}｜應付 ${s.total_amount - s.paid_amount}｜後五碼 ${esc(s.payer_last5)}` : '—'}</td>
-          <td><div class="row">${s && s.status === 'pending_payment' ? `<button class="btn green sm" data-ok="${s.id}">確認配對</button>` : ''}<input placeholder="訂單編號或學號" style="width:130px" data-in><button class="btn sm line" data-assign>指定</button><button class="btn sm line" data-ignore>略過</button></div></td></tr>`; }).join('')}
-        </tbody></table></div>` : '<p class="muted">目前沒有需要處理的交易 🎉</p>'}
+      <div class="card"><h2>${icon('circle-alert')}需要人工確認（${txns.length}）</h2><p>「建議配對」是系統找到可能的訂單，確認無誤就按「確認配對」；「找不到」可以輸入訂單編號或學號指定，或略過非活動款項。</p>
+        ${txns.length ? `<div class="tblwrap"><table class="tbl"><thead><tr><th>入帳時間</th><th class="r">金額</th><th>後五碼</th><th>附言</th><th>系統判斷</th><th>可能的訂單</th><th>處理</th></tr></thead><tbody>
+        ${txns.map(t => { const s = byId[t.suggested_registration_id]; return `<tr data-t="${t.id}"><td class="small">${esc(fmtTime(t.txn_at))}${t.is_test ? ' <span class="mini test">測試</span>' : ''}</td><td class="r num"><b>${t.amount}</b></td><td class="num">${esc(t.account_last5 || '—')}</td><td>${esc(t.memo || '—')}</td>
+          <td><span class="badge ${t.status === 'suggested' ? 'b-caution' : 'b-crit'}">${t.status === 'suggested' ? '建議配對' : '找不到'}</span><div class="small muted" style="margin-top:4px">${esc(t.match_note || '')}</div></td>
+          <td class="small">${s ? `<b>${esc(s.name)}</b> <span class="num">${esc(s.order_no)}</span><br>${esc(s.student_id || '校外')}・應付 <span class="num">${s.total_amount - s.paid_amount}</span>・後五碼 <span class="num">${esc(s.payer_last5)}</span>` : '<span class="muted">—</span>'}</td>
+          <td><div class="row">${s && s.status === 'pending_payment' ? `<button class="btn sm" type="button" data-ok="${s.id}">${icon('check')}確認配對</button>` : ''}<input class="in" style="width:120px;min-height:32px" placeholder="訂單編號／學號" data-in aria-label="指定訂單"><button class="btn sm sec" type="button" data-assign>指定</button><button class="btn sm quiet" type="button" data-ignore>略過</button></div></td></tr>`; }).join('')}
+        </tbody></table></div>` : `<div class="empty">${icon('circle-check')}沒有需要人工處理的款項</div>`}
       </div>
-      <div class="card"><h2>最近匯入紀錄</h2><table><thead><tr><th>時間</th><th>期間</th><th>筆數／新增</th><th>自動入帳</th><th>建議</th><th>找不到</th></tr></thead><tbody>
-        ${batches.map(b => `<tr><td class="small">${esc(fmtTime(b.created_at))}</td><td class="small">${esc(b.file_period || '')}</td><td>${b.rows_total}／${b.rows_new}</td><td>${b.matched}</td><td>${b.suggested}</td><td>${b.unmatched}</td></tr>`).join('') || '<tr><td colspan="6" class="muted">尚無紀錄</td></tr>'}
-      </tbody></table></div>`;
-    $('csv').onchange = async e => {
-      const f = e.target.files[0]; if (!f) return;
-      const buf = await f.arrayBuffer(); let text = new TextDecoder('utf-8').decode(buf);
-      if (!/交易日期/.test(text)) { try { text = new TextDecoder('big5').decode(buf); } catch (er) {} }
-      parsed = parsePostCSV(text);
-      $('preview').innerHTML = parsed.rows.length ? `期間 ${esc(parsed.period)}：找到 <b>${parsed.rows.length}</b> 筆轉入，略過 ${parsed.skipped} 筆非付款項目（利息、薪資等）。` : '<span style="color:var(--red)">找不到轉入紀錄，請確認是郵局匯出的交易明細 CSV。</span>';
-      $('doImport').disabled = !parsed.rows.length;
-    };
-    $('doImport').onclick = async () => {
-      $('doImport').disabled = true;
-      const res = await run(() => Api.rpc('admin_import_txns', { p_rows: parsed.rows, p_period: parsed.period }));
-      toast(`新增 ${res.new} 筆：自動入帳 ${res.matched}、建議 ${res.suggested}、找不到 ${res.unmatched}`);
-      parsed = null; await loadAll(); renderRecon();
-    };
-    V('recon').onclick = reconClick;
+      <div class="card"><h2>${icon('clock')}最近匯入</h2>
+        ${batches.length ? `<div class="tblwrap"><table class="tbl"><thead><tr><th>時間</th><th>明細期間</th><th class="r">筆數</th><th class="r">新增</th><th class="r">自動入帳</th><th class="r">建議</th><th class="r">找不到</th></tr></thead><tbody>
+        ${batches.map(b => `<tr><td class="small">${esc(fmtTime(b.created_at))}</td><td class="small">${esc(b.file_period || '')}</td><td class="r num">${b.rows_total}</td><td class="r num">${b.rows_new}</td><td class="r num">${b.matched}</td><td class="r num">${b.suggested}</td><td class="r num">${b.unmatched}</td></tr>`).join('')}</tbody></table></div>` : '<p class="muted">還沒有匯入紀錄</p>'}
+      </div>`;
+    const drop = $('drop');
+    ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+    ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+    drop.addEventListener('drop', e => { if (e.dataTransfer.files[0]) readCSV(e.dataTransfer.files[0]); });
+    $('csv').onchange = e => { if (e.target.files[0]) readCSV(e.target.files[0]); };
+    $('doImport').onclick = e => busy(e.currentTarget, async () => { const res = await run(() => Api.rpc('admin_import_txns', { p_rows: parsed.rows, p_period: parsed.period })); toast(`新增 ${res.new} 筆：自動入帳 ${res.matched}、建議 ${res.suggested}、找不到 ${res.unmatched}`); parsed = null; await loadAll(); renderRecon(); });
+    page().onclick = reconClick;
+  }
+  async function readCSV(f){
+    const buf = await f.arrayBuffer(); let text = new TextDecoder('utf-8').decode(buf);
+    if (!/交易日期/.test(text)) { try { text = new TextDecoder('big5').decode(buf); } catch (er) {} }
+    parsed = parsePostCSV(text);
+    $('preview').innerHTML = parsed.rows.length ? `<b style="color:var(--ok)">${esc(f.name)}</b>：期間 ${esc(parsed.period)}，找到 ${parsed.rows.length} 筆轉入，略過 ${parsed.skipped} 筆非付款項目` : `<b style="color:var(--crit)">${esc(f.name)} 裡找不到轉入紀錄，請確認是郵局匯出的交易明細 CSV</b>`;
+    $('doImport').disabled = !parsed.rows.length;
   }
   async function reconClick(e){
     const tr = e.target.closest('[data-t]'); if (!tr) return;
+    const b = e.target.closest('button'); if (!b) return;
     const tid = tr.dataset.t;
-    const isOk = e.target.dataset.ok, isAssign = e.target.hasAttribute('data-assign'), isIgnore = e.target.hasAttribute('data-ignore');
-    if (!isOk && !isAssign && !isIgnore) return;
     try {
-      if (isOk) { await run(() => Api.rpc('admin_resolve_txn', { p_txn: tid, p_reg: isOk }), '已入帳'); }
-      else if (isAssign) {
+      if (b.dataset.ok) await run(() => Api.rpc('admin_resolve_txn', { p_txn: tid, p_reg: b.dataset.ok }), '已入帳');
+      else if (b.hasAttribute('data-assign')) {
         const key = tr.querySelector('[data-in]').value.trim().toUpperCase(); const r = regs.find(x => x.order_no === key || x.student_id === key);
-        if (!r) return toast('找不到這筆訂單');
-        if (!confirm(`把這筆款項入帳到 ${r.order_no} ${r.name}（應付 ${r.total_amount - r.paid_amount}）？`)) return;
+        if (!r) return toast('找不到這筆訂單', 'err');
+        if (!(await ask({ title: '指定入帳', body: `把這筆款項入帳到 ${r.order_no} ${r.name}（應付 ${r.total_amount - r.paid_amount} 元）？`, ok: '入帳' }))) return;
         await run(() => Api.rpc('admin_resolve_txn', { p_txn: tid, p_reg: r.id }), '已入帳');
-      } else { const n = prompt('略過原因（例如：非活動款項、已退款）'); if (!n) return; await run(() => Api.rpc('admin_ignore_txn', { p_txn: tid, p_note: n }), '已略過'); }
+      } else if (b.hasAttribute('data-ignore')) {
+        const n = await ask({ title: '略過這筆款項', input: { label: '原因', placeholder: '例如：社課費、已退款' }, ok: '略過' }); if (!n) return;
+        await run(() => Api.rpc('admin_ignore_txn', { p_txn: tid, p_note: n }), '已略過');
+      } else return;
     } catch (er) { return; }
     await loadAll(); renderRecon();
   }
+  async function simulate(){ const r = await run(() => Api.rpc('admin_test_simulate_txns')); toast(r.pending_used ? `模擬明細已匯入：自動入帳 ${r.matched}、建議 ${r.suggested}、找不到 ${r.unmatched}` : '沒有待付款的測試訂單，只產生一筆找不到的款項'); await loadAll(); if (view === 'recon') renderRecon(); else show(view); }
 
   // ---------- 信件 ----------
   let mailTab = 'pending_approval';
   const VARS = ['姓名','學號','附言代碼','身分','訂單編號','餐點明細','總金額','已付金額','付款期限','收款銀行','收款帳號','戶名','查詢連結','活動名稱','活動資訊','聯絡方式'];
   async function renderMail(){
-    await badges();
+    page().innerHTML = `<div class="card empty">${icon('loader-circle', 'spin')}載入中…</div>`;
     const [tpls, queue] = await Promise.all([
       Api.select('email_templates', 'select=*&order=key'),
       Api.select('email_queue', 'select=id,registration_id,template_key,to_email,subject,body,status,error,created_at,sent_at&order=created_at.desc&limit=500')
     ]);
     const counts = {}; queue.forEach(q => counts[q.status] = (counts[q.status] || 0) + 1);
-    const tabs = [['pending_approval','待核准'],['approved','等待寄出'],['sent','已寄出'],['failed','寄送失敗'],['blocked','被系統擋下'],['cancelled','已取消']];
+    const tabs = [['pending_approval', '待核准'], ['approved', '等待寄出'], ['sent', '已寄出'], ['failed', '寄送失敗'], ['blocked', '被擋下'], ['cancelled', '已取消']];
     const list = queue.filter(q => q.status === mailTab);
     const lbl = Object.fromEntries(tpls.map(t => [t.key, t.label]));
-    V('mail').innerHTML = `
-      <div class="banner info">寄信程式尚未啟用（等 Gmail 授權設定完成）。在這之前，信件只會排在佇列裡，不會寄出任何一封。</div>
-      <div class="card"><h2>信件佇列</h2>
-        <div class="row">${tabs.map(([k,v]) => `<button class="btn sm ${mailTab===k?'':'line'}" data-mt="${k}">${v}（${counts[k] || 0}）</button>`).join('')}</div>
-        ${mailTab === 'pending_approval' && list.length ? `<div class="row" style="margin:12px 0"><label><input type="checkbox" id="mAll"> 全選</label><span class="grow"></span><button class="btn line sm" id="mCancel">取消選取的信</button><button class="btn green" id="mApprove">核准寄出選取的信</button></div>` : ''}
-        ${['failed','blocked'].includes(mailTab) && list.length ? `<div class="row" style="margin:12px 0"><label><input type="checkbox" id="mAll"> 全選</label><span class="grow"></span><button class="btn line sm" id="mCancel">取消選取的信</button>${mailTab === 'failed' ? '<button class="btn green sm" id="mApprove">重新寄送</button>' : ''}</div>` : ''}
-        ${mailTab === 'blocked' && list.length ? '<p class="small muted">被擋下通常是信件裡還有變數沒代入（例如沒設定報名頁網址），或 Email 格式錯誤。修正後請取消這些信，系統下次會重新產生。</p>' : ''}
-        <table><thead><tr><th></th><th>類型</th><th>收件人</th><th>主旨</th><th>時間</th></tr></thead><tbody>
-        ${list.map(q => `<tr><td><input type="checkbox" data-q="${q.id}"></td><td class="small">${esc(lbl[q.template_key] || q.template_key)}</td><td>${esc(q.to_email)}</td><td><details><summary>${esc(q.subject)}</summary><pre class="mail">${esc(q.body)}</pre>${q.error ? `<div class="small" style="color:var(--red)">${esc(q.error)}</div>` : ''}</details></td><td class="small">${esc(fmtTime(q.sent_at || q.created_at))}</td></tr>`).join('') || '<tr><td colspan="5" class="muted">沒有信件</td></tr>'}
-        </tbody></table>
+    const isTest = id => { const r = regs.find(x => x.id === id); return r && r.is_test; };
+    page().innerHTML = `
+      <div class="note info">${icon('info')}<span>寄信程式還沒啟用（等 Gmail 授權設定完成）。在那之前，核准的信只會排在佇列裡，不會真的寄出。</span></div>
+      <div class="card"><h2>${icon('inbox')}信件佇列</h2>
+        <div class="seg" role="group" aria-label="信件狀態" style="margin:8px 0 14px">${tabs.map(([k, v]) => `<button type="button" data-mt="${k}" aria-pressed="${mailTab === k}">${v}<span class="c">${counts[k] || 0}</span></button>`).join('')}</div>
+        ${list.length && ['pending_approval', 'failed', 'blocked'].includes(mailTab) ? `<div class="row" style="margin-bottom:10px"><label class="row small"><input type="checkbox" id="mAll">全選</label><span class="grow"></span><button class="btn sec sm" type="button" id="mCancel">取消選取的信</button>${mailTab !== 'blocked' ? `<button class="btn sm" type="button" id="mApprove">${icon('send')}${mailTab === 'failed' ? '重新寄送' : '核准寄出'}</button>` : ''}</div>` : ''}
+        ${mailTab === 'blocked' && list.length ? '<div class="note caution">' + icon('triangle-alert') + '<span>被擋下通常是信件裡還有變數沒代入（例如沒設定報名頁網址），或 Email 格式錯誤。修正後取消這些信，系統下次會重新產生。</span></div>' : ''}
+        ${list.length ? `<div class="tblwrap"><table class="tbl"><thead><tr><th></th><th>類型</th><th>收件人</th><th>主旨</th><th>時間</th></tr></thead><tbody>
+        ${list.map(q => `<tr><td><input type="checkbox" data-q="${q.id}" aria-label="選取"></td><td class="small">${esc(lbl[q.template_key] || q.template_key)}${isTest(q.registration_id) ? ' <span class="mini test">測試</span>' : ''}</td><td>${esc(q.to_email)}</td><td><details><summary>${esc(q.subject)}</summary><pre class="mail">${esc(q.body)}</pre>${q.error ? `<div class="small" style="color:var(--crit)">${esc(q.error)}</div>` : ''}</details></td><td class="small muted">${esc(fmtTime(q.sent_at || q.created_at))}</td></tr>`).join('')}
+        </tbody></table></div>` : `<div class="empty">${icon('mail-check')}這個分類沒有信件</div>`}
       </div>
-      <div class="card"><h2>信件範本</h2>
-        <p class="small muted">修改後必須按「核准並啟用」才會使用新內容。點下面的變數可以插入到內文游標位置。</p>
-        <div class="vars small">${VARS.map(v => `<code data-var="${v}">{{${v}}}</code>`).join('')}</div>
-        ${tpls.map(t => `<div class="card" style="background:#fdfbf6" data-tpl="${t.key}">
-          <div class="row"><h3 class="grow" style="margin:0">${esc(t.label)}</h3>
-          <span class="tag ${t.approved_at && t.enabled ? 't-sent' : 't-pending_approval'}">${t.approved_at && t.enabled ? '已核准啟用' : t.approved_at ? '已核准・停用中' : '尚未核准'}</span></div>
-          <label class="f">主旨<input data-f="subject" value="${esc(t.subject)}"></label>
-          <label class="f">內文<textarea data-f="body" rows="12">${esc(t.body)}</textarea></label>
-          <div class="row"><button class="btn line sm" data-act="save">儲存修改</button><button class="btn line sm" data-act="preview">用第一筆訂單預覽</button>
-          <span class="grow"></span>${t.enabled ? '<button class="btn line sm" data-act="disable">停用</button>' : ''}<button class="btn gold sm" data-act="approve">核准並啟用</button></div>
+      <div class="card"><h2>${icon('pencil')}信件範本</h2><p>修改後要按「核准並啟用」才會使用新的內容。點下面的變數，可以插入到內文游標的位置。</p>
+        <div class="vars">${VARS.map(v => `<button type="button" data-var="${v}">{{${v}}}</button>`).join('')}</div>
+        ${tpls.map(t => `<div class="card" style="background:var(--sunk)" data-tpl="${t.key}">
+          <div class="row"><h3 class="grow" style="margin:0;font-size:15px">${esc(t.label)}</h3><span class="badge ${t.approved_at && t.enabled ? 'b-ok' : 'b-caution'}">${t.approved_at && t.enabled ? '已核准・啟用中' : t.approved_at ? '已核准・停用中' : '尚未核准'}</span></div>
+          <label class="field" style="margin-top:10px"><span>主旨</span><input data-f="subject" value="${esc(t.subject)}"></label>
+          <label class="field"><span>內文</span><textarea data-f="body" rows="12">${esc(t.body)}</textarea></label>
+          <div class="row"><button class="btn sec sm" type="button" data-act="save">儲存修改</button><button class="btn sec sm" type="button" data-act="preview">${icon('eye')}用一筆訂單預覽</button><span class="grow"></span>${t.enabled ? '<button class="btn quiet sm" type="button" data-act="disable">停用</button>' : ''}<button class="btn sm" type="button" data-act="approve">${icon('badge-check')}核准並啟用</button></div>
           <div data-out></div></div>`).join('')}
       </div>`;
     let lastTa = null;
-    V('mail').querySelectorAll('textarea[data-f]').forEach(ta => ta.onfocus = () => lastTa = ta);
-    V('mail').onclick = async e => {
-      const mt = e.target.dataset.mt; if (mt) { mailTab = mt; return renderMail(); }
-      const vv = e.target.dataset.var; if (vv && lastTa) { const s = lastTa.selectionStart; lastTa.value = lastTa.value.slice(0, s) + '{{' + vv + '}}' + lastTa.value.slice(lastTa.selectionEnd); lastTa.focus(); return; }
-      if (e.target.id === 'mAll') { V('mail').querySelectorAll('[data-q]').forEach(c => c.checked = e.target.checked); return; }
-      const ids = [...V('mail').querySelectorAll('[data-q]:checked')].map(c => c.dataset.q);
-      if (e.target.id === 'mApprove') { if (!ids.length) return toast('請先勾選信件'); if (!confirm(`確定核准 ${ids.length} 封信寄出？`)) return; await run(() => Api.rpc('admin_set_email_status', { p_ids: ids, p_status: 'approved' }), '已核准'); return renderMail(); }
-      if (e.target.id === 'mCancel') { if (!ids.length) return toast('請先勾選信件'); if (!confirm(`確定取消 ${ids.length} 封信？`)) return; await run(() => Api.rpc('admin_set_email_status', { p_ids: ids, p_status: 'cancelled' }), '已取消'); return renderMail(); }
-      const box = e.target.closest('[data-tpl]'); const act = e.target.dataset.act; if (!box || !act) return;
+    page().querySelectorAll('textarea[data-f]').forEach(ta => ta.onfocus = () => lastTa = ta);
+    page().onclick = async e => {
+      const mt = e.target.closest('[data-mt]'); if (mt) { mailTab = mt.dataset.mt; return renderMail(); }
+      const vv = e.target.closest('[data-var]'); if (vv && lastTa) { const s = lastTa.selectionStart, v = '{{' + vv.dataset.var + '}}'; lastTa.value = lastTa.value.slice(0, s) + v + lastTa.value.slice(lastTa.selectionEnd); lastTa.focus(); lastTa.selectionStart = lastTa.selectionEnd = s + v.length; return; }
+      if (e.target.id === 'mAll') { page().querySelectorAll('[data-q]').forEach(c => c.checked = e.target.checked); return; }
+      const ids = [...page().querySelectorAll('[data-q]:checked')].map(c => c.dataset.q);
+      const b = e.target.closest('button');
+      if (b && b.id === 'mApprove') { if (!ids.length) return toast('請先勾選信件', 'err'); if (!(await ask({ title: `核准 ${ids.length} 封信寄出？`, ok: '核准寄出' }))) return; await run(() => Api.rpc('admin_set_email_status', { p_ids: ids, p_status: 'approved' }), '已核准'); await loadAll(); return renderMail(); }
+      if (b && b.id === 'mCancel') { if (!ids.length) return toast('請先勾選信件', 'err'); if (!(await ask({ title: `取消 ${ids.length} 封信？`, ok: '取消這些信', danger: true, cancel: '先不要' }))) return; await run(() => Api.rpc('admin_set_email_status', { p_ids: ids, p_status: 'cancelled' }), '已取消'); await loadAll(); return renderMail(); }
+      const box = e.target.closest('[data-tpl]'); const act = b && b.dataset.act; if (!box || !act) return;
       const key = box.dataset.tpl, subject = box.querySelector('[data-f="subject"]').value, body = box.querySelector('[data-f="body"]').value;
-      if (act === 'save') { await run(() => Api.patch('email_templates', 'key=eq.' + encodeURIComponent(key), { subject, body }), '已儲存，請記得重新核准'); return renderMail(); }
-      if (act === 'preview') { const r = regs[regs.length - 1]; if (!r) return toast('還沒有訂單可以預覽'); const p = await run(() => Api.rpc('admin_preview_email', { p_key: key, p_reg: r.id })); box.querySelector('[data-out]').innerHTML = `<p class="small muted">以 ${esc(r.order_no)} ${esc(r.name)} 預覽（未儲存的修改不會顯示）：</p><pre class="mail"><b>${esc(p.subject)}</b>\n\n${esc(p.body)}</pre>`; return; }
-      if (act === 'approve') { if (!confirm('核准後，這個範本就會用來寄信給同學。確定內容沒問題？')) return; await run(() => Api.patch('email_templates', 'key=eq.' + encodeURIComponent(key), { subject, body })); await run(() => Api.rpc('admin_approve_template', { p_key: key }), '已核准啟用'); return renderMail(); }
+      if (act === 'save') { await run(() => Api.patch('email_templates', 'key=eq.' + encodeURIComponent(key), { subject, body }), '已儲存，記得重新核准'); return renderMail(); }
+      if (act === 'preview') { const r = regs[0]; if (!r) return toast('還沒有訂單可以預覽', 'err'); const p = await run(() => Api.rpc('admin_preview_email', { p_key: key, p_reg: r.id })); box.querySelector('[data-out]').innerHTML = `<p class="small muted" style="margin:12px 0 0">用 ${esc(r.order_no)} ${esc(r.name)} 預覽（還沒儲存的修改不會出現）：</p><pre class="mail"><b>${esc(p.subject)}</b>\n\n${esc(p.body)}</pre>`; return; }
+      if (act === 'approve') { if (!(await ask({ title: '核准這個範本？', body: '核准後就會用它寄信給報名的人。請確認內容沒問題。', ok: '核准並啟用' }))) return; await run(() => Api.patch('email_templates', 'key=eq.' + encodeURIComponent(key), { subject, body })); await run(() => Api.rpc('admin_approve_template', { p_key: key }), '已核准啟用'); return renderMail(); }
       if (act === 'disable') { await run(() => Api.patch('email_templates', 'key=eq.' + encodeURIComponent(key), { enabled: false }), '已停用'); return renderMail(); }
     };
   }
 
   // ---------- 菜單 ----------
   function renderMenu(){
-    V('menu').innerHTML = `
-      <div class="banner warn">⚠ 菜單會直接顯示在公開的報名頁上，修改前請確認名稱與價格正確。已成立的訂單會保留下單時的價格，不受影響。</div>
+    acts(`<a class="btn sec" href="./" target="_blank" rel="noopener">${icon('external-link')}看報名頁</a>`);
+    page().innerHTML = `
+      <div class="note caution">${icon('triangle-alert')}<span>菜單會直接顯示在公開的報名頁上。已經成立的訂單會保留下單時的品名和價格，不受修改影響。</span></div>
       ${menu.vendors.map(v => `<div class="card" data-vendor="${v.id}">
-        <div class="row"><input data-vf="name" value="${esc(v.name)}" class="grow" style="font-weight:700"><input data-vf="description" value="${esc(v.description)}" placeholder="店家說明" class="grow"><input data-vf="image_url" value="${esc(v.image_url || '')}" placeholder="店家照片網址" class="grow"><input data-vf="sort" type="number" value="${v.sort}" style="width:70px" title="排序"><label><input type="checkbox" data-vf="active" ${v.active ? 'checked' : ''}> 顯示</label><button class="btn sm" data-sv>儲存店家</button></div>
-        <table style="margin-top:10px"><thead><tr><th style="width:22%">品名</th><th style="width:26%">說明</th><th>價格</th><th>限量（空白＝不限）</th><th>標籤</th><th>排序</th><th>上架</th><th></th></tr></thead><tbody>
+        <div class="row" style="align-items:flex-end">
+          <label class="field grow" style="margin:0"><span>店家名稱</span><input data-vf="name" value="${esc(v.name)}" style="font-weight:700"></label>
+          <label class="field grow" style="margin:0"><span>店家說明</span><input data-vf="description" value="${esc(v.description)}"></label>
+          <label class="field grow" style="margin:0"><span>照片網址</span><input data-vf="image_url" value="${esc(v.image_url || '')}"></label>
+          <label class="field" style="margin:0;width:76px"><span>排序</span><input data-vf="sort" type="number" value="${v.sort}"></label>
+          <label class="row small" style="min-height:40px"><input type="checkbox" data-vf="active" ${v.active ? 'checked' : ''}>顯示</label>
+          <button class="btn sec" type="button" data-sv>儲存店家</button>
+        </div>
+        <div class="tblwrap" style="margin-top:14px"><table class="tbl"><thead><tr><th style="min-width:150px">品名</th><th style="min-width:170px">說明</th><th>價格</th><th>限量</th><th>已售</th><th>標籤</th><th>排序</th><th>上架</th><th></th></tr></thead><tbody>
         ${menu.items.filter(i => i.vendor_id === v.id).map(i => itemRow(i)).join('')}
         ${itemRow({ id: '', vendor_id: v.id, name: '', description: '', price: '', stock_limit: null, tag: '', sort: 99, active: true })}
-        </tbody></table></div>`).join('')}
-      <div class="card"><h2>新增店家</h2><div class="row"><input id="newV" placeholder="店家名稱" class="grow"><button class="btn" id="addV">新增</button></div></div>`;
-    V('menu').onclick = async e => {
-      if (e.target.id === 'addV') { const n = $('newV').value.trim(); if (!n) return; await run(() => Api.insert('vendors', { name: n, sort: menu.vendors.length + 1 }), '已新增店家'); await loadAll(); return renderMenu(); }
-      if (e.target.hasAttribute('data-sv')) { const box = e.target.closest('[data-vendor]'); const g = f => box.querySelector(`[data-vf="${f}"]`); await run(() => Api.patch('vendors', 'id=eq.' + box.dataset.vendor, { name: g('name').value.trim(), description: g('description').value.trim(), image_url: g('image_url').value.trim() || null, sort: parseInt(g('sort').value,10) || 0, active: g('active').checked }), '店家已儲存'); await loadAll(); return renderMenu(); }
-      if (e.target.hasAttribute('data-si')) {
-        const tr = e.target.closest('tr'); const g = f => tr.querySelector(`[data-if="${f}"]`);
-        const row = { name: g('name').value.trim(), description: g('description').value.trim(), price: parseInt(g('price').value, 10), stock_limit: g('stock').value === '' ? null : parseInt(g('stock').value, 10), tag: g('tag').value.trim() || null, sort: parseInt(g('sort').value,10) || 0, active: g('active').checked };
-        if (!row.name || isNaN(row.price) || row.price < 0) return toast('請填寫品名與正確價格');
+        </tbody></table></div></div>`).join('')}
+      <div class="card"><h2>${icon('circle-plus')}新增店家</h2><div class="row"><input class="in grow" id="newV" placeholder="店家名稱"><button class="btn" type="button" id="addV">新增店家</button></div></div>`;
+    page().onclick = async e => {
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.id === 'addV') { const n = $('newV').value.trim(); if (!n) return; await run(() => Api.insert('vendors', { name: n, sort: menu.vendors.length + 1 }), '已新增店家'); await loadAll(); return renderMenu(); }
+      if (b.hasAttribute('data-sv')) { const box = b.closest('[data-vendor]'); const g = f => box.querySelector(`[data-vf="${f}"]`); await run(() => Api.patch('vendors', 'id=eq.' + box.dataset.vendor, { name: g('name').value.trim(), description: g('description').value.trim(), image_url: g('image_url').value.trim() || null, sort: parseInt(g('sort').value, 10) || 0, active: g('active').checked }), '店家已儲存'); await loadAll(); return renderMenu(); }
+      if (b.hasAttribute('data-si')) {
+        const tr = b.closest('tr'); const g = f => tr.querySelector(`[data-if="${f}"]`);
+        const row = { name: g('name').value.trim(), description: g('description').value.trim(), price: parseInt(g('price').value, 10), stock_limit: g('stock').value === '' ? null : parseInt(g('stock').value, 10), tag: g('tag').value.trim() || null, sort: parseInt(g('sort').value, 10) || 0, active: g('active').checked };
+        if (!row.name || isNaN(row.price) || row.price < 0) return toast('請填寫品名和正確的價格', 'err');
         if (tr.dataset.item) await run(() => Api.patch('menu_items', 'id=eq.' + tr.dataset.item, row), '品項已儲存');
         else await run(() => Api.insert('menu_items', { ...row, vendor_id: tr.dataset.vendor }), '已新增品項');
         await loadAll(); return renderMenu();
       }
     };
   }
+  function sold(id){ let n = 0; regs.forEach(r => { if (r.status !== 'cancelled') (r.order_items || []).forEach(o => { if (o.menu_item_id === id) n += o.qty; }); }); return n; }
   function itemRow(i){
-    return `<tr class="menu-row" data-item="${i.id}" data-vendor="${i.vendor_id}"><td><input data-if="name" value="${esc(i.name)}" placeholder="${i.id ? '' : '＋ 新品項名稱'}"></td><td><input data-if="description" value="${esc(i.description)}"></td><td><input data-if="price" type="number" min="0" value="${esc(i.price)}" style="width:80px"></td><td><input data-if="stock" type="number" min="0" value="${i.stock_limit == null ? '' : i.stock_limit}" style="width:80px"></td><td><input data-if="tag" value="${esc(i.tag || '')}" style="width:70px" placeholder="熱門"></td><td><input data-if="sort" type="number" value="${i.sort}" style="width:60px"></td><td><input type="checkbox" data-if="active" ${i.active ? 'checked' : ''}></td><td><button class="btn sm ${i.id ? 'line' : 'gold'}" data-si>${i.id ? '儲存' : '新增'}</button></td></tr>`;
+    return `<tr data-item="${i.id}" data-vendor="${i.vendor_id}"><td><input class="in" data-if="name" value="${esc(i.name)}" placeholder="${i.id ? '' : '＋ 新品項名稱'}"></td><td><input class="in" data-if="description" value="${esc(i.description)}"></td><td><input class="in num" data-if="price" type="number" min="0" value="${esc(i.price)}" style="width:80px"></td><td><input class="in num" data-if="stock" type="number" min="0" value="${i.stock_limit == null ? '' : i.stock_limit}" placeholder="不限" style="width:80px"></td><td class="num">${i.id ? sold(i.id) : ''}</td><td><input class="in" data-if="tag" value="${esc(i.tag || '')}" style="width:76px" placeholder="熱門"></td><td><input class="in num" data-if="sort" type="number" value="${i.sort}" style="width:64px"></td><td><input type="checkbox" data-if="active" ${i.active ? 'checked' : ''} aria-label="上架"></td><td><button class="btn sm ${i.id ? 'sec' : ''}" type="button" data-si>${i.id ? '儲存' : '新增'}</button></td></tr>`;
   }
 
   // ---------- 設定 ----------
   function renderSettings(){
     const s = settings;
-    const f = (k, label, type = 'text', hint = '') => `<label class="f">${label}${type === 'textarea' ? `<textarea data-s="${k}">${esc(s[k] || '')}</textarea>` : `<input data-s="${k}" type="${type}" value="${esc(type === 'datetime-local' ? toLocalInput(s[k]) : (s[k] ?? ''))}">`}</label>${hint ? `<div class="small muted">${hint}</div>` : ''}`;
-    V('settings').innerHTML = `<div class="card"><h2>活動與報名設定</h2>
-      <div class="banner warn">⚠ 這些內容大多會顯示在公開的報名頁和信件裡，上線前請再確認一次。</div>
-      ${f('event_name','活動名稱')}${f('event_info','活動資訊（日期、時間、地點）','text','用兩個空白或全形空白分隔，報名頁會分成小標籤顯示')}
-      ${f('registration_open_at','開放報名時間（台北時間）','datetime-local')}${f('registration_close_at','報名截止時間','datetime-local')}${f('payment_deadline','付款期限（新報名預設值）','datetime-local','修改這裡不會影響已報名同學的期限；個別延長請到「訂單」處理')}
-      ${f('capacity','名額上限','number')}
-      <h3>首頁介紹</h3>${f('film_title','放映電影片名','text','還沒確定可以先空白，首頁會顯示「片單待公布」')}${f('film_note','電影介紹','textarea')}${f('film_image_url','電影海報或場地照片網址','text','需取得放映與圖片使用授權')}${f('venue_note','現場體驗說明（座位、自備物品、雨備等）','textarea')}
-      <h3>收款資訊</h3>${f('bank_name','收款銀行')}${f('bank_code','銀行代碼')}${f('account_no','收款帳號（郵局 14 碼）')}${f('account_name','戶名')}${f('qr_image_url','收款 QR Code 圖片網址','text','把郵局收款碼圖片放到網站上後，貼上圖片網址')}
-      <h3>其他</h3>${f('contact_info','聯絡方式')}${f('site_url','報名頁網址','text','例如 https://nccusa.github.io/xmas-cinema/，信件的查詢連結會用到')}${f('email_cap_24h','每 24 小時寄信上限','number','一般 Gmail 上限是 500，建議 450')}${f('privacy_notice','個人資料蒐集告知','textarea')}
-      <div style="margin-top:14px"><button class="btn gold" id="saveS">儲存設定</button></div></div>`;
-    $('saveS').onclick = async () => {
-      const p = {}; V('settings').querySelectorAll('[data-s]').forEach(el => { const k = el.dataset.s; p[k] = el.type === 'datetime-local' ? fromLocalInput(el.value) : el.type === 'number' ? parseInt(el.value, 10) : el.value.trim(); });
+    const f = (k, label, type = 'text', hint = '') => `<label class="field"><span>${label}</span>${type === 'textarea' ? `<textarea data-s="${k}">${esc(s[k] || '')}</textarea>` : `<input data-s="${k}" type="${type}" value="${esc(type === 'datetime-local' ? toLocalInput(s[k]) : (s[k] ?? ''))}"${type === 'number' ? ' class="num"' : ''}>`}${hint ? `<small>${hint}</small>` : ''}</label>`;
+    page().innerHTML = `
+      <div class="note caution">${icon('triangle-alert')}<span>這些內容大多會顯示在公開的報名頁和信件裡，上線前請再確認一次。</span></div>
+      <div class="card"><h2>${icon('film')}活動</h2><p>報名頁首頁和信件會用到。</p>
+        ${f('event_name', '活動名稱')}${f('event_info', '活動資訊（日期、時間、地點）', 'text', '格式：日期：2026/12/9（三）　時間：18:00　地點：達賢圖書館大草坪（用全形空白分隔）')}
+        <div class="grid2">${f('film_title', '放映電影片名', 'text', '還沒確定可以先空白，首頁會顯示「片單待公布」')}${f('film_image_url', '電影海報或場地照片網址', 'text', '需要取得放映與圖片使用授權')}</div>
+        ${f('film_note', '電影介紹', 'textarea')}${f('venue_note', '現場說明（座位、自備物品、雨備）', 'textarea')}</div>
+      <div class="card"><h2>${icon('calendar')}報名與名額</h2>
+        <div class="grid2">${f('registration_open_at', '開放報名時間（台北時間）', 'datetime-local')}${f('registration_close_at', '報名截止時間', 'datetime-local')}${f('payment_deadline', '付款期限（新報名的預設值）', 'datetime-local', '改這裡不會影響已經報名的人；個別延長請到「訂單」')}${f('capacity', '名額上限', 'number')}</div></div>
+      <div class="card"><h2>${icon('wallet')}收款資訊</h2>
+        <div class="grid2">${f('bank_name', '收款銀行')}${f('bank_code', '銀行代碼')}${f('account_no', '收款帳號（郵局 14 碼）')}${f('account_name', '戶名')}</div>${f('qr_image_url', '收款 QR Code 圖片網址', 'text', '把郵局收款碼圖片放到網站上後，貼上圖片網址')}</div>
+      <div class="card"><h2>${icon('mail')}信件與其他</h2>
+        <div class="grid2">${f('contact_info', '聯絡方式')}${f('site_url', '報名頁網址', 'text', '信件裡的查詢連結會用到')}${f('email_cap_24h', '每 24 小時寄信上限', 'number', '一般 Gmail 上限是 500，建議 450')}</div>${f('privacy_notice', '個人資料蒐集告知', 'textarea')}</div>
+      <div class="savebar"><button class="btn" type="button" id="saveS">${icon('check')}儲存設定</button></div>`;
+    $('saveS').onclick = e => busy(e.currentTarget, async () => {
+      const p = {}; page().querySelectorAll('[data-s]').forEach(el => { const k = el.dataset.s; p[k] = el.type === 'datetime-local' ? fromLocalInput(el.value) : el.type === 'number' ? parseInt(el.value, 10) : el.value.trim(); });
       if (p.qr_image_url === '') p.qr_image_url = null; if (p.film_image_url === '') p.film_image_url = null;
       p.updated_at = new Date().toISOString();
       await run(() => Api.patch('settings', 'id=eq.1', p), '設定已儲存'); await loadAll(); renderSettings();
-    };
+    });
   }
 
   // ---------- 工作人員 ----------
   async function renderStaff(){
     const list = await run(() => Api.rpc('admin_list_staff'));
-    V('staff').innerHTML = `<div class="card"><h2>工作人員與權限</h2>
-      <p class="small muted">管理員：可以使用整個後台。現場人員：只能使用掃描頁（查詢與交付），看不到完整名單，也不能改價格或訂單。</p>
-      <table><thead><tr><th>Email</th><th>名稱</th><th>角色</th><th></th></tr></thead><tbody>
-      ${list.map(s => `<tr><td>${esc(s.email)}</td><td>${esc(s.display_name || '')}</td><td>${s.role === 'admin' ? '管理員' : '現場人員'}</td><td><button class="btn sm line" data-rm="${s.user_id}">移除權限</button></td></tr>`).join('')}
-      </tbody></table>
-      <h3>加入工作人員</h3>
-      <p class="small muted">步驟：① 到 Supabase 後台 Authentication → Users → Add user，建立帳號（Email＋密碼）② 回到這裡輸入同一個 Email 授權。</p>
-      <div class="row"><input id="sEmail" placeholder="Email" class="grow"><input id="sName" placeholder="名稱（例如：活動部小明）"><select id="sRole"><option value="staff">現場人員</option><option value="admin">管理員</option></select><button class="btn" id="sAdd">授權</button></div></div>`;
-    V('staff').onclick = async e => {
-      if (e.target.id === 'sAdd') { await run(() => Api.rpc('admin_grant_role', { p_email: $('sEmail').value, p_role: $('sRole').value, p_name: $('sName').value }), '已授權'); return renderStaff(); }
-      if (e.target.dataset.rm) { if (!confirm('確定移除這個人的權限？')) return; await run(() => Api.rpc('admin_revoke_role', { p_user: e.target.dataset.rm }), '已移除'); return renderStaff(); }
+    page().innerHTML = `<div class="card"><h2>${icon('users')}可以登入的人</h2><p>管理員可以用整個後台；現場人員只能用掃描頁（查詢、報到、交付），看不到完整名單，也不能改價格或訂單。</p>
+      <div class="tblwrap"><table class="tbl"><thead><tr><th>Email</th><th>名稱</th><th>角色</th><th></th></tr></thead><tbody>
+      ${list.map(s => `<tr><td>${esc(s.email)}</td><td>${esc(s.display_name || '')}</td><td><span class="badge ${s.role === 'admin' ? 'b-info' : 'b-neu'}">${s.role === 'admin' ? '管理員' : '現場人員'}</span></td><td class="r"><button class="btn sm quiet" type="button" data-rm="${s.user_id}">移除權限</button></td></tr>`).join('')}
+      </tbody></table></div></div>
+      <div class="card"><h2>${icon('circle-plus')}加入工作人員</h2><p>先到 Supabase 後台 Authentication → Users → Add user 建立帳號（勾 Auto Confirm），再回到這裡用同一個 Email 授權。</p>
+      <div class="row"><input class="in grow" id="sEmail" placeholder="Email" type="email"><input class="in" id="sName" placeholder="名稱，例如：活動部小明"><select class="in" id="sRole" style="width:auto"><option value="staff">現場人員</option><option value="admin">管理員</option></select><button class="btn" type="button" id="sAdd">授權</button></div>
+      <p class="small muted" style="margin:12px 0 0">現場人員的掃描頁網址：<span class="num">${esc(location.origin + location.pathname.replace(/admin\.html$/, ''))}scan.html</span>，建議請他們打開後「加到主畫面」。</p></div>`;
+    page().onclick = async e => {
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.id === 'sAdd') { await run(() => Api.rpc('admin_grant_role', { p_email: $('sEmail').value.trim(), p_role: $('sRole').value, p_name: $('sName').value.trim() }), '已授權'); return renderStaff(); }
+      if (b.dataset.rm) { if (!(await ask({ title: '移除這個人的權限？', ok: '移除', danger: true, cancel: '先不要' }))) return; await run(() => Api.rpc('admin_revoke_role', { p_user: b.dataset.rm }), '已移除'); return renderStaff(); }
     };
   }
+
+  // ---------- 測試工具 ----------
+  function renderTest(){
+    const tests = regs.filter(r => r.is_test);
+    const paidTests = tests.filter(r => r.status === 'paid' || r.status === 'picked_up');
+    const base = location.origin + location.pathname.replace(/admin\.html$/, '');
+    page().innerHTML = `
+      <div class="card"><h2>${icon('flask-conical')}測試模式</h2><p>開啟後：報名不受開放時間限制、付款頁會出現「模擬已付款」按鈕、這段期間建立的報名都會標成測試資料。正式開放報名前一定要關閉，並清除測試資料。</p>
+        <label class="switch"><input type="checkbox" id="tm" ${settings.test_mode ? 'checked' : ''}><span class="sw"></span><span><b id="tmText">${settings.test_mode ? '測試模式開啟中' : '測試模式已關閉'}</b><small>${settings.test_mode ? '報名頁、掃描頁和後台都會顯示測試標示' : '目前是正式狀態'}</small></span></label></div>
+      <div class="cols">
+        <div class="card"><h2>${icon('list-checks')}一鍵工具</h2><p>需要先開啟測試模式。</p>
+          <div class="todo">
+            <button type="button" id="seedBtn" ${settings.test_mode ? '' : 'disabled'}><span class="ic info">${icon('users')}</span><span><b>產生 20 筆測試報名</b><small>大約一半待付款、一半已付款，含校外人士和不點餐的人</small></span>${icon('play')}</button>
+            <button type="button" id="simBtn2" ${settings.test_mode ? '' : 'disabled'}><span class="ic caution">${icon('landmark')}</span><span><b>模擬一份郵局明細</b><small>待付款的測試訂單會走過四種對帳情況：附言對、後五碼對、後五碼錯一碼、金額不對</small></span>${icon('play')}</button>
+            <button type="button" id="resetBtn" ${tests.length ? '' : 'disabled'}><span class="ic crit">${icon('trash-2')}</span><span><b>清除全部測試資料（${tests.length} 筆）</b><small>連同餐點、取餐紀錄、信件和模擬款項；正式資料不受影響</small></span>${icon('play')}</button>
+          </div></div>
+        <div class="card"><h2>${icon('monitor-smartphone')}建議的測試順序</h2>
+          <ol style="margin:0;padding-left:20px;line-height:1.9">
+            <li>手機打開<a href="${esc(base)}" target="_blank" rel="noopener">報名頁</a>，用自己的學號報名並點餐</li>
+            <li>付款頁按「模擬已付款」，看完成畫面和 QR Code</li>
+            <li>另一台裝置打開<a href="${esc(base)}scan.html" target="_blank" rel="noopener">掃描頁</a>，選「報到站」掃自己的學生證</li>
+            <li>換「取餐站」再掃一次，確認會顯示要交付的餐點</li>
+            <li>產生測試報名 → 模擬明細 → 到「對帳」處理建議配對</li>
+            <li>用下面的 QR Code 測試校外人士報到</li>
+            <li>測完按「清除全部測試資料」</li>
+          </ol></div>
+      </div>
+      <div class="card"><h2>${icon('qr-code')}測試用報到 QR Code（${paidTests.length}）</h2><p>已付款的測試報名。用掃描頁的鏡頭直接掃這個畫面，就能測報到和取餐。</p>
+        ${paidTests.length ? `<div class="qrs">${paidTests.slice(0, 24).map(r => `<figure>${qrSvg(r.qr_token)}<figcaption><b>${esc(r.name)}</b><br><span class="small muted">${r.participant_type === 'guest' ? '校外' : esc(r.student_id)}・${(r.order_items || []).length ? (r.order_items || []).length + ' 項餐點' : '沒點餐'}・${r.status === 'picked_up' ? '已完成' : r.checked_in_at ? '已報到' : '未報到'}</span></figcaption></figure>`).join('')}</div>` : `<div class="empty">${icon('qr-code')}還沒有已付款的測試報名</div>`}
+      </div>`;
+    $('tm').onchange = async e => {
+      const on = e.target.checked;
+      if (!on && tests.length && !(await ask({ title: '關閉測試模式？', body: `還有 ${tests.length} 筆測試資料。建議先清除，再關閉測試模式。`, ok: '直接關閉', cancel: '先不要' }))) { e.target.checked = true; return; }
+      if (on && !(await ask({ title: '開啟測試模式？', body: '報名頁會變成任何時間都能報名，付款頁會出現「模擬已付款」。這是公開網址，正式開放報名前一定要關掉。', ok: '開啟' }))) { e.target.checked = false; return; }
+      await run(() => Api.patch('settings', 'id=eq.1', { test_mode: on, updated_at: new Date().toISOString() }), on ? '測試模式已開啟' : '測試模式已關閉');
+      await loadAll(); renderTest();
+    };
+    $('seedBtn').onclick = e => busy(e.currentTarget, async () => { const r = await run(() => Api.rpc('admin_test_seed', { p_n: 20 })); toast(`已產生 ${r.created} 筆：已付款 ${r.paid}、待付款 ${r.pending}`); await loadAll(); renderTest(); });
+    $('simBtn2').onclick = e => busy(e.currentTarget, async () => { await simulate(); renderTest(); });
+    $('resetBtn').onclick = async () => { if (!(await ask({ title: `清除 ${tests.length} 筆測試資料？`, body: '測試報名、餐點、報到取餐紀錄、信件和模擬款項都會刪除，不能復原。正式資料不受影響。', ok: '全部清除', danger: true, cancel: '先不要' }))) return; const r = await run(() => Api.rpc('admin_test_reset')); toast(`已清除 ${r.registrations} 筆報名、${r.txns} 筆款項`); await loadAll(); renderTest(); };
+  }
+  function qrSvg(t){ if (!t || !window.qrcode) return `<div class="num small">${esc(t || '')}</div>`; const q = qrcode(0, 'M'); q.addData(t); q.make(); return q.createSvgTag({ cellSize: 4, margin: 2, scalable: true }); }
+
   boot();
 })();
 </script>
