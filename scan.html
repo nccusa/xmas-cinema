@@ -268,12 +268,12 @@ button{font:inherit;color:inherit}
   <button class="primary" type="button" id="iosOk">知道了</button>
 </section>
 
-<script src="assets/icons.js"></script>
-<script src="assets/api.js"></script>
+<script src="assets/icons.js?v=20261120a"></script>
+<script src="assets/api.js?v=20261120a"></script>
 <script>
 (function(){
   Api.storeKey = 'xc_staff_session';
-  registerSW(); hydrateIcons();
+  if (window.registerSW) registerSW(); hydrateIcons();
   const $ = id => document.getElementById(id);
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;

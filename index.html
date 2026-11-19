@@ -487,8 +487,8 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
 
 <div class="wrap"><footer><span id="footContact"></span>　主辦：國立政治大學學生會</footer></div>
 
-<script src="assets/icons.js"></script>
-<script src="assets/api.js"></script>
+<script src="assets/icons.js?v=20261120a"></script>
+<script src="assets/api.js?v=20261120a"></script>
 <script>
 (function(){
   const $ = id => document.getElementById(id);
@@ -635,7 +635,7 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
   }
   function swap(fn, dir){
     document.documentElement.dataset.dir = dir;
-    if (document.startViewTransition && !reduce) { document.startViewTransition(fn); return; }
+    if (document.startViewTransition && !reduce && !document.hidden) { try { const t = document.startViewTransition(fn); t.ready.catch(() => {}); t.finished.catch(() => {}); t.updateCallbackDone.catch(() => {}); return; } catch (e) {} }
     fn(); const v = $('stepview'); v.classList.remove('enter', 'back-dir'); void v.offsetWidth; v.classList.add('enter'); if (dir === 'back') v.classList.add('back-dir');
   }
   function go(s){

@@ -266,12 +266,12 @@ pre.mail{white-space:pre-wrap;background:var(--sunk);border:1px solid var(--rule
 <div class="dialog" id="dialog" role="alertdialog" aria-modal="true"><div class="box" id="dialogBox"></div></div>
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
-<script src="assets/icons.js"></script>
-<script src="assets/api.js"></script>
+<script src="assets/icons.js?v=20261120a"></script>
+<script src="assets/api.js?v=20261120a"></script>
 <script>
 (function(){
   Api.storeKey = 'xc_admin_session';
-  registerSW();
+  if (window.registerSW) registerSW();
   const $ = id => document.getElementById(id);
   let regs = [], menu = { vendors: [], items: [] }, settings = null, dash = null, view = 'dash';
   const PAGES = [
