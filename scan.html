@@ -16,7 +16,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js"></script>
 <style>
 :root{
   --night:#0F1B17; --deck:#17261F; --deck2:#1F3229; --rule:rgba(242,239,229,.12); --cream:#F2EFE5; --dim:#A9B5AE;
@@ -212,7 +211,7 @@ button{font:inherit;color:inherit}
 
   <div class="stage">
     <div class="cam" id="cam">
-      <video id="video" playsinline muted></video>
+      <video id="video" playsinline muted autoplay></video>
       <div class="frame" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
       <div class="sweep" aria-hidden="true"></div>
       <span class="pill"><span data-icon="scan-barcode"></span>條碼槍也可以直接掃</span>
@@ -268,8 +267,9 @@ button{font:inherit;color:inherit}
   <button class="primary" type="button" id="iosOk">知道了</button>
 </section>
 
-<script src="assets/icons.js?v=20261120a"></script>
-<script src="assets/api.js?v=20261120a"></script>
+<script src="assets/vendor/barcode-detector.js?v=20261120c"></script>
+<script src="assets/icons.js?v=20261120c"></script>
+<script src="assets/api.js?v=20261120c"></script>
 <script>
 (function(){
   Api.storeKey = 'xc_staff_session';
@@ -338,24 +338,43 @@ button{font:inherit;color:inherit}
   $('stBtn').onclick = pickStation; $('mStation').onclick = pickStation;
 
   // ---------- 鏡頭 ----------
+  let zxPrepared = false;
+  async function getDetector(){
+    const want = ['code_128', 'code_39', 'codabar', 'ean_13', 'itf', 'qr_code'];
+    if ('BarcodeDetector' in window) {
+      try { const f = await BarcodeDetector.getSupportedFormats(); const use = want.filter(x => f.includes(x)); if (use.includes('code_128') && use.includes('qr_code')) return new BarcodeDetector({ formats: use }); } catch (e) {}
+    }
+    const api = window.BarcodeDetectionAPI;
+    if (!api) throw new Error('掃描程式沒有載入，請重新整理');
+    if (!zxPrepared) {
+      api.prepareZXingModule({ overrides: { locateFile: (path, prefix) => path.endsWith('.wasm') ? new URL('assets/vendor/zxing_reader.wasm?v=20261120c', location.href).href : prefix + path }, fireImmediately: true });
+      zxPrepared = true;
+    }
+    return new api.BarcodeDetector({ formats: want });
+  }
   async function startCamera(){
     $('camMsg').classList.add('hidden'); $('cam').classList.remove('paused');
     try {
-      const constraints = { video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false };
-      if ('BarcodeDetector' in window) {
-        const fmts = await BarcodeDetector.getSupportedFormats();
-        detector = new BarcodeDetector({ formats: ['code_128','code_39','codabar','ean_13','itf','qr_code'].filter(f => fmts.includes(f)) });
-        stream = await navigator.mediaDevices.getUserMedia(constraints);
-        $('video').srcObject = stream; await $('video').play();
-        const loop = async () => { if (!stream) return; try { const codes = await detector.detect($('video')); if (codes.length) onCode(codes[0].rawValue, 'cam'); } catch (e) {} scanTimer = setTimeout(loop, 160); };
-        loop();
-      } else if (window.ZXing) {
-        const hints = new Map(); hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [ZXing.BarcodeFormat.CODE_128, ZXing.BarcodeFormat.CODE_39, ZXing.BarcodeFormat.CODABAR, ZXing.BarcodeFormat.EAN_13, ZXing.BarcodeFormat.ITF, ZXing.BarcodeFormat.QR_CODE]);
-        hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
-        zx = new ZXing.BrowserMultiFormatReader(hints, 180);
-        await zx.decodeFromConstraints(constraints, $('video'), res => { if (res) onCode(res.getText(), 'cam'); });
-        stream = $('video').srcObject;
-      } else throw new Error('這個瀏覽器不支援鏡頭掃描');
+      const constraints = { video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false };
+      camMsg('loader-circle', '正在啟動鏡頭…'); $('cam').classList.remove('paused');
+      const [det, st] = await Promise.all([getDetector(), navigator.mediaDevices.getUserMedia(constraints)]);
+      detector = det; stream = st;
+      const v = $('video'); v.setAttribute('playsinline', ''); v.muted = true; v.srcObject = stream;
+      await v.play().catch(() => {});
+      $('camMsg').classList.add('hidden'); $('cam').classList.remove('paused');
+      const tr = stream.getVideoTracks()[0];
+      try { const c = tr.getCapabilities ? tr.getCapabilities() : {}; if (c.focusMode && c.focusMode.includes('continuous')) await tr.applyConstraints({ advanced: [{ focusMode: 'continuous' }] }); } catch (e) {}
+      let busyDetect = false;
+      const loop = async () => {
+        if (!stream) return;
+        if (!busyDetect && v.readyState >= 2 && v.videoWidth) {
+          busyDetect = true;
+          try { const codes = await detector.detect(v); if (codes && codes.length) onCode(codes[0].rawValue, 'cam'); } catch (e) {}
+          busyDetect = false;
+        }
+        scanTimer = setTimeout(loop, 120);
+      };
+      loop();
       track = stream && stream.getVideoTracks()[0];
       const caps = track && track.getCapabilities ? track.getCapabilities() : {};
       $('torchBtn').classList.toggle('hidden', !caps.torch);
@@ -366,7 +385,6 @@ button{font:inherit;color:inherit}
   function camMsg(ic, text){ $('camMsg').innerHTML = icon(ic) + `<span>${esc(text)}</span>`; $('camMsg').classList.remove('hidden'); $('cam').classList.add('paused'); }
   function stopCamera(){
     clearTimeout(scanTimer); torchOn = false; $('torchBtn').classList.remove('on');
-    if (zx) { try { zx.reset(); } catch (e) {} zx = null; }
     if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
     track = null;
   }

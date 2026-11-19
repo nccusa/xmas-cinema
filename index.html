@@ -280,6 +280,31 @@ fieldset.field{border:none;margin:0 0 22px;padding:0}
 .testpay b{display:flex;align-items:center;gap:8px;color:var(--redtext)}
 .testpay p{margin:6px 0 12px;font-size:14px;color:var(--muted)}
 .testpay .btn{background:var(--red);border-color:var(--red)}
+.resume{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:12px 0 0;padding:14px 16px;border:1px solid var(--line);border-radius:var(--r);background:var(--paper)}
+.resume .t{flex:1;min-width:200px}
+.resume .t b{display:block}
+.resume .t span{color:var(--muted);font-size:14px}
+.resume .acts{display:flex;gap:8px;flex-wrap:wrap}
+.draftnote{display:flex;gap:6px;align-items:flex-start;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:4px 0 14px}
+.draftnote svg{width:16px;height:16px;flex:none;margin-top:2px}
+.confirm .cf-rows{border-top:1px solid var(--ink);margin:4px 0 0}
+.confirm .cf-rows .rw{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:15px}
+.confirm .cf-tot{display:flex;justify-content:space-between;align-items:baseline;padding:12px 0 6px;font-weight:700}
+.confirm .cf-tot .num{font-size:26px;font-weight:800}
+.confirm .cf-who{font-size:14px;color:var(--muted);margin:0 0 4px}
+.cfwarn{display:flex;gap:10px;align-items:flex-start;background:#FDF3E1;border-left:3px solid var(--gold);padding:12px 14px;border-radius:0 var(--r) var(--r) 0;margin:12px 0;font-size:14px}
+.cfwarn svg{flex:none;width:18px;height:18px;margin-top:2px;color:#8a6516}
+.cfacts{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.cfacts .btn{flex:1;min-width:140px}
+.cancelbox p{margin:0 0 10px;font-size:14px;color:var(--muted)}
+.btn.danger{background:transparent;color:var(--red);border-color:var(--red)}
+.btn.danger:hover{background:#FCEDEC}
+.lkform{display:grid;gap:12px;text-align:left;margin:20px 0 8px}
+.lkform .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:560px){.lkform .row2{grid-template-columns:1fr}}
+.saveqr{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0 6px}
+.imgsheet{text-align:center}
+.imgsheet img{width:min(320px,86vw);border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.12);-webkit-touch-callout:default;user-select:auto}
 .notice{display:flex;gap:10px;border-left:3px solid var(--red);background:#FCEDEC;padding:12px 16px;margin:18px 0;border-radius:0 var(--r) var(--r) 0}
 .notice .i{color:var(--redtext);margin-top:3px}
 .more{margin-top:32px;border-top:1px solid var(--line)}
@@ -365,6 +390,7 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
 
 <!-- 首頁 -->
 <main id="home">
+  <div class="wrap"><div id="resume" class="resume hidden" role="region" aria-label="上次的進度"></div></div>
   <section class="hero" aria-labelledby="evTitle">
     <div class="hero-art" aria-hidden="true"><svg id="heroArt" viewBox="0 0 460 620" preserveAspectRatio="xMinYMid slice"></svg></div>
     <div class="wrap">
@@ -453,10 +479,11 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
               </div>
             </fieldset>
             <div class="field" id="w_name"><label for="f_name">姓名</label><div class="err" id="e_name"></div><div class="ipt"><span data-icon="user"></span><input id="f_name" autocomplete="name" maxlength="30" aria-describedby="e_name"><span class="okw"></span></div></div>
-            <div class="field" id="w_sid"><label for="f_sid">學號</label><p class="help" id="h_sid">9 碼數字，也是轉帳時附言要填的號碼。</p><div class="err" id="e_sid"></div><div class="ipt"><span data-icon="id-card"></span><input id="f_sid" inputmode="numeric" maxlength="9" autocomplete="off" aria-describedby="h_sid e_sid"><span class="okw"></span></div></div>
+            <div class="field" id="w_sid"><label for="f_sid">學號</label><p class="help" id="h_sid">9 碼數字，也是轉帳時「備註」欄要填的號碼。</p><div class="err" id="e_sid"></div><div class="ipt"><span data-icon="id-card"></span><input id="f_sid" inputmode="numeric" maxlength="9" autocomplete="off" aria-describedby="h_sid e_sid"><span class="okw"></span></div></div>
             <div class="field" id="w_phone"><label for="f_phone">手機號碼</label><div class="err" id="e_phone"></div><div class="ipt"><span data-icon="phone"></span><input id="f_phone" type="tel" inputmode="numeric" maxlength="12" placeholder="0912345678" autocomplete="tel" aria-describedby="e_phone"><span class="okw"></span></div></div>
             <div class="field" id="w_email"><label for="f_email">Email</label><p class="help" id="h_email">付款確認通知會寄到這裡。</p><div class="err" id="e_email"></div><div class="ipt"><span data-icon="mail"></span><input id="f_email" type="email" autocomplete="email" maxlength="120" aria-describedby="h_email e_email"><span class="okw"></span></div></div>
-            <div class="field" id="w_last5"><label for="f_last5">轉帳帳戶的帳號後五碼</label><p class="help" id="h_last5">如果轉帳時忘了填附言，我們會用它核對。開頭是 0 也要填。</p><div class="err" id="e_last5"></div><div class="ipt" style="max-width:220px"><span data-icon="wallet"></span><input id="f_last5" inputmode="numeric" maxlength="5" autocomplete="off" aria-describedby="h_last5 e_last5"><span class="okw"></span></div></div>
+            <div class="field" id="w_last5"><label for="f_last5">轉帳帳戶的帳號後五碼</label><p class="help" id="h_last5">如果轉帳時忘了填備註，我們會用它核對。開頭是 0 也要填。</p><div class="err" id="e_last5"></div><div class="ipt" style="max-width:220px"><span data-icon="wallet"></span><input id="f_last5" inputmode="numeric" maxlength="5" autocomplete="off" aria-describedby="h_last5 e_last5"><span class="okw"></span></div></div>
+            <p class="draftnote"><span data-icon="shield-check"></span>填到一半的資料只會暫存在這台裝置，送出後或 24 小時後自動清除。<button type="button" class="linkbtn" id="clearDraft">清除已填資料</button></p>
             <div class="field" id="w_agree"><p class="privacy" id="privacyText"></p><div class="err" id="e_agree"></div><label class="check"><input type="checkbox" id="f_agree" aria-describedby="e_agree"><span>我已閱讀並同意個人資料蒐集告知</span></label></div>
           </form>
         </section>
@@ -483,12 +510,16 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
   <button class="btn" type="button" id="mNext">下一步</button>
 </div></div>
 <div class="scrim" id="scrim"></div>
+<section class="sheet imgsheet" id="imgSheet" role="dialog" aria-modal="true" aria-labelledby="imgT"><div class="grab"></div><h3 id="imgT">長按圖片，選「加入照片」</h3><p class="muted" style="margin:0 0 12px;font-size:14px">存進相簿後，活動當天沒有網路也能出示。</p><img id="imgSheetImg" alt="報到 QR Code 圖片"><p><button type="button" class="btn line" id="imgSheetClose">完成</button></p></section>
+<section class="sheet confirm" id="confirmSheet" role="dialog" aria-modal="true" aria-labelledby="cfT"><div class="grab"></div><h3 id="cfT">確認一下你的訂單</h3><div id="cfBody"></div>
+  <div class="cfwarn"><span data-icon="triangle-alert"></span><span><b>送出後就不能修改餐點。</b>付款前如果想改，只能在訂單頁取消後重新報名；付款後不能修改或加訂。</span></div>
+  <div class="cfacts"><button type="button" class="btn line" id="cfBack">回去修改</button><button type="button" class="btn" id="cfGo">確認送出</button></div></section>
 <section class="sheet" id="cartSheet" role="dialog" aria-modal="true" aria-labelledby="cartT"><div class="grab"></div><h3 id="cartT">你的訂單</h3><ul class="sum-list" id="cartList"></ul><div class="sum-total"><span>總金額</span><span class="num" id="cartTotal"></span></div></section>
 
 <div class="wrap"><footer><span id="footContact"></span>　主辦：國立政治大學學生會</footer></div>
 
-<script src="assets/icons.js?v=20261120a"></script>
-<script src="assets/api.js?v=20261120a"></script>
+<script src="assets/icons.js?v=20261120c"></script>
+<script src="assets/api.js?v=20261120c"></script>
 <script>
 (function(){
   const $ = id => document.getElementById(id);
@@ -523,6 +554,52 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
 
   // ---------- 狀態 ----------
   let catalog = null, step = 0; const cart = {};
+  // 暫存：填到一半的報名（24 小時）、這台裝置最近的訂單（方便回來看 QR Code）
+  const DRAFT_KEY = 'xc_draft_v1', ORDER_KEY = 'xc_order_v1', DRAFT_TTL = 24 * 3600e3, ORDER_TTL = 60 * 24 * 3600e3;
+  const store = {
+    get(k){ try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
+    set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+    del(k){ try { localStorage.removeItem(k); } catch (e) {} }
+  };
+  const FKEYS = ['name', 'sid', 'phone', 'email', 'last5'];
+  let draftTimer = null, draftReady = false;
+  function saveDraft(){
+    if (!draftReady) return;
+    clearTimeout(draftTimer);
+    draftTimer = setTimeout(() => {
+      const f = {}; FKEYS.forEach(k => { const el = $('f_' + k); f[k] = el ? el.value : ''; });
+      const has = Object.values(cart).some(q => q > 0) || FKEYS.some(k => f[k].trim());
+      if (!has) { store.del(DRAFT_KEY); return; }
+      store.set(DRAFT_KEY, { at: Date.now(), cart: { ...cart }, f, ptype: ptype(), step: step === 2 ? 2 : 1 });
+    }, 250);
+  }
+  function loadDraft(){ const d = store.get(DRAFT_KEY); if (!d || Date.now() - (d.at || 0) > DRAFT_TTL) { store.del(DRAFT_KEY); return null; } return d; }
+  function applyDraft(d){
+    const items = all();
+    Object.entries(d.cart || {}).forEach(([id, q]) => { const it = items.find(i => i.id === id); if (it && q > 0 && it.remaining !== 0) cart[id] = Math.min(q, it.remaining == null ? 10 : it.remaining); });
+    FKEYS.forEach(k => { if (d.f && d.f[k]) $('f_' + k).value = d.f[k]; });
+    const r = document.querySelector(`input[name=ptype][value="${d.ptype === 'guest' ? 'guest' : 'nccu'}"]`); if (r) r.checked = true;
+    syncType();
+  }
+  function clearDraft(){
+    store.del(DRAFT_KEY); Object.keys(cart).forEach(k => delete cart[k]);
+    FKEYS.forEach(k => { $('f_' + k).value = ''; $('w_' + k).classList.remove('good', 'bad'); $('e_' + k).innerHTML = ''; });
+    $('f_agree').checked = false;
+  }
+  function draftSummary(d){ const n = Object.values(d.cart || {}).reduce((s, q) => s + (q > 0 ? q : 0), 0); return (n ? `已選 ${n} 份餐點` : '還沒選餐點') + (d.f && d.f.name ? `・${d.f.name}` : ''); }
+  function renderResume(d){
+    const el = $('resume'); const o = store.get(ORDER_KEY);
+    const order = o && Date.now() - (o.at || 0) < ORDER_TTL && /^[0-9a-f]{48}$/.test(o.token || '') ? o : null;
+    if (order) {
+      el.innerHTML = `<span data-icon="ticket"></span><div class="t"><b>你在這台裝置報名過：訂單 ${esc(order.order_no || '')}</b><span>付款資訊和報到方式都在訂單頁。</span></div><div class="acts"><a class="btn" href="?t=${esc(order.token)}">${icon('arrow-right')}查看我的訂單</a></div>`;
+    } else if (d) {
+      el.innerHTML = `<span data-icon="rotate-ccw"></span><div class="t"><b>上次的報名還沒送出，已經幫你保留</b><span>${esc(draftSummary(d))}</span></div><div class="acts"><button type="button" class="btn" id="resumeGo">${icon('arrow-right')}繼續填寫</button><button type="button" class="btn line" id="resumeClear">清除重填</button></div>`;
+    } else { el.classList.add('hidden'); return; }
+    if (window.hydrateIcons) hydrateIcons(el); else el.querySelectorAll('[data-icon]').forEach(x => x.outerHTML = icon(x.dataset.icon));
+    el.classList.remove('hidden');
+    const g = $('resumeGo'); if (g) g.onclick = () => { history.pushState({ s: d.step }, '', '#order'); go(d.step === 2 ? 2 : 1); };
+    const c = $('resumeClear'); if (c) c.onclick = () => { clearDraft(); renderMenu(); updateSummary(false); el.classList.add('hidden'); toast('已清除，可以重新填寫', 'check'); };
+  }
   const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && innerWidth < 1100);
   function toast(m, ic){ const t = $('toast'); t.innerHTML = icon(ic || 'info') + `<span>${esc(m)}</span>`; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), 2600); }
   function say(m){ $('live').textContent = ''; setTimeout(() => $('live').textContent = m, 30); }
@@ -552,15 +629,15 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
     const facts = [['calendar', '日期', real(info['日期']) ? info['日期'] : null], ['clock', '時間', real(info['時間']) ? info['時間'] : null], ['map-pin', '地點', real(info['地點']) ? info['地點'] : null], ['info', '現場', catalog.venue_note || null]];
     $('facts').innerHTML = facts.map(([ic, k, v]) => `<li>${icon(ic)}<b>${k}</b><span>${v ? esc(v) : tbd}</span></li>`).join('');
     $('vlist').innerHTML = catalog.vendors.map(v => `<div class="vcard"><span class="ic">${icon(vIcon(v))}</span><div><b>${esc(v.name)}</b><span>${esc(v.items.slice(0, 4).map(i => i.name).join('、'))}${v.items.length > 4 ? ' 等' : ''}${v.items.length ? `・$${Math.min(...v.items.map(i => i.price))} 起` : ''}</span></div></div>`).join('') || '<p class="muted">餐點待公布</p>';
-    $('how').innerHTML = [['utensils-crossed', '報名，選好餐點', '政大學生填學號；校外人士也可以報名。'], ['wallet', '轉帳，附言填代碼', '政大學生填學號，校外人士填訂單編號。轉完就好，確認入帳後會寄信通知。'], ['ticket', '當天報到、取餐', '政大學生帶學生證，校外人士出示付款完成信裡的 QR Code。']]
+    $('how').innerHTML = [['utensils-crossed', '報名，選好餐點', '政大學生填學號；校外人士也可以報名。'], ['wallet', '轉帳，備註填號碼', '轉帳時在「備註」欄填學號（校外人士填訂單編號）。轉完就好，確認入帳後會寄信通知。'], ['ticket', '當天報到、取餐', '政大學生帶學生證，校外人士出示付款完成信裡的 QR Code。']]
       .map(([ic, t, d], i) => `<li><div class="ic">${icon(ic)}<span>${i + 1}</span></div><h3>${t}</h3><p>${d}</p></li>`).join('');
     $('footContact').textContent = '聯絡我們：' + (catalog.contact_info || '');
     $('privacyText').textContent = catalog.privacy_notice || '';
     const faqs = [
       ['付款後多久會收到確認？', '我們會定期核對入帳紀錄，大約 1 個工作天內寄出「付款完成」通知。轉帳後不需要回到網頁填資料。'],
-      ['轉帳時忘了填附言怎麼辦？', '系統也會用報名時填的帳號後五碼和金額核對。超過 1 個工作天還沒收到確認，請私訊學生會，提供轉帳時間和後五碼。請不要重複轉帳。'],
-      ['校外人士可以參加嗎？', '可以。報名時選「校外人士」，不需要學號；轉帳附言填訂單編號，當天出示付款完成信裡的 QR Code 報到。'],
-      ['可以修改餐點嗎？', '網頁上不能自己修改，請私訊學生會，由工作人員協助。'],
+      ['轉帳時忘了填備註怎麼辦？', '系統也會用報名時填的帳號後五碼和金額核對。超過 1 個工作天還沒收到確認，請私訊學生會，提供轉帳時間和後五碼。請不要重複轉帳。'],
+      ['校外人士可以參加嗎？', '可以。報名時選「校外人士」，不需要學號；轉帳時在備註欄填訂單編號，當天出示付款完成信裡的 QR Code 報到。'],
+      ['可以修改餐點嗎？', '送出前會再請你確認一次。送出後如果還沒付款，可以在訂單頁「取消這筆報名」再重新報名；付款後就不能修改或加訂。'],
       ['下雨怎麼辦？要帶什麼？', '雨備方案和建議攜帶的物品待公布，確定後會在學生會社群通知。'],
       ['可以取消或退費嗎？', '退費規則待公布。'],
     ];
@@ -622,6 +699,7 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
   // ---------- 摘要與步驟 ----------
   let lastTotal = 0;
   function updateSummary(animate){
+    saveDraft();
     const l = list(), t = total();
     const items = l.length ? l.map(i => `<li><span>${esc(i.name)} × ${i.qty}</span><span class="num">$${i.price * i.qty}</span></li>`).join('') : '<li class="empty">還沒選餐點，也可以不點</li>';
     $('sumList').innerHTML = items; $('cartList').innerHTML = items;
@@ -666,11 +744,12 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
     else if (step === 1) swap(() => { $('flow').classList.add('hidden'); $('mbar').classList.remove('on'); $('home').classList.remove('hidden'); step = 0; scrollTo({ top: 0 }); }, 'back');
   });
   $('mMeta').onclick = () => { if (!count()) return; $('scrim').classList.add('on'); $('cartSheet').classList.add('on'); };
-  $('scrim').onclick = () => { $('scrim').classList.remove('on'); $('cartSheet').classList.remove('on'); };
+  $('scrim').onclick = () => { $('scrim').classList.remove('on'); ['cartSheet', 'imgSheet', 'confirmSheet'].forEach(id => $(id).classList.remove('on')); };
 
   function ptype(){ const c = document.querySelector('input[name=ptype]:checked'); return c ? c.value : 'nccu'; }
   function syncType(){ $('w_sid').classList.toggle('hidden', ptype() === 'guest'); }
-  document.addEventListener('change', e => { if (e.target.name === 'ptype') syncType(); });
+  document.addEventListener('change', e => { if (e.target.name === 'ptype') { syncType(); saveDraft(); } });
+  document.addEventListener('input', e => { if (e.target.id && /^f_(name|sid|phone|email|last5)$/.test(e.target.id)) saveDraft(); });
   function renderReview(){
     const l = list();
     $('review').innerHTML = (l.length ? l.map(i => `<div class="rw"><span>${esc(i.name)} × ${i.qty}<div class="s">${esc(i.vendor)}</div></span><span class="num">$${i.price * i.qty}</span></div>`).join('') : '<div class="rw"><span>不點餐，只報名活動</span><span></span></div>')
@@ -707,8 +786,20 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
   $('f_agree').onchange = () => { if ($('f_agree').checked) { $('w_agree').classList.remove('bad'); $('e_agree').innerHTML = ''; } };
   $('errlist').onclick = e => { const a = e.target.closest('[data-f]'); if (a) { e.preventDefault(); $(a.dataset.f).focus(); } };
   let sending = false;
-  async function submit(){
+  function openConfirm(){
+    const l = list(), guest = ptype() === 'guest';
+    $('cfBody').innerHTML = `<p class="cf-who">${esc($('f_name').value.trim())}・${guest ? '校外人士' : '學號 ' + esc($('f_sid').value.trim())}・${esc($('f_phone').value.trim())}</p>
+      <div class="cf-rows">${l.length ? l.map(i => `<div class="rw"><span>${esc(i.name)} × ${i.qty}<br><small class="muted">${esc(i.vendor)}</small></span><span class="num">$${i.price * i.qty}</span></div>`).join('') : '<div class="rw"><span>不點餐，只報名活動</span><span></span></div>'}</div>
+      <div class="cf-tot"><span>總金額</span><span class="num">${money(total())}</span></div>`;
+    $('scrim').classList.add('on'); $('confirmSheet').classList.add('on');
+    setTimeout(() => $('cfGo').focus(), 50);
+  }
+  function closeConfirm(){ $('confirmSheet').classList.remove('on'); $('scrim').classList.remove('on'); }
+  $('cfBack').onclick = closeConfirm;
+  $('cfGo').onclick = () => { closeConfirm(); submit(true); };
+  async function submit(confirmed){
     if (sending || !validate()) return;
+    if (!confirmed) return openConfirm();
     sending = true; [$('sumNext'), $('mNext')].forEach(b => { b.disabled = true; b.innerHTML = icon('loader-circle', 'spin') + '送出中…'; });
     const p = { participant_type: ptype(), name: $('f_name').value.trim(), student_id: ptype() === 'guest' ? null : $('f_sid').value.trim(),
       phone: $('f_phone').value.replace(/[\s-]/g, ''), email: $('f_email').value.trim(), payer_last5: total() === 0 ? '00000' : $('f_last5').value.trim(),
@@ -716,6 +807,7 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
     try {
       const r = await Api.rpc('public_create_registration', { p });
       history.replaceState(null, '', location.pathname + '?t=' + r.lookup_token);
+      clearTimeout(draftTimer); store.del(DRAFT_KEY); store.set(ORDER_KEY, { token: r.lookup_token, order_no: r.order_no, at: Date.now() });
       renderPayment($('step3'), r, true); go(3);
     } catch (e) {
       const net = /Failed to fetch|NetworkError|連線/.test(e.message);
@@ -752,16 +844,17 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
       </div></div>
       <div role="tabpanel" id="pn_qr" aria-labelledby="tb_qr" class="${tab === 'qr' ? '' : 'hidden'}"><div class="qrbox">
         ${r.qr_image_url ? `<img src="${esc(r.qr_image_url)}" alt="學生會收款 QR Code">` : '<p>收款 QR Code 還沒設定，請改用「複製帳號」。</p>'}
-        <p>用另一支手機掃描；同一支手機請長按圖片儲存，再到銀行 App 從相簿匯入。掃碼只會帶入帳號，金額和附言要自己填。</p>
+        <p>用另一支手機掃描；同一支手機請長按圖片儲存，再到銀行 App 從相簿匯入。掃碼只會帶入帳號，金額和備註要自己填。</p>
       </div></div>
-      <div class="memo"><div class="k">${icon('triangle-alert')}附言一定要填</div><div class="row"><span class="v">${esc(r.memo_code)}</span>${copyBtn(r.memo_code, '附言')}</div><p>${guest ? '你的訂單編號' : '你的學號'}，系統靠它確認是你付的款。</p></div>
+      <div class="memo"><div class="k">${icon('triangle-alert')}轉帳時，請在「備註」欄填這串號碼</div><div class="row"><span class="v">${esc(r.memo_code)}</span>${copyBtn(r.memo_code, '轉帳備註')}</div><p>這是${guest ? '你的訂單編號' : '你的學號'}，我們靠它確認是你付的款。每家銀行 App 的叫法不一樣，可能是「備註」「附言」「轉帳說明」或「給收款人的訊息」，填在其中一格就可以。</p></div>
       <ol class="after">
-        <li><span class="ic">${icon('send')}</span><div><b>轉帳</b><span>轉完就好，不用回到這個頁面回報。</span></div></li>
+        <li><span class="ic">${icon('send')}</span><div><b>轉帳，記得填備註</b><span>轉完就好，不用回到這個頁面回報。</span></div></li>
         <li><span class="ic">${icon('mail-check')}</span><div><b>收到「付款完成」信</b><span>我們核對入帳後（大約 1 個工作天）寄到你的 Email${guest ? '，信裡有報到用的 QR Code' : ''}。</span></div></li>
         <li><span class="ic">${icon('ticket')}</span><div><b>活動當天報到、取餐</b><span>${guest ? '出示 QR Code 報到。' : '帶學生證報到。'}</span></div></li>
       </ol>
       <div class="more">
         <details><summary>訂單內容${icon('chevron-down')}</summary><div class="in review" style="border:none;padding:0;background:none">${itemsRows(r.items)}</div></details>
+        <details><summary>想修改餐點？${icon('chevron-down')}</summary><div class="in cancelbox"><p>送出後不能直接修改。<b>還沒付款</b>的話，可以先取消這筆報名，再重新報名一次。</p><p>${icon('triangle-alert')}如果你已經轉帳了，請不要取消，私訊學生會處理。付款後不能修改或加訂。</p><button type="button" class="btn danger" id="selfCancel">${icon('circle-x')}取消這筆報名</button></div></details>
         <details><summary>訂單查詢連結${icon('chevron-down')}</summary><div class="in"><p class="muted" style="margin:0 0 6px;font-size:14px">報名成功信裡也有這個連結，可以先存起來。</p><span class="num" style="font-size:13px;word-break:break-all">${esc(link)}</span> ${copyBtn(link, '查詢連結')}</div></details>
       </div>`;
     el.onclick = async e => {
@@ -769,6 +862,20 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
       if (t) { el.querySelectorAll('[role="tab"]').forEach(b => b.setAttribute('aria-selected', b === t)); el.querySelectorAll('[role="tabpanel"]').forEach(p => p.classList.toggle('hidden', p.id !== t.getAttribute('aria-controls'))); return; }
       const c = e.target.closest('[data-copy]');
       if (c) { const ok = await copyText(c.dataset.copy); const old = c.innerHTML; c.classList.toggle('done', ok); c.innerHTML = ok ? icon('check') + '已複製' : '請長按複製'; say(ok ? '已複製' : '請長按手動複製'); setTimeout(() => { c.innerHTML = old; c.classList.remove('done'); }, 1800); }
+      const sc = e.target.closest('#selfCancel');
+      if (sc) {
+        if (sc.dataset.armed !== '1') { sc.dataset.armed = '1'; sc.innerHTML = icon('triangle-alert') + '確定要取消嗎？再按一次'; setTimeout(() => { if (sc.isConnected) { sc.dataset.armed = ''; sc.innerHTML = icon('circle-x') + '取消這筆報名'; } }, 5000); return; }
+        sc.disabled = true; sc.innerHTML = icon('loader-circle', 'spin') + '取消中…';
+        try {
+          await Api.rpc('public_cancel_registration', { p_token: r.lookup_token });
+          store.del(ORDER_KEY);
+          store.set(DRAFT_KEY, { at: Date.now(), cart: Object.fromEntries((r.items || []).map(i => { const m = all().find(x => x.name === i.name && x.vendor === i.vendor); return m ? [m.id, i.qty] : null; }).filter(Boolean)), f: { name: r.name || '', sid: r.student_id || '', phone: '', email: '', last5: '' }, ptype: r.participant_type, step: 1 });
+          el.innerHTML = `<div class="state-page" style="margin:24px auto">${glyph()}<h2>已取消訂單 ${esc(r.order_no)}</h2><p class="muted">名額已經釋出。剛剛選的餐點已經幫你帶回去，可以修改後重新報名。</p><button type="button" class="btn" id="againBtn">${icon('arrow-right')}重新報名</button></div>`;
+          $('againBtn').onclick = () => { location.href = location.pathname + '#order'; location.reload(); };
+          history.replaceState(null, '', location.pathname);
+        } catch (er) { toast(er.message, 'circle-alert'); sc.disabled = false; sc.dataset.armed = ''; sc.innerHTML = icon('circle-x') + '取消這筆報名'; }
+        return;
+      }
       const tp = e.target.closest('#testPay');
       if (tp) { tp.disabled = true; tp.innerHTML = icon('loader-circle', 'spin') + '處理中…'; try { const r2 = await Api.rpc('public_test_pay', { p_token: r.lookup_token }); swap(() => { renderTicket(el, r2, true); scrollTo({ top: 0 }); }, 'fwd'); } catch (er) { toast(er.message, 'circle-alert'); tp.disabled = false; tp.innerHTML = icon('circle-check') + '模擬已付款'; } }
     };
@@ -778,16 +885,69 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
     if (r.qr_token && window.qrcode) { const q = qrcode(0, 'M'); q.addData(r.qr_token); q.make(); qr = q.createSvgTag({ cellSize: 5, margin: 2, scalable: true }); }
     if (!qr && r.qr_token) qr = `<div style="padding:12px;border:1px dashed var(--ink);border-radius:8px;text-align:center"><div style="font-size:13px">報到代碼</div><div class="num" style="font-weight:600;word-break:break-all">${esc(r.qr_token)}</div></div>`;
     const done = r.status === 'picked_up', guest = r.participant_type === 'guest';
+    const itemCount = x => (x.items || []).length ? (x.items || []).reduce((s, i) => s + i.qty, 0) + ' 份餐點' : '沒有點餐';
+    const linkBtn = `<button type="button" class="btn line" id="copyTicketLink" data-copy="${esc(location.origin + location.pathname + '?t=' + (r.lookup_token || ''))}">${icon('copy')}複製這頁連結</button>`;
     el.innerHTML = `
       ${celebrate ? glyph('celebrate') : ''}
       <div class="status-line"><span class="pill done">${icon('circle-check')}${done ? '已完成報到與取餐' : '付款已確認'}</span>${r.is_test ? `<span class="pill test">${icon('flask-conical')}測試訂單</span>` : ''}<span>訂單 <span class="num">${esc(r.order_no)}</span></span></div>
       <h2 tabindex="-1" id="payT" style="margin:0">${done ? '祝你觀影愉快' : '報名完成，活動當天見'}</h2>
-      ${!done ? `<div class="ticket"><svg class="band" viewBox="0 0 432 36" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${tileBand(12, 36)}</svg>
-        <div class="tin"><div><div class="who">${esc(r.name)}</div><div class="meta"><span>${guest ? '校外人士' : '學號 <span class="num">' + esc(r.student_id) + '</span>'}</span><span>${(r.items || []).length ? (r.items || []).reduce((s, i) => s + i.qty, 0) + ' 份餐點' : '沒有點餐'}</span></div><p class="muted" style="margin:12px 0 0">${guest ? '當天到報到櫃檯出示這個 QR Code，報到後到取餐區取餐。建議先截圖保存。' : '當天帶學生證到報到櫃檯，報到後到取餐區取餐。忘了帶學生證，可以出示這個 QR Code。'}</p></div>
-        <div class="qr" aria-label="報到用 QR Code">${qr}</div></div></div>` : ''}
+      ${!done ? (guest ? `<div class="ticket"><svg class="band" viewBox="0 0 432 36" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${tileBand(12, 36)}</svg>
+        <div class="tin"><div><div class="who">${esc(r.name)}</div><div class="meta"><span>校外人士</span><span>${itemCount(r)}</span></div><p class="muted" style="margin:12px 0 0">活動當天到報到櫃檯出示這個 QR Code，報到後到取餐區取餐。</p></div>
+        <div class="qr" aria-label="報到用 QR Code">${qr}</div></div></div>
+      ${r.qr_token ? `<div class="saveqr"><button type="button" class="btn" id="saveQr">${icon('download')}把 QR Code 存到手機</button>${linkBtn}</div>
+      <p class="muted" style="font-size:14px;margin:0">這是你的報到憑證，建議現在就存進相簿。之後也可以點付款完成信裡的連結，或在報名網站用「查詢訂單」找回來。</p>` : ''}`
+      : `<div class="ticket"><svg class="band" viewBox="0 0 432 36" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${tileBand(12, 36)}</svg>
+        <div class="tin"><div><div class="who">${esc(r.name)}</div><div class="meta"><span>學號 <span class="num">${esc(r.student_id)}</span></span><span>${itemCount(r)}</span></div>
+        <p style="margin:12px 0 0;display:flex;gap:8px;align-items:flex-start">${icon('id-card')}<span><b>活動當天帶學生證報到就好</b><br><span class="muted">工作人員掃你的學生證，就會看到你的餐點，不需要另外出示 QR Code。</span></span></p></div></div></div>
+      ${r.qr_token ? `<div class="more"><details><summary>忘了帶學生證？備用 QR Code${icon('chevron-down')}</summary><div class="in" style="text-align:center"><div class="qr" style="display:inline-block" aria-label="備用報到 QR Code">${qr}</div>
+        <p class="muted" style="font-size:14px">沒帶學生證時，出示這個 QR Code 也能報到。</p><div class="saveqr" style="justify-content:center"><button type="button" class="btn line" id="saveQr">${icon('download')}存到手機</button>${linkBtn}</div></div></details></div>` : ''}`) : ''}
       <div class="more"><details open><summary>訂單內容${icon('chevron-down')}</summary><div class="in review" style="border:none;padding:0;background:none">${itemsRows(r.items)}</div></details>
       ${r.event_info ? `<details><summary>活動資訊${icon('chevron-down')}</summary><div class="in">${esc(r.event_info)}</div></details>` : ''}</div>`;
+    const sq = el.querySelector('#saveQr'); if (sq) sq.onclick = () => saveTicket(r, sq);
+    const cl = el.querySelector('#copyTicketLink'); if (cl) cl.onclick = async () => { const ok = await copyText(cl.dataset.copy); const o = cl.innerHTML; cl.innerHTML = ok ? icon('check') + '已複製' : '請長按複製'; setTimeout(() => cl.innerHTML = o, 1800); };
   }
+
+  // 報到憑證圖片：在手機上產生 PNG（姓名、訂單編號、QR Code），不經過伺服器
+  async function ticketBlob(r){
+    const W = 900, H = 1280, INK = '#182026', c = document.createElement('canvas'); c.width = W; c.height = H;
+    const g = c.getContext('2d'), F = '"Noto Sans TC","PingFang TC","Heiti TC","Microsoft JhengHei",sans-serif';
+    try { await document.fonts.ready; } catch (e) {}
+    g.fillStyle = C.cream; g.fillRect(0, 0, W, H);
+    // 第一張海報的三角樹，放在左上角
+    [[C.green2, 70, 230, 220], [C.red, 230, 390, 320], [C.green, 390, 520, 410]].forEach(([col, y0, y1, w]) => { g.fillStyle = col; g.beginPath(); g.moveTo(0, y0); g.lineTo(w, y1); g.lineTo(0, y1); g.closePath(); g.fill(); });
+    g.fillStyle = INK; g.textAlign = 'right';
+    g.font = `900 64px ${F}`; g.fillText('聖誕', W - 70, 150); g.fillText('露天電影院', W - 70, 230);
+    g.font = `500 30px ${F}`; g.fillStyle = C.green; g.fillText('報到憑證', W - 70, 285);
+    g.textAlign = 'left'; g.fillStyle = INK;
+    g.font = `700 52px ${F}`; g.fillText(String(r.name || '').slice(0, 14), 70, 610);
+    g.font = `500 30px ${F}`; g.fillStyle = '#5E646A';
+    g.fillText(`訂單 ${r.order_no}${r.participant_type === 'guest' ? '・校外人士' : r.student_id ? '・學號 ' + r.student_id : ''}`, 70, 662);
+    const q = qrcode(0, 'M'); q.addData(r.qr_token); q.make();
+    const n = q.getModuleCount(), size = 420, x0 = (W - size) / 2, y0 = 750, cell = size / n;
+    g.fillStyle = '#fff'; g.fillRect(x0 - 28, y0 - 28, size + 56, size + 56);
+    g.fillStyle = '#000'; for (let r1 = 0; r1 < n; r1++) for (let c1 = 0; c1 < n; c1++) if (q.isDark(r1, c1)) g.fillRect(Math.floor(x0 + c1 * cell), Math.floor(y0 + r1 * cell), Math.ceil(cell), Math.ceil(cell));
+    g.textAlign = 'center'; g.fillStyle = INK; g.font = `500 28px ${F}`;
+    g.fillText(r.participant_type === 'guest' ? '活動當天到報到櫃檯出示這張圖' : '活動當天帶學生證報到；忘了帶可以出示這張圖', W / 2, y0 + size + 100);
+    return new Promise(res => c.toBlob(res, 'image/png'));
+  }
+  const isIOS = () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform || ''));
+  async function saveTicket(r, btn){
+    const old = btn.innerHTML; btn.disabled = true; btn.innerHTML = icon('loader-circle', 'spin') + '產生圖片中…';
+    try {
+      const blob = await ticketBlob(r); const name = `露天電影院報到_${r.order_no}.png`;
+      const file = typeof File === 'function' ? new File([blob], name, { type: 'image/png' }) : null;
+      if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try { await navigator.share({ files: [file], title: '露天電影院報到 QR Code' }); toast('在分享選單選「儲存影像」就會存進相簿', 'check'); return; }
+        catch (e) { if (e && e.name === 'AbortError') return; }
+      }
+      const url = URL.createObjectURL(blob);
+      if (isIOS()) { $('imgSheetImg').src = url; $('scrim').classList.add('on'); $('imgSheet').classList.add('on'); return; }
+      const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+      toast('已下載報到 QR Code 圖片', 'download');
+    } catch (e) { toast('無法產生圖片，請直接截圖這個畫面', 'circle-alert'); }
+    finally { btn.disabled = false; btn.innerHTML = old; }
+  }
+  $('imgSheetClose').onclick = () => { $('scrim').classList.remove('on'); $('imgSheet').classList.remove('on'); };
 
   // ---------- 查詢 ----------
   const home = () => `<a class="btn" href="${esc(location.pathname)}">${icon('house')}回到首頁</a>`;
@@ -797,14 +957,45 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
     showState('<div class="state-page"><div class="skel"></div><div class="skel"></div></div>');
     try {
       const r = await Api.rpc('public_get_registration', { p_token: token });
-      if (!r) return showState(`<div class="state-page">${glyph()}<h2>找不到這筆訂單</h2><p class="muted">訂單可能已經取消。如果你已經付款，請不要重複付款，私訊學生會協助確認。</p>${home()}</div>`);
+      if (!r) return showState(`<div class="state-page">${glyph()}<h2>找不到這筆訂單</h2><p class="muted">訂單可能已經取消。如果你已經付款，請不要重複付款，私訊學生會協助確認。</p><p><button class="btn line" type="button" onclick="document.getElementById('lookupLink').click()">${icon('search')}用學號和手機查詢</button></p>${home()}</div>`);
+      store.set(ORDER_KEY, { token, order_no: r.order_no, at: Date.now() });
       const box = document.createElement('div'); box.style.cssText = 'max-width:620px;margin:16px auto 96px';
       $('lookupBody').innerHTML = ''; $('lookupBody').appendChild(box); renderPayment(box, r, false);
     } catch (e) { showState(`<div class="state-page">${glyph()}<h2>目前無法查詢</h2><p class="muted">可能是網路不穩，請稍後再試。</p><button class="btn" type="button" onclick="location.reload()">${icon('refresh-cw')}重新整理</button></div>`); }
   }
-  $('lookupLink').onclick = e => { e.preventDefault();
-    showState(`<div class="state-page">${glyph()}<h2>查詢訂單</h2><p class="muted">為了保護個人資料，訂單只能用專屬連結查詢。請打開報名成功或付款完成的 Email，點裡面的連結；也可以貼在下面。</p><form id="lkForm" style="display:flex;gap:8px;text-align:left;margin:20px 0"><label class="sr" for="lkIn">查詢連結</label><div class="ipt" style="flex:1">${icon('ticket')}<input id="lkIn" placeholder="貼上 Email 裡的查詢連結"></div><button class="btn" type="submit">查詢</button></form><p><a href="${esc(location.pathname)}">回到首頁</a></p></div>`);
-    $('lkForm').onsubmit = ev => { ev.preventDefault(); const v = $('lkIn').value.trim(), m = v.match(/[?&]t=([0-9a-f]{48})/) || v.match(/^([0-9a-f]{48})$/); if (m) { history.pushState(null, '', location.pathname + '?t=' + m[1]); showLookup(m[1]); } else toast('連結格式不正確，請貼上完整的查詢連結', 'circle-alert'); }; };
+  $('lookupLink').onclick = e => { e.preventDefault(); showFind(); };
+  function showFind(){
+    const o = store.get(ORDER_KEY), mine = o && /^[0-9a-f]{48}$/.test(o.token || '') ? o : null;
+    showState(`<div class="state-page">${glyph()}<h2>查詢訂單</h2>
+      ${mine ? `<p><a class="btn" href="?t=${esc(mine.token)}">${icon('ticket')}查看這台裝置的訂單 ${esc(mine.order_no || '')}</a></p><p class="muted" style="margin:16px 0 0">不是這筆？用下面的方式查詢。</p>` : '<p class="muted">輸入報名時填的資料就能找到你的訂單。</p>'}
+      <form id="findForm" class="lkform" novalidate>
+        <div class="row2">
+          <div class="field"><label for="fdCode">學號<span class="muted" style="font-weight:400">（校外人士填訂單編號）</span></label><div class="ipt">${icon('id-card')}<input id="fdCode" autocomplete="off" placeholder="例如 112xxxxxx 或 XC0012" maxlength="12"></div></div>
+          <div class="field"><label for="fdPhone">報名時填的手機號碼</label><div class="ipt">${icon('smartphone')}<input id="fdPhone" type="tel" inputmode="numeric" maxlength="12" placeholder="0912345678" autocomplete="tel"></div></div>
+        </div>
+        <div class="err" id="fdErr" role="alert" style="display:block"></div>
+        <button class="btn" type="submit" id="fdGo">${icon('search')}查詢</button>
+      </form>
+      <details class="more" style="text-align:left"><summary>有 Email 裡的訂單連結？${icon('chevron-down')}</summary><div class="in"><form id="lkForm" style="display:flex;gap:8px"><label class="sr" for="lkIn">查詢連結</label><div class="ipt" style="flex:1">${icon('ticket')}<input id="lkIn" placeholder="貼上 Email 裡的查詢連結"></div><button class="btn line" type="submit">開啟</button></form></div></details>
+      <p style="margin-top:20px"><a href="${esc(location.pathname)}">回到首頁</a></p></div>`);
+    $('findForm').onsubmit = async ev => {
+      ev.preventDefault();
+      const code = $('fdCode').value.trim().toUpperCase(), ph = $('fdPhone').value.replace(/[\s-]/g, '');
+      if (!/^([0-9]{9}|XC[0-9]{4,})$/.test(code)) { $('fdErr').innerHTML = icon('circle-alert') + '請填 9 碼學號，校外人士請填訂單編號（例如 XC0012）'; $('fdCode').focus(); return; }
+      if (!/^09[0-9]{8}$/.test(ph)) { $('fdErr').innerHTML = icon('circle-alert') + '請填報名時的 10 碼手機號碼'; $('fdPhone').focus(); return; }
+      const bt = $('fdGo'); bt.disabled = true; bt.innerHTML = icon('loader-circle', 'spin') + '查詢中…';
+      try {
+        const r = await Api.rpc('public_find_registration', { p_code: code, p_phone: ph });
+        if (!r) { $('fdErr').innerHTML = icon('circle-alert') + '找不到符合的訂單。請確認學號（或訂單編號）和手機號碼是報名時填的；已取消的訂單查不到。'; return; }
+        store.set(ORDER_KEY, { token: r.lookup_token, order_no: r.order_no, at: Date.now() });
+        history.pushState(null, '', location.pathname + '?t=' + r.lookup_token);
+        const box = document.createElement('div'); box.style.cssText = 'max-width:620px;margin:16px auto 96px';
+        $('lookupBody').innerHTML = ''; $('lookupBody').appendChild(box); renderPayment(box, r, false); scrollTo({ top: 0 });
+      } catch (er) { $('fdErr').innerHTML = icon('circle-alert') + esc(er.message); }
+      finally { if (bt.isConnected) { bt.disabled = false; bt.innerHTML = icon('search') + '查詢'; } }
+    };
+    $('lkForm').onsubmit = ev => { ev.preventDefault(); const v = $('lkIn').value.trim(), m = v.match(/[?&]t=([0-9a-f]{48})/) || v.match(/^([0-9a-f]{48})$/); if (m) { history.pushState(null, '', location.pathname + '?t=' + m[1]); showLookup(m[1]); } else toast('連結格式不正確，請貼上完整的查詢連結', 'circle-alert'); };
+  }
 
   // ---------- 啟動 ----------
   async function init(){
@@ -813,8 +1004,12 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
     catch (e) { showState(`<div class="state-page">${glyph()}<h2>目前無法連線</h2><p class="muted">可能是網路不穩，請稍後再試。</p><button class="btn" type="button" onclick="location.reload()">${icon('refresh-cw')}重新整理</button></div>`); return; }
     renderHome();
     if (token) return showLookup(token);
-    renderMenu(); updateSummary(false);
-    if (location.hash === '#order') history.replaceState(null, '', location.pathname);
+    const d = loadDraft();
+    if (d) applyDraft(d);
+    renderMenu(); draftReady = true; updateSummary(false);
+    $('clearDraft').onclick = () => { clearDraft(); renderMenu(); updateSummary(false); toast('已清除這台裝置暫存的資料', 'check'); if (step === 2) renderReview(); };
+    if (location.hash === '#order' && d) { go(d.step === 2 ? 2 : 1); toast('已恢復你剛剛填寫的內容', 'rotate-ccw'); }
+    else { if (location.hash === '#order') history.replaceState(null, '', location.pathname); renderResume(d); }
   }
   init();
 })();
