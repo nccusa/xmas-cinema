@@ -1,7 +1,7 @@
 // 露天電影院：Service Worker
 // 網頁檔一律先抓最新版（網路優先），斷線時才用快取；Supabase 的資料請求完全不經過這裡。
-const CACHE = 'xc-20261120c';
-const SHELL = ['./', './index.html', './scan.html', './admin.html', './assets/api.js?v=20261120c', './assets/icons.js?v=20261120c',
+const CACHE = 'xc-20261120d';
+const SHELL = ['./', './index.html', './scan.html', './admin.html', './assets/api.js?v=20261120d', './assets/icons.js?v=20261120d',
   './icons/scan-192.png', './icons/admin-192.png', './scan.webmanifest', './admin.webmanifest'];
 const CDN = ['cdn.jsdelivr.net', 'cdnjs.cloudflare.com', 'fonts.googleapis.com', 'fonts.gstatic.com'];
 

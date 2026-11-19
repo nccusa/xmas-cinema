@@ -110,6 +110,13 @@ input[type=checkbox]{width:17px;height:17px;accent-color:var(--green)}
 .tbl td{padding:11px 12px;border-bottom:1px solid var(--rule);vertical-align:middle}
 .tbl tr:last-child td{border-bottom:0}
 .tbl tr.click{cursor:pointer;transition:background .1s}
+.tbl .selc{width:44px;padding:0 0 0 12px}
+.tbl .selc input{width:20px;height:20px;accent-color:var(--green,#004E3B);cursor:pointer;vertical-align:middle}
+.tbl tr.picked td{background:#EEF5F1}
+.bulkbar{position:sticky;top:8px;z-index:5;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 12px;margin-bottom:12px;border-radius:12px;background:var(--ink,#182026);color:#fff;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+.bulkbar b{margin-right:4px}.bulkbar .grow{flex:1}
+.bulkbar .btn.sec{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.25)}
+.bulkbar .btn.sec:hover{background:rgba(255,255,255,.2)}
 .tbl tr.click:hover td{background:#FBF8F0}
 .tbl .r{text-align:right}
 .tblwrap{border:1px solid var(--rule);border-radius:12px;overflow:auto;background:#fff;max-height:70vh}
@@ -266,8 +273,8 @@ pre.mail{white-space:pre-wrap;background:var(--sunk);border:1px solid var(--rule
 <div class="dialog" id="dialog" role="alertdialog" aria-modal="true"><div class="box" id="dialogBox"></div></div>
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
-<script src="assets/icons.js?v=20261120c"></script>
-<script src="assets/api.js?v=20261120c"></script>
+<script src="assets/icons.js?v=20261120d"></script>
+<script src="assets/api.js?v=20261120d"></script>
 <script>
 (function(){
   Api.storeKey = 'xc_admin_session';
@@ -411,7 +418,7 @@ pre.mail{white-space:pre-wrap;background:var(--sunk);border:1px solid var(--rule
   }
 
   // ---------- 訂單 ----------
-  let oq = '', ost = 'all', onlyTest = false;
+  let oq = '', ost = 'all', onlyTest = false; const osel = new Set();
   function orderFilter(r){
     if (onlyTest && !r.is_test) return false;
     if (ost === 'overdue') return overdue(r);
@@ -427,6 +434,8 @@ pre.mail{white-space:pre-wrap;background:var(--sunk);border:1px solid var(--rule
     const segs = [['all', '全部'], ['pending_payment', '待付款'], ['overdue', '逾期'], ['paid', '已付款'], ['checked', '已報到'], ['picked_up', '全部完成'], ['balance', '差額'], ['cancelled', '已取消']];
     const cnt = k => { const o = ost; ost = k; const n = base.filter(orderFilter).length; ost = o; return n; };
     const list = base.filter(orderFilter);
+    [...osel].forEach(id => { if (!list.some(r => r.id === id)) osel.delete(id); });
+    const picked = list.filter(r => osel.has(r.id)), allOn = list.length > 0 && picked.length === list.length;
     page().innerHTML = `
       <div class="row" style="margin-bottom:12px">
         <label class="searchbox grow" style="max-width:420px">${icon('search')}<input class="in" id="oq" placeholder="姓名、學號、手機、Email、訂單編號" value="${esc(oq)}" aria-label="搜尋訂單"></label>
@@ -434,8 +443,14 @@ pre.mail{white-space:pre-wrap;background:var(--sunk);border:1px solid var(--rule
       </div>
       <div class="seg" role="group" aria-label="狀態篩選" style="margin-bottom:14px">${segs.map(([k, n]) => `<button type="button" data-st="${k}" aria-pressed="${ost === k}">${n}<span class="c">${cnt(k)}</span></button>`).join('')}</div>
       ${ost === 'overdue' && list.length ? `<div class="note caution">${icon('triangle-alert')}<div class="grow">這些人已經超過付款期限。<b>先匯入最新的郵局明細</b>，確認還是沒付，再設定新期限（會產生「延長期限通知」信，核准後才寄出）。</div><button class="btn sm" type="button" id="extendAll">為 ${list.length} 人設定新期限</button></div>` : ''}
-      ${list.length ? `<div class="tblwrap"><table class="tbl"><thead><tr><th>訂單</th><th>姓名</th><th>學號／身分</th><th>手機</th><th class="r">應付／已付</th><th>狀態</th><th>報到・取餐</th><th>報名時間</th></tr></thead><tbody>
-        ${list.map(r => { const vendors = new Set((r.order_items || []).map(o => o.vendor_name)).size; return `<tr class="click" data-id="${r.id}" tabindex="0">
+      ${picked.length ? `<div class="bulkbar" role="region" aria-label="批次操作"><b>已選 ${picked.length} 筆</b><span class="grow"></span>
+        ${picked.some(r => r.status === 'pending_payment') ? `<button class="btn sm sec" type="button" data-bulk="deadline">${icon('calendar')}設定付款期限</button>` : ''}
+        ${picked.some(r => r.status !== 'cancelled') ? `<button class="btn sm sec" type="button" data-bulk="cancel">${icon('circle-x')}取消報名</button>` : ''}
+        <button class="btn sm danger" type="button" data-bulk="delete">${icon('trash-2')}永久刪除</button>
+        <button class="btn sm sec" type="button" data-bulk="clear">取消選取</button></div>` : ''}
+      ${list.length ? `<div class="tblwrap"><table class="tbl"><thead><tr><th class="selc"><input type="checkbox" id="selAll" aria-label="全選這一頁的訂單" ${allOn ? 'checked' : ''}></th><th>訂單</th><th>姓名</th><th>學號／身分</th><th>手機</th><th class="r">應付／已付</th><th>狀態</th><th>報到・取餐</th><th>報名時間</th></tr></thead><tbody>
+        ${list.map(r => { const vendors = new Set((r.order_items || []).map(o => o.vendor_name)).size; return `<tr class="click${osel.has(r.id) ? ' picked' : ''}" data-id="${r.id}" tabindex="0">
+          <td class="selc"><input type="checkbox" data-sel="${r.id}" aria-label="選取 ${esc(r.order_no)}" ${osel.has(r.id) ? 'checked' : ''}></td>
           <td class="num">${esc(r.order_no)}</td>
           <td class="namecell"><b>${esc(r.name)}</b><span class="tags">${r.is_test ? `<span class="mini test">${icon('flask-conical')}測試</span>` : ''}${r.internal_note ? `<span class="mini" title="有備註">${icon('sticky-note')}</span>` : ''}</span></td>
           <td>${r.participant_type === 'guest' ? `<span class="mini guest">${icon('globe')}校外</span>` : `<span class="num">${esc(r.student_id)}</span>`}</td>
@@ -449,13 +464,50 @@ pre.mail{white-space:pre-wrap;background:var(--sunk);border:1px solid var(--rule
     page().querySelector('.seg').onclick = e => { const b = e.target.closest('[data-st]'); if (b) { ost = b.dataset.st; renderOrders(); } };
     if ($('onlyTest')) $('onlyTest').onchange = e => { onlyTest = e.target.checked; renderOrders(); };
     const tb = page().querySelector('tbody');
+    if ($('selAll')) { $('selAll').indeterminate = picked.length > 0 && !allOn; $('selAll').onchange = e => { list.forEach(r => e.target.checked ? osel.add(r.id) : osel.delete(r.id)); renderOrders(); }; }
+    if (tb) tb.addEventListener('click', e => {
+      const cb = e.target.closest('[data-sel]'), cell = e.target.closest('.selc');
+      if (!cb && !cell) return;
+      e.stopImmediatePropagation();
+      const box = cb || cell.querySelector('input'); if (!cb) box.checked = !box.checked;
+      const id = box.dataset.sel, on = box.checked;
+      if (e.shiftKey && osel.last && list.some(r => r.id === osel.last)) { const a = list.findIndex(r => r.id === osel.last), b = list.findIndex(r => r.id === id); list.slice(Math.min(a, b), Math.max(a, b) + 1).forEach(r => on ? osel.add(r.id) : osel.delete(r.id)); }
+      else on ? osel.add(id) : osel.delete(id);
+      osel.last = id; const y = scrollY; renderOrders(); scrollTo(0, y);
+    }, true);
+    page().querySelectorAll('[data-bulk]').forEach(b => b.onclick = () => bulk(b.dataset.bulk, picked));
     if (tb) { tb.onclick = e => { const tr = e.target.closest('[data-id]'); if (tr) openOrder(tr.dataset.id); }; tb.onkeydown = e => { if (e.key === 'Enter') { const tr = e.target.closest('[data-id]'); if (tr) openOrder(tr.dataset.id); } }; }
     if ($('extendAll')) $('extendAll').onclick = async () => {
       const v = await ask({ title: `為 ${list.length} 人設定新的付款期限`, body: '每個人都會產生一封「延長期限通知」信，要到「信件」核准才會寄出。', input: { label: '新的付款期限（台北時間）', type: 'datetime-local' }, ok: '設定' });
       if (!v) return; const dl = fromLocalInput(v);
-      for (const r of list) await run(() => Api.rpc('admin_update_registration', { p_reg: r.id, p: { payment_deadline: dl } }));
+      await run(() => Api.rpc('admin_bulk_registrations', { p_ids: list.map(r => r.id), p_action: 'deadline', p_value: dl }));
       toast('已設定，請到「信件」核准延長通知'); refresh();
     };
+  }
+  async function bulk(act, picked){
+    if (act === 'clear') { osel.clear(); return renderOrders(); }
+    const ids = picked.map(r => r.id), n = ids.length;
+    const pend = picked.filter(r => r.status === 'pending_payment'), live = picked.filter(r => r.status !== 'cancelled');
+    const paidLive = live.filter(r => r.paid_amount > 0);
+    const deletable = picked.filter(r => r.is_test || (r.status === 'cancelled' && !(r.paid_amount > 0)));
+    let res;
+    if (act === 'deadline') {
+      const v = await ask({ title: `為 ${pend.length} 筆待付款訂單設定新的付款期限`, body: (n > pend.length ? `選取的另外 ${n - pend.length} 筆不是待付款，會略過。` : '') + '每個人都會產生一封「延長期限通知」信，要到「信件」核准才會寄出。', input: { label: '新的付款期限（台北時間）', type: 'datetime-local' }, ok: '設定' });
+      if (!v) return;
+      res = await run(() => Api.rpc('admin_bulk_registrations', { p_ids: pend.map(r => r.id), p_action: 'deadline', p_value: fromLocalInput(v) }));
+      if (res) toast(`已為 ${res.done} 筆設定新期限，請到「信件」核准延長通知`);
+    } else if (act === 'cancel') {
+      if (!(await ask({ title: `取消 ${live.length} 筆報名？`, body: `名額和限量餐點會釋出，還沒寄出的信也會一起取消。${paidLive.length ? `其中 ${paidLive.length} 筆已經付款，取消後記得另外處理退款。` : ''}${n > live.length ? `另外 ${n - live.length} 筆本來就已取消，會略過。` : ''}`, ok: `取消 ${live.length} 筆`, danger: true, cancel: '先不要' }))) return;
+      res = await run(() => Api.rpc('admin_bulk_registrations', { p_ids: live.map(r => r.id), p_action: 'cancel' }));
+      if (res) toast(`已取消 ${res.done} 筆`);
+    } else if (act === 'delete') {
+      if (!deletable.length) return toast('只能永久刪除「已取消且沒收過款」或「測試」的訂單。正式訂單請先取消；已收款的訂單要保留帳務紀錄。', 'err');
+      const typed = await ask({ title: `永久刪除 ${deletable.length} 筆訂單？`, body: `訂單、餐點、報到取餐紀錄和信件都會刪除，不能復原，訂單編號也不會重新使用。${n > deletable.length ? `另外 ${n - deletable.length} 筆是正式訂單且還沒取消（或已收過款），不會刪除。` : ''}`, input: { label: `確認請輸入「刪除」`, placeholder: '刪除' }, ok: '永久刪除', danger: true, cancel: '先不要' });
+      if (!typed) return; if (typed.trim() !== '刪除') return toast('沒有輸入「刪除」，已取消操作', 'err');
+      res = await run(() => Api.rpc('admin_bulk_registrations', { p_ids: deletable.map(r => r.id), p_action: 'delete' }));
+      if (res) toast(`已永久刪除 ${res.done} 筆`);
+    }
+    if (res) { osel.clear(); await loadAll(); renderOrders(); }
   }
   function openDrawer(html){ $('drawer').innerHTML = html; $('drawer').classList.add('on'); $('scrim').classList.add('on'); }
   function closeDrawer(){ $('drawer').classList.remove('on'); $('scrim').classList.remove('on'); }
@@ -472,7 +524,7 @@ pre.mail{white-space:pre-wrap;background:var(--sunk);border:1px solid var(--rule
       <div class="dhead">
         <div class="row"><div class="grow"><h2 id="dTitle">${esc(r.name)}</h2><div class="sub"><span class="num">${esc(r.order_no)}</span>・${r.participant_type === 'guest' ? '校外人士' : '學號 <span class="num">' + esc(r.student_id) + '</span>'}・${esc(r.email)}</div></div>
         <button class="btn quiet sm" type="button" id="dClose" aria-label="關閉">${icon('x')}</button></div>
-        <div class="row" style="margin-top:10px">${stBadge(r)}${r.is_test ? `<span class="badge b-crit flat">${icon('flask-conical')}測試資料</span>` : ''}${r.paid_method ? `<span class="small muted">付款方式：${esc({ memo: '附言自動對帳', last5_amount: '後五碼自動對帳', manual_confirm: '人工確認配對', manual: '人工入帳', test: '測試模擬付款', no_payment_needed: '不需付款' }[r.paid_method] || r.paid_method)}</span>` : ''}</div>
+        <div class="row" style="margin-top:10px">${stBadge(r)}${r.is_test ? `<span class="badge b-crit flat">${icon('flask-conical')}測試資料</span>` : ''}${r.paid_method ? `<span class="small muted">付款方式：${esc({ memo: '備註學號／編號自動對帳', last5_amount: '後五碼自動對帳', memo_name: '備註姓名自動對帳', manual_confirm: '人工確認配對', manual: '人工入帳', test: '測試模擬付款', no_payment_needed: '不需付款' }[r.paid_method] || r.paid_method)}</span>` : ''}</div>
         <div class="timeline">${steps.map(([n, t, on]) => `<div class="${on ? 'on' : ''}"><b>${n}</b>${t && on ? esc(fmtTime(t).slice(5)) : '—'}</div>`).join('')}</div>
       </div>
       <div class="dbody">
