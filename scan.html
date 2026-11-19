@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>現場報到掃描｜聖誕露天電影院</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js"></script>
+<style>
+:root{--bg:#0b1230;--card:#141e48;--line:rgba(255,255,255,.12);--ink:#f6f1e7;--muted:#aeb6d3;--gold:#f3c56b;--ok:#1f9d63;--okbg:#0f3d2b;--bad:#d64a3f;--badbg:#45161a;--warn:#e89a2c;--warnbg:#47310f}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Noto Sans TC",system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+header{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line);background:#0e1640}
+header h1{font-size:17px;margin:0;flex:1}
+header h1 span{color:var(--gold)}
+.hbtn{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:10px;padding:8px 12px;font:inherit;font-size:14px;cursor:pointer;min-height:40px}
+.hbtn.on{border-color:var(--gold);color:var(--gold)}
+main{display:grid;grid-template-columns:minmax(280px,42%) 1fr;gap:16px;padding:16px;min-height:calc(100vh - 62px)}
+@media (max-width:800px),(orientation:portrait){main{grid-template-columns:1fr}}
+.cam{background:#000;border-radius:18px;overflow:hidden;position:relative;aspect-ratio:4/3;align-self:start}
+.cam video{width:100%;height:100%;object-fit:cover;display:block}
+.cam .aim{position:absolute;left:10%;right:10%;top:35%;bottom:35%;border:3px solid rgba(243,197,107,.85);border-radius:12px;box-shadow:0 0 0 999px rgba(0,0,0,.25)}
+.cam .msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;color:var(--muted);font-size:15px}
+.side{display:flex;flex-direction:column;gap:14px}
+.search{display:flex;gap:8px}
+.search input{flex:1;padding:14px;border-radius:12px;border:1px solid var(--line);background:#0a102b;color:var(--ink);font:inherit;font-size:17px}
+.search button{border:none;border-radius:12px;background:var(--gold);color:#2a1d05;font:inherit;font-weight:700;padding:0 20px;font-size:16px;cursor:pointer}
+.wedge{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.dot{width:10px;height:10px;border-radius:50%;background:#555}
+.dot.live{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.result{border-radius:20px;padding:22px;background:var(--card);border:2px solid var(--line);min-height:300px}
+.result.ok{background:var(--okbg);border-color:var(--ok)}
+.result.bad{background:var(--badbg);border-color:var(--bad)}
+.result.warn{background:var(--warnbg);border-color:var(--warn)}
+.result.done{background:#132a46;border-color:#5aa7ff}
+.big{font-size:30px;font-weight:900;line-height:1.25}
+.state{display:inline-block;font-weight:900;font-size:18px;border-radius:10px;padding:4px 14px;margin-bottom:10px}
+.ok .state{background:var(--ok)}.bad .state{background:var(--bad)}.warn .state{background:var(--warn);color:#2a1300}.done .state{background:#5aa7ff;color:#04142b}
+.who{color:var(--muted);font-size:16px;margin:4px 0 14px}
+.vendor{margin:12px 0 4px;font-weight:700;color:var(--gold);font-size:16px}
+.line{display:flex;justify-content:space-between;font-size:22px;padding:6px 0;border-bottom:1px dashed var(--line)}
+.line b{font-size:26px}
+.note{margin-top:14px;background:rgba(243,197,107,.15);border:1px solid rgba(243,197,107,.5);border-radius:12px;padding:10px 12px;font-size:16px;white-space:pre-wrap}
+.go{width:100%;margin-top:18px;border:none;border-radius:16px;padding:20px;font:inherit;font-weight:900;font-size:24px;background:#fff;color:#0f3d2b;cursor:pointer}
+.go:disabled{opacity:.5}
+.list button{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:12px;margin:6px 0;font:inherit;cursor:pointer}
+.login{max-width:380px;margin:12vh auto;padding:24px;background:var(--card);border-radius:18px;border:1px solid var(--line)}
+.login input{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:#0a102b;color:var(--ink);font:inherit;font-size:16px;margin:6px 0 12px}
+.st{display:block;width:100%;text-align:left;margin:10px 0;padding:16px 18px;border-radius:14px;border:2px solid var(--line);background:#0a102b;color:var(--ink);font:inherit;font-size:18px;font-weight:700;cursor:pointer}
+.st small{display:block;font-weight:400;color:var(--muted);font-size:14px;margin-top:2px}
+.st:hover{border-color:var(--gold)}
+.badge{display:inline-block;border-radius:8px;padding:2px 10px;font-size:15px;font-weight:700;margin-right:6px}
+.b-in{background:#1f9d63}.b-food{background:#d64a3f}.b-one{background:#5aa7ff;color:#04142b}
+.line.dim{opacity:.35}
+.line .got{font-size:14px;color:#7fe0b4;margin-left:8px}
+.hint{margin-top:12px;border-radius:12px;padding:10px 12px;font-size:16px;background:rgba(255,255,255,.08)}
+.login button{width:100%;padding:14px;border:none;border-radius:12px;background:var(--gold);font:inherit;font-weight:700;font-size:16px;cursor:pointer}
+.err{color:#ff9b8f;font-size:14px;min-height:20px}
+.muted{color:var(--muted)}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div id="loginView" class="login hidden">
+  <h2 style="margin-top:0">工作人員登入</h2>
+  <form id="loginForm">
+    <label>Email<input type="email" id="lEmail" autocomplete="username" required></label>
+    <label>密碼<input type="password" id="lPass" autocomplete="current-password" required></label>
+    <div class="err" id="lErr"></div>
+    <button type="submit">登入</button>
+  </form>
+</div>
+
+<div id="stationView" class="login hidden" style="max-width:560px">
+  <h2 style="margin-top:0">這台裝置是哪一站？</h2>
+  <p class="muted">選一次就好，這台裝置之後都會記住。換站時按右上角「切換站別」。</p>
+  <div id="stationList"></div>
+</div>
+
+<div id="app" class="hidden">
+  <header>
+    <h1 id="stTitle">🎄 現場</h1>
+    <button class="hbtn" id="stBtn" type="button">切換站別</button>
+    <button class="hbtn on" id="camBtn" type="button">鏡頭：開</button>
+    <button class="hbtn" id="outBtn" type="button">登出</button>
+  </header>
+  <main>
+    <div>
+      <div class="cam" id="cam"><video id="video" playsinline muted></video><div class="aim"></div><div class="msg hidden" id="camMsg"></div></div>
+      <div class="wedge" style="margin-top:10px"><span class="dot live" id="wedgeDot"></span>條碼槍隨時可用：直接掃描即可，不需要點任何地方</div>
+    </div>
+    <div class="side">
+      <form class="search" id="searchForm">
+        <input id="q" placeholder="沒帶學生證／校外人士：輸入姓名、手機、學號或訂單編號" autocomplete="off">
+        <button type="submit">查詢</button>
+      </form>
+      <div class="list" id="list"></div>
+      <div class="result" id="result"><div class="big muted">請掃描學生證</div><p class="muted">也可以掃描付款完成信裡的 QR Code。</p></div>
+    </div>
+  </main>
+</div>
+
+<script src="assets/api.js"></script>
+<script>
+(function(){
+  Api.storeKey = 'xc_staff_session';
+  const $ = id => document.getElementById(id);
+  let current = null, lastCode = '', lastAt = 0, busy = false, stream = null, zx = null, detector = null, camOn = true, scanTimer = null;
+
+  // ---------- 回饋音效 ----------
+  let actx = null;
+  function beep(ok){ try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); const o = actx.createOscillator(), g = actx.createGain(); o.frequency.value = ok ? 1046 : 220; g.gain.value = .12; o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime + (ok ? .12 : .35)); } catch (e) {} if (navigator.vibrate) navigator.vibrate(ok ? 60 : [80,60,80]); }
+
+  // ---------- 登入 ----------
+  async function boot(){
+    Api.loadSession();
+    if (!Api.session) return showLogin();
+    try { const role = await Api.rpc('my_role'); if (!role) throw new Error('這個帳號沒有工作人員權限'); }
+    catch (e) { await Api.logout(); return showLogin(e.message); }
+    $('loginView').classList.add('hidden');
+    let st = null; try { st = JSON.parse(localStorage.getItem('xc_station')); } catch (e) {}
+    if (!st) return pickStation();
+    setStation(st);
+  }
+  async function pickStation(){
+    stopCamera(); $('app').classList.add('hidden'); $('stationView').classList.remove('hidden');
+    let vendors = []; try { vendors = await Api.rpc('staff_vendors'); } catch (e) {}
+    const opts = [{ mode: 'checkin', label: '報到站', desc: '只確認報到，不交付餐點' }, { mode: 'pickup', vendor: null, label: '取餐站（全部店家）', desc: '一次交付這位同學所有的餐點' }]
+      .concat(vendors.map(v => ({ mode: 'pickup', vendor: v, label: '取餐站：' + v, desc: '只交付這家店的餐點' })))
+      .concat([{ mode: 'both', label: '單一櫃檯（報到＋取餐一次完成）', desc: '報到和取餐在同一個位置時使用' }]);
+    $('stationList').innerHTML = opts.map((o, i) => `<button class="st" type="button" data-i="${i}">${esc(o.label)}<small>${esc(o.desc)}</small></button>`).join('');
+    $('stationList').onclick = e => { const b = e.target.closest('[data-i]'); if (!b) return; const o = opts[+b.dataset.i]; try { localStorage.setItem('xc_station', JSON.stringify(o)); } catch (er) {} setStation(o); };
+  }
+  let station = null;
+  function setStation(o){
+    station = o; $('stationView').classList.add('hidden'); $('app').classList.remove('hidden');
+    const cls = o.mode === 'checkin' ? 'b-in' : o.mode === 'pickup' ? 'b-food' : 'b-one';
+    $('stTitle').innerHTML = `<span class="badge ${cls}">${esc(o.mode === 'checkin' ? '報到站' : o.mode === 'pickup' ? '取餐站' : '單一櫃檯')}</span>${o.mode === 'pickup' ? esc(o.vendor || '全部店家') : o.mode === 'checkin' ? '確認報到' : '報到＋取餐'}`;
+    $('result').className = 'result'; $('result').innerHTML = '<div class="big muted">請掃描學生證或報到 QR Code</div>';
+    startCamera();
+  }
+  $('stBtn').onclick = pickStation;
+  function showLogin(msg){ $('stationView').classList.add('hidden'); $('app').classList.add('hidden'); $('loginView').classList.remove('hidden'); $('lErr').textContent = msg || ''; }
+  $('loginForm').onsubmit = async e => { e.preventDefault(); $('lErr').textContent = ''; try { await Api.login($('lEmail').value.trim(), $('lPass').value); $('lPass').value = ''; boot(); } catch (err) { $('lErr').textContent = '登入失敗：' + err.message; } };
+  $('outBtn').onclick = async () => { stopCamera(); await Api.logout(); showLogin(); };
+
+  // ---------- 鏡頭 ----------
+  async function startCamera(){
+    if (!camOn) return;
+    $('camMsg').classList.add('hidden');
+    try {
+      if ('BarcodeDetector' in window) {
+        const fmts = await BarcodeDetector.getSupportedFormats();
+        detector = new BarcodeDetector({ formats: ['code_128','code_39','codabar','ean_13','itf','qr_code'].filter(f => fmts.includes(f)) });
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 } }, audio: false });
+        $('video').srcObject = stream; await $('video').play();
+        const loop = async () => { if (!camOn || !stream) return; try { const codes = await detector.detect($('video')); if (codes.length) onCode(codes[0].rawValue, 'cam'); } catch (e) {} scanTimer = setTimeout(loop, 180); };
+        loop();
+      } else if (window.ZXing) {
+        const hints = new Map(); hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [ZXing.BarcodeFormat.CODE_128, ZXing.BarcodeFormat.CODE_39, ZXing.BarcodeFormat.CODABAR, ZXing.BarcodeFormat.EAN_13, ZXing.BarcodeFormat.ITF, ZXing.BarcodeFormat.QR_CODE]);
+        hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
+        zx = new ZXing.BrowserMultiFormatReader(hints, 200);
+        await zx.decodeFromConstraints({ video: { facingMode: 'environment', width: { ideal: 1280 } } }, $('video'), (res) => { if (res) onCode(res.getText(), 'cam'); });
+      } else throw new Error('這個瀏覽器不支援鏡頭掃描');
+    } catch (e) {
+      $('camMsg').textContent = '鏡頭無法啟動（' + e.message + '）。請允許相機權限，或直接使用條碼槍／手動查詢。';
+      $('camMsg').classList.remove('hidden');
+    }
+  }
+  function stopCamera(){
+    clearTimeout(scanTimer);
+    if (zx) { try { zx.reset(); } catch (e) {} zx = null; }
+    if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
+  }
+  $('camBtn').onclick = () => { camOn = !camOn; $('camBtn').textContent = '鏡頭：' + (camOn ? '開' : '關'); $('camBtn').classList.toggle('on', camOn); if (camOn) startCamera(); else { stopCamera(); $('camMsg').textContent = '鏡頭已關閉，條碼槍仍可使用'; $('camMsg').classList.remove('hidden'); } };
+
+  // ---------- 條碼槍（模擬鍵盤輸入，與鏡頭同時運作） ----------
+  let buf = '', lastKey = 0;
+  document.addEventListener('keydown', e => {
+    const inField = e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA');
+    if (inField) return;
+    const now = Date.now();
+    if (now - lastKey > 120) buf = '';
+    lastKey = now;
+    if (e.key === 'Enter') { if (buf.length >= 6) { onCode(buf, 'gun'); e.preventDefault(); } buf = ''; return; }
+    if (e.key.length === 1) buf += e.key;
+  });
+
+  // ---------- 查詢與顯示 ----------
+  async function onCode(raw, src){
+    const code = String(raw || '').trim();
+    if (!code || busy) return;
+    const now = Date.now();
+    if (src === 'cam' && code === lastCode && now - lastAt < 4000) return;
+    lastCode = code; lastAt = now; busy = true;
+    try { const r = await Api.rpc('staff_lookup', { p_code: code }); show(r); beep(r.found && (r.status === 'paid' || r.status === 'picked_up') && !!document.getElementById('goBtn')); }
+    catch (e) { showError(e.message); beep(false); }
+    finally { busy = false; }
+  }
+  function itemsHtml(items, onlyVendor){
+    if (!items || !items.length) return '<div class="muted" style="font-size:18px;margin-top:10px">沒有點餐（只報到）</div>';
+    const by = {}; items.forEach(i => { (by[i.vendor] = by[i.vendor] || []).push(i); });
+    return Object.keys(by).map(v => { const dim = onlyVendor && v !== onlyVendor; const got = by[v][0].picked_up_at;
+      return `<div class="vendor"${dim ? ' style="opacity:.35"' : ''}>${esc(v)}${got ? `<span class="got">✓ 已於 ${esc(fmtTime(got).slice(-5))} 取餐</span>` : ''}${dim ? '（不是這一站）' : ''}</div>` + by[v].map(i => `<div class="line${dim ? ' dim' : ''}"><span>${esc(i.name)}</span><b>× ${esc(i.qty)}</b></div>`).join(''); }).join('');
+  }
+  function headHtml(r){
+    return `<div class="big">${esc(r.name)}${r.participant_type === 'guest' ? ' <span style="font-size:16px;background:#f3c56b;color:#2a1d05;border-radius:8px;padding:2px 10px;vertical-align:middle">校外人士</span>' : ''}</div><div class="who">${r.student_id ? '學號 ' + esc(r.student_id) + '｜' : ''}訂單 ${esc(r.order_no)}｜手機末三碼 ${esc(r.phone_tail)}</div>`;
+  }
+  const idNote = r => `<p class="muted" style="font-size:13px;margin-bottom:0">${r.participant_type === 'guest' ? '校外人士：請口頭確認姓名與手機末三碼。' : '請核對學生證照片是否為本人。'}</p>`;
+  function vendorsLeft(r){ const by = {}; (r.items || []).forEach(i => by[i.vendor] = i.picked_up_at); return Object.keys(by).filter(v => !by[v]); }
+  function show(r){
+    const el = $('result'); current = r && r.found ? r : null; $('list').innerHTML = '';
+    if (!r || !r.found) { el.className = 'result bad'; el.innerHTML = `<span class="state">查無報名</span><div class="big">${esc(r && r.reason || '找不到資料')}</div><p class="muted">掃到的內容：${esc(r && r.code || '')}<br>請改用上方手動查詢姓名或手機。</p>`; return; }
+    const note = r.internal_note ? `<div class="note">📝 ${esc(r.internal_note)}</div>` : '';
+    const head = headHtml(r);
+    if (r.status === 'pending_payment') { el.className = 'result warn'; el.innerHTML = `<span class="state">尚未確認付款</span>${head}<div style="font-size:18px">應付 ${money(r.total_amount)}，已收 ${money(r.paid_amount)}</div>${itemsHtml(r.items)}${note}<p>請同學到管理員處確認付款狀態，暫時不要報到或交付餐點。</p>`; return; }
+    if (r.status === 'cancelled') { el.className = 'result bad'; el.innerHTML = `<span class="state">此報名已取消</span>${head}${note}`; return; }
+    const m = station.mode;
+    if (m === 'checkin') {
+      const food = (r.items || []).length;
+      if (r.checked_in_at) { el.className = 'result bad'; el.innerHTML = `<span class="state">⚠ 已經報到過</span>${head}<div class="big" style="font-size:22px">已於 ${esc(fmtTime(r.checked_in_at))} 報到</div>${note}`; return; }
+      el.className = 'result ok';
+      el.innerHTML = `<span class="state">✓ 已付款，可以報到</span>${head}${food ? `<div class="hint">🍽 這位有預訂 ${food} 項餐點，報到後請提醒他到取餐區。</div>` : '<div class="hint">這位沒有點餐，報到後就完成了。</div>'}${note}<button class="go" id="goBtn" type="button">確認報到</button>${idNote(r)}`;
+    } else if (m === 'pickup') {
+      const left = vendorsLeft(r).filter(v => !station.vendor || v === station.vendor);
+      const mine = (r.items || []).filter(i => !station.vendor || i.vendor === station.vendor);
+      if (!mine.length) { el.className = 'result warn'; el.innerHTML = `<span class="state">這一站沒有他的餐點</span>${head}${itemsHtml(r.items, station.vendor)}${note}`; return; }
+      if (!left.length) { el.className = 'result bad'; el.innerHTML = `<span class="state">⚠ 這一站的餐點已經取過了</span>${head}${itemsHtml(r.items, station.vendor)}${note}<p>請勿重複交付，有疑問請找管理員。</p>`; return; }
+      el.className = 'result ok';
+      el.innerHTML = `<span class="state">✓ 請交付以下餐點</span>${head}${itemsHtml(r.items, station.vendor)}${!r.checked_in_at ? '<div class="hint" style="background:rgba(232,154,44,.25)">⚠ 這位還沒報到。可以先交付餐點，但請提醒他到報到站報到。</div>' : ''}${note}<button class="go" id="goBtn" type="button">確認交付餐點</button>${idNote(r)}`;
+    } else {
+      if (r.status === 'picked_up') { el.className = 'result bad'; el.innerHTML = `<span class="state">⚠ 已經完成過</span>${head}<div class="big" style="font-size:22px">已於 ${esc(fmtTime(r.picked_up_at))} 完成報到＋取餐</div>${itemsHtml(r.items)}${note}`; return; }
+      el.className = 'result ok';
+      el.innerHTML = `<span class="state">✓ 已付款，可取餐</span>${head}${itemsHtml(r.items)}${note}<button class="go" id="goBtn" type="button">確認交付（完成報到＋取餐）</button>${idNote(r)}`;
+    }
+    $('goBtn').onclick = confirmAct;
+  }
+  function showError(msg){ const el = $('result'); el.className = 'result bad'; el.innerHTML = `<span class="state">錯誤</span><div class="big" style="font-size:22px">${esc(msg)}</div>`; if (/登入/.test(msg)) showLogin(msg); }
+  async function confirmAct(){
+    if (!current) return; const b = $('goBtn'); b.disabled = true; b.textContent = '處理中…';
+    try {
+      const m = station.mode;
+      const r = m === 'checkin' ? await Api.rpc('staff_check_in', { p_reg: current.id })
+              : m === 'pickup' ? await Api.rpc('staff_pickup', { p_reg: current.id, p_vendor: station.vendor })
+              : await Api.rpc('staff_confirm_pickup', { p_reg: current.id });
+      if (r.ok) {
+        const el = $('result'); el.className = 'result done';
+        const what = m === 'checkin' ? '已完成報到' : m === 'pickup' ? '已交付餐點' : '已報到＋取餐';
+        const more = m === 'checkin' && (r.items || []).length ? '<div class="hint">🍽 請提醒他到取餐區取餐。</div>' : m === 'pickup' && vendorsLeft(r).length ? `<div class="hint">還有其他店家的餐點沒取：${esc(vendorsLeft(r).join('、'))}</div>` : '';
+        el.innerHTML = `<span class="state">✓ 完成</span><div class="big">${esc(r.name)} ${what}</div>${more}<p class="muted">可以掃描下一位。</p>`; beep(true); current = null;
+      } else { show({ found: true, ...r }); beep(false); }
+    } catch (e) { showError(e.message); }
+  }
+  $('searchForm').onsubmit = async e => {
+    e.preventDefault(); const q = $('q').value.trim(); if (q.length < 2) return;
+    if (/^[0-9]{9,11}$/.test(q) || /^XCQR-/.test(q)) { $('q').value = ''; $('q').blur(); return onCode(q, 'manual'); }
+    try {
+      const rows = await Api.rpc('staff_search', { p_q: q });
+      $('list').innerHTML = rows.length ? rows.map((r,i) => `<button type="button" data-i="${i}"><b>${esc(r.name)}</b>　${esc(r.student_id || '校外')}　${esc(r.order_no)}　<span class="muted">${esc(STATUS_TEXT[r.status])}</span></button>`).join('') : '<div class="muted">找不到符合的報名</div>';
+      $('list').onclick = ev => { const b = ev.target.closest('[data-i]'); if (b) { show({ found: true, ...rows[+b.dataset.i] }); $('q').value = ''; $('q').blur(); } };
+    } catch (err) { showError(err.message); }
+  };
+  boot();
+})();
+</script>
+</body>
+</html>

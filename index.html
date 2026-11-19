@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>聖誕露天電影院｜報名＋預訂餐點｜政大學生會</title>
+<meta name="description" content="政大學生會聖誕露天電影院：線上報名、預訂餐點、事先轉帳，活動當天報到取餐。">
+<meta name="theme-color" content="#F2EFE5">
+<meta name="robots" content="noindex,nofollow"><!-- 測試期間不讓搜尋引擎收錄；正式開放報名前移除 -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+:root{
+  --cream:#F2EFE5; --paper:#F8F6EF; --green:#004E3B; --green2:#009B7A; --red:#D9141A; --gold:#B18B35; --ink:#182026;
+  --muted:#5E646A; --line:#D8D2C2; --line2:#E6E1D4; --field:#A9A391;
+  --r:8px; --font:"Noto Sans TC","PingFang TC","Heiti TC","Microsoft JhengHei",system-ui,sans-serif; --num:"Inter","Noto Sans TC",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.7;font-weight:400;-webkit-font-smoothing:antialiased}
+a{color:var(--green);text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--green);outline-offset:3px;border-radius:4px}
+[tabindex="-1"]:focus{outline:none}
+.wrap{max-width:1160px;margin:0 auto;padding:0 20px}
+.hidden{display:none!important}
+.num{font-family:var(--num);font-variant-numeric:tabular-nums}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.muted{color:var(--muted)}
+.tbd{color:var(--muted)}
+.label{font-family:var(--num);font-size:12.5px;font-weight:600;letter-spacing:.14em;color:var(--green);text-transform:uppercase}
+h1{font-weight:900;font-size:clamp(44px,7vw,88px);line-height:1.05;letter-spacing:-.015em;margin:12px 0 20px}
+h2{font-weight:700;font-size:clamp(24px,2.6vw,30px);line-height:1.35;margin:6px 0 14px}
+h3{font-weight:700;font-size:18px;margin:0 0 6px}
+
+/* 頂列 */
+.top{display:flex;align-items:center;justify-content:space-between;padding:18px 0}
+.brand{font-weight:500;font-size:14px;display:flex;align-items:center;gap:8px}
+.brand svg{width:18px;height:18px}
+.toplink{font-size:14px;color:var(--ink)}
+
+/* 按鈕 */
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 26px;border-radius:var(--r);border:1px solid var(--green);background:var(--green);color:var(--cream);font:inherit;font-weight:700;font-size:16px;cursor:pointer;text-decoration:none;transition:background .15s}
+.btn:hover{background:#003a2c}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.full{width:100%}
+.btn.text{background:none;border-color:transparent;color:var(--green);padding:12px 8px;font-weight:500;text-decoration:underline;text-underline-offset:4px}
+.btn.text:hover{background:none;color:#003a2c}
+
+/* 首屏：第一張海報的非對稱構圖 */
+.hero{position:relative;min-height:min(78vh,680px);display:flex;align-items:center}
+.hero-art{position:absolute;left:0;top:0;bottom:0;width:46%;pointer-events:none}
+.hero-art svg{width:100%;height:100%;display:block}
+.hero .wrap{width:100%}
+.hero-copy{margin-left:auto;max-width:560px;text-align:right;padding:40px 0 56px}
+.hero-date{font-family:var(--num);font-weight:800;font-size:clamp(30px,3.6vw,44px);line-height:1;letter-spacing:-.01em}
+.hero-date small{font-size:.45em;font-weight:500;margin-left:6px}
+.hero-meta{margin:18px 0 30px;color:var(--ink);line-height:1.6}
+.hero-meta b{font-weight:700}
+.cta{display:flex;gap:8px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
+.cta-note{margin-top:10px;font-size:14px;color:var(--muted)}
+
+/* 首頁內容 */
+.sec{padding:72px 0;border-top:1px solid var(--line)}
+.film{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:56px;align-items:center}
+.poster{aspect-ratio:4/5;background:var(--paper);border:1px solid var(--line2);border-radius:var(--r);overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px;text-align:center}
+.poster img{width:100%;height:100%;object-fit:cover}
+.poster .ph svg{width:56px;height:56px;display:block;margin:0 auto 10px}
+.film p{max-width:560px}
+.facts{list-style:none;padding:0;margin:20px 0 0;border-top:1px solid var(--line)}
+.facts li{display:grid;grid-template-columns:96px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.facts b{font-weight:500;color:var(--muted)}
+.food-intro{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:56px}
+.vlist{list-style:none;padding:0;margin:0;border-top:1px solid var(--line)}
+.vlist li{padding:16px 0;border-bottom:1px solid var(--line)}
+.vlist .vn{font-weight:700}
+.vlist .vi{color:var(--muted);font-size:15px}
+.how{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:32px}
+.how li{border-top:2px solid var(--ink);padding-top:14px}
+.how .n{font-family:var(--num);font-weight:600;color:var(--green);font-size:14px}
+.how p{margin:4px 0 0;color:var(--muted);font-size:15px}
+.faq{max-width:760px}
+.faq details{border-bottom:1px solid var(--line)}
+.faq details:first-child{border-top:1px solid var(--line)}
+.faq summary{cursor:pointer;font-weight:500;padding:16px 0;list-style:none;display:flex;justify-content:space-between;gap:12px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font-family:var(--num);color:var(--green)}
+.faq details[open] summary::after{content:"−"}
+.faq p{margin:0 0 18px;color:var(--muted)}
+.closing{text-align:center;padding:72px 0}
+
+/* 流程 */
+.flow{padding-top:8px;padding-bottom:160px}
+.progress{display:flex;gap:24px;margin:8px 0 36px;padding:0;list-style:none;font-size:14px}
+.progress li{color:var(--muted);padding-bottom:8px;border-bottom:2px solid transparent}
+.progress li.on{color:var(--ink);font-weight:700;border-color:var(--green)}
+.progress li.done{color:var(--green)}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:64px;align-items:start}
+.layout.single{grid-template-columns:minmax(0,600px);justify-content:center}
+.lead{color:var(--muted);margin:0 0 8px;max-width:600px}
+
+/* 菜單 */
+.jump{position:sticky;top:0;z-index:5;background:var(--cream);display:flex;gap:20px;padding:12px 0;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.jump::-webkit-scrollbar{display:none}
+.jump button{flex:none;background:none;border:none;font:inherit;font-size:15px;color:var(--muted);padding:6px 0;cursor:pointer;border-bottom:2px solid transparent;min-height:40px}
+.jump button[aria-current="true"]{color:var(--ink);font-weight:700;border-color:var(--ink)}
+.vendor{scroll-margin-top:64px;padding:36px 0 8px}
+.vhead{display:flex;gap:20px;align-items:flex-end;margin-bottom:8px}
+.vhead img{width:200px;aspect-ratio:4/3;object-fit:cover;border-radius:var(--r);flex:none}
+.vhead .vdesc{color:var(--muted);font-size:15px;margin:0}
+.menu-list{list-style:none;padding:0;margin:0;border-top:1px solid var(--ink)}
+.mi{display:grid;grid-template-columns:minmax(0,1fr) auto 132px;gap:16px;align-items:center;padding:16px 0;border-bottom:1px solid var(--line)}
+.mi .nm{font-weight:500;font-size:17px}
+.mi .note{font-size:13px;margin-left:8px;font-weight:500}
+.note.red{color:var(--red)}.note.green{color:var(--green)}.note.gold{color:#7a5e1f}
+.mi .ds{color:var(--muted);font-size:14px;margin-top:2px}
+.mi .pr{font-family:var(--num);font-weight:500;font-size:17px;text-align:right}
+.mi.out .nm,.mi.out .pr{color:var(--muted)}
+.ctl{display:flex;justify-content:flex-end}
+.add{min-height:40px;min-width:88px;padding:6px 16px;border-radius:var(--r);border:1px solid var(--green);background:transparent;color:var(--green);font:inherit;font-weight:500;cursor:pointer}
+.add:hover{background:rgba(0,78,59,.06)}
+.soldout{font-size:14px;color:var(--muted)}
+.stepper{display:inline-flex;align-items:center;gap:2px}
+.stepper button{width:40px;height:40px;border-radius:50%;border:1px solid var(--green);background:transparent;color:var(--green);font-size:20px;line-height:1;cursor:pointer}
+.stepper button.plus{background:var(--green);color:var(--cream)}
+.stepper output{min-width:34px;text-align:center;font-family:var(--num);font-weight:600;font-size:17px}
+.skip{margin-top:40px;color:var(--muted)}
+
+/* 摘要 */
+.summary{position:sticky;top:24px;border:1px solid var(--line);border-radius:var(--r);padding:22px;background:var(--paper)}
+.summary h3{font-size:15px;font-weight:500;color:var(--muted);margin-bottom:10px}
+.sum-list{margin:0;padding:0;list-style:none}
+.sum-list li{display:flex;justify-content:space-between;gap:12px;padding:6px 0;font-size:15px}
+.sum-list .empty{color:var(--muted)}
+.sum-total{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--line);margin-top:10px;padding-top:14px}
+.sum-total .num{font-size:28px;font-weight:800}
+.summary .btn{margin-top:18px}
+.summary .hint{font-size:13px;color:var(--muted);margin:10px 0 0}
+
+/* 表單 */
+.form{max-width:560px;margin-top:36px}
+.form h3{margin-bottom:16px}
+.field{margin-bottom:22px}
+.field label,.field legend{display:block;font-weight:500;margin-bottom:4px;padding:0}
+.field .help{font-size:14px;color:var(--muted);margin:0 0 8px}
+.field input[type=text],.field input[type=tel],.field input[type=email],.field input:not([type]){width:100%;min-height:48px;padding:11px 14px;border:1px solid var(--field);border-radius:var(--r);background:#fff;color:var(--ink);font:inherit;font-size:17px}
+.field input:focus{outline:2px solid var(--green);outline-offset:0;border-color:var(--green)}
+.field input[aria-invalid="true"]{border-color:var(--red);box-shadow:inset 3px 0 0 var(--red)}
+.field .err{display:none;color:var(--red);font-weight:500;font-size:14px;margin-bottom:6px}
+.field.bad .err{display:block}
+fieldset.field{border:none;margin:0 0 22px;padding:0}
+.choice{display:flex;gap:12px;align-items:flex-start;padding:12px 0;cursor:pointer;border-bottom:1px solid var(--line2)}
+.choice:first-of-type{border-top:1px solid var(--line2)}
+.choice input{width:20px;height:20px;margin:3px 0 0;accent-color:var(--green);flex:none}
+.choice small{display:block;color:var(--muted);font-size:14px}
+.check{display:flex;gap:12px;align-items:flex-start;cursor:pointer}
+.check input{width:20px;height:20px;margin:3px 0 0;accent-color:var(--green);flex:none}
+.privacy{font-size:14px;color:var(--muted);margin:0 0 12px}
+.errsum{border-left:3px solid var(--red);padding:4px 0 4px 16px;margin:0 0 28px}
+.errsum h3{font-size:17px;margin:0 0 4px}
+.errsum ul{margin:0;padding-left:18px}
+.errsum a{color:var(--red)}
+.review{margin:16px 0 0;border-top:1px solid var(--ink)}
+.review .rw{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:15px}
+.review .rw .s{color:var(--muted);font-size:13px}
+.review .tot{display:flex;justify-content:space-between;align-items:baseline;padding:12px 0}
+.review .tot .num{font-size:22px;font-weight:800}
+.linkbtn{background:none;border:none;color:var(--green);font:inherit;font-size:15px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:4px 0}
+
+/* 付款 */
+.status-line{font-size:14px;color:var(--muted);margin-bottom:4px}
+.status-line b{color:var(--ink);font-weight:500}
+.pay-amount{margin:28px 0 4px}
+.pay-amount .num{font-size:clamp(44px,8vw,60px);font-weight:800;line-height:1;letter-spacing:-.02em}
+.pay-deadline{color:var(--muted);margin:6px 0 32px}
+.method{display:flex;gap:4px;margin:0 0 8px}
+.method button{background:none;border:none;font:inherit;font-size:14px;padding:6px 10px;border-radius:6px;color:var(--muted);cursor:pointer}
+.method button[aria-selected="true"]{background:var(--paper);color:var(--ink);font-weight:700;box-shadow:inset 0 0 0 1px var(--line)}
+.acct{border-top:1px solid var(--ink)}
+.acct .r{display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.acct .k{color:var(--muted);font-size:14px}
+.acct .v{font-family:var(--num);font-weight:500;font-size:18px;word-break:break-all}
+.acct .v.t{font-family:var(--font);font-size:16px}
+.copy{background:none;border:none;color:var(--green);font:inherit;font-size:15px;font-weight:500;text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:44px;padding:0 4px}
+.qrbox{padding:20px 0;text-align:center;border-top:1px solid var(--ink);border-bottom:1px solid var(--line)}
+.qrbox img{width:min(220px,70%);background:#fff;padding:8px;border-radius:var(--r)}
+.qrbox p{font-size:14px;color:var(--muted);margin:10px auto 0;max-width:420px}
+.memo{margin:28px 0;padding:4px 0 4px 18px;border-left:4px solid var(--red)}
+.memo .k{font-weight:700}
+.memo .row{display:flex;align-items:center;gap:16px}
+.memo .v{font-family:var(--num);font-weight:800;font-size:30px;letter-spacing:.03em}
+.memo p{margin:2px 0 0;font-size:14px;color:var(--muted)}
+.after{margin:32px 0 0}
+.after p{margin:4px 0 0;color:var(--muted)}
+.notice{border-left:3px solid var(--red);padding:2px 0 2px 16px;margin:20px 0}
+.more{margin-top:40px;border-top:1px solid var(--line)}
+.more details{border-bottom:1px solid var(--line)}
+.more summary{cursor:pointer;padding:14px 0;font-weight:500}
+.more .in{padding:0 0 16px}
+
+/* 票券 */
+.ticket{border:1px solid var(--ink);border-radius:var(--r);overflow:hidden;margin:28px 0;background:var(--paper)}
+.ticket .band{display:block;width:100%;height:36px}
+.ticket .tin{display:grid;grid-template-columns:1fr auto;gap:24px;padding:22px;align-items:center}
+.ticket .who{font-weight:900;font-size:26px;line-height:1.2;margin:4px 0 8px}
+.ticket .qr svg{width:160px;height:160px;display:block;background:#fff}
+
+/* 手機底部列 */
+.mbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--cream);border-top:1px solid var(--line);padding:10px 20px calc(10px + env(safe-area-inset-bottom));display:none}
+.mbar .in{display:flex;align-items:center;gap:8px;max-width:600px;margin:0 auto}
+.mbar .meta{flex:1;font-size:13px;color:var(--muted);line-height:1.3}
+.mbar .meta b{display:block;color:var(--ink);font-family:var(--num);font-size:22px;font-weight:800;white-space:nowrap}
+
+.toast{position:fixed;left:50%;top:16px;transform:translateX(-50%);background:var(--ink);color:var(--cream);padding:10px 18px;border-radius:var(--r);z-index:50;font-size:15px;display:none;max-width:90vw}
+footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font-size:14px;color:var(--muted)}
+.state-page{max-width:560px;margin:48px auto 96px;text-align:center}
+.state-page .glyph{width:64px;height:64px;margin:0 auto 16px;display:block}
+
+@media (max-width:900px){
+  .hero{min-height:0;display:block}
+  .hero-art{position:relative;width:auto;height:300px;margin-bottom:-8px}
+  .hero-copy{text-align:left;margin:0;padding:8px 0 48px}
+  .cta{justify-content:flex-start}
+  .film,.food-intro{grid-template-columns:1fr;gap:28px}
+  .poster{aspect-ratio:16/10}
+  .how{grid-template-columns:1fr;gap:20px}
+  .layout{grid-template-columns:1fr}
+  .summary-col{display:none}
+  .mbar.on{display:block}
+  .sec{padding:56px 0}
+}
+@media (max-width:560px){
+  .mi{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"t p" "t c";row-gap:8px}
+  .mi .tx{grid-area:t}.mi .pr{grid-area:p}.mi .ctl{grid-area:c}
+  .vhead{flex-direction:column;align-items:stretch}
+  .vhead img{width:100%;aspect-ratio:16/9}
+  .acct .r{grid-template-columns:56px minmax(0,1fr) auto}
+  .ticket .tin{grid-template-columns:1fr}
+  .ticket .qr{justify-self:center}
+  .progress{gap:16px}
+}
+</style>
+</head>
+<body>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="sr" id="live" aria-live="polite"></div>
+
+<div class="wrap">
+  <div class="top">
+    <div class="brand"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 4 L22 22 H2Z" fill="#004E3B"/></svg>國立政治大學學生會</div>
+    <a href="#" class="toplink" id="lookupLink">查詢訂單</a>
+  </div>
+</div>
+
+<!-- 首頁 -->
+<main id="home">
+  <section class="hero" aria-labelledby="evTitle">
+    <div class="hero-art" aria-hidden="true"><svg id="heroArt" viewBox="0 0 460 620" preserveAspectRatio="xMinYMid slice"></svg></div>
+    <div class="wrap">
+      <div class="hero-copy">
+        <div class="label">NCCUSA Christmas Open-Air Cinema</div>
+        <h1 id="evTitle">聖誕<br>露天電影院</h1>
+        <div class="hero-date" id="evDate"><span class="tbd">日期待公布</span></div>
+        <div class="hero-meta" id="evMeta"></div>
+        <div class="cta"><button class="btn" type="button" id="startBtn">報名＋預訂餐點</button></div>
+        <div class="cta-note" id="openNote"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <section class="sec" aria-labelledby="filmT">
+      <div class="film">
+        <div class="poster" id="poster"></div>
+        <div>
+          <div class="label">Tonight's Film</div>
+          <h2 id="filmT">放映電影</h2>
+          <div id="filmBody"></div>
+          <ul class="facts" id="facts"></ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" aria-labelledby="foodT">
+      <div class="food-intro">
+        <div>
+          <div class="label">Food &amp; Drinks</div>
+          <h2 id="foodT">先訂好，現場直接取</h2>
+          <p class="muted">場地規定現場不能有交易，所以餐點要在報名時一起預訂、事先轉帳。兩家店可以自由搭配，不需要也可以只報名。</p>
+        </div>
+        <ul class="vlist" id="vlist"></ul>
+      </div>
+    </section>
+
+    <section class="sec" aria-labelledby="howT">
+      <h2 id="howT">報名方式</h2>
+      <ol class="how">
+        <li><div class="n num">01</div><h3>報名，選好餐點</h3><p>政大學生填學號；校外人士也可以報名。</p></li>
+        <li><div class="n num">02</div><h3>轉帳，附言填代碼</h3><p>政大學生填學號，校外人士填訂單編號。轉完就好，確認後會寄信通知。</p></li>
+        <li><div class="n num">03</div><h3>當天報到，取餐</h3><p>政大學生帶學生證，校外人士出示付款完成信裡的 QR Code。</p></li>
+      </ol>
+    </section>
+
+    <section class="sec" aria-labelledby="faqT">
+      <h2 id="faqT">常見問題</h2>
+      <div class="faq" id="faq"></div>
+    </section>
+
+    <section class="closing">
+      <button class="btn" type="button" id="startBtn2">報名＋預訂餐點</button>
+      <div class="cta-note" id="openNote2"></div>
+    </section>
+  </div>
+</main>
+
+<!-- 報名流程 -->
+<main id="flow" class="hidden">
+  <div class="wrap flow">
+    <ol class="progress" id="progress" aria-label="報名步驟">
+      <li data-s="1">1 選餐點</li><li data-s="2">2 確認資料</li><li data-s="3">3 轉帳</li>
+    </ol>
+    <div class="layout" id="layout">
+      <div>
+        <section id="step1" aria-labelledby="s1t">
+          <h2 id="s1t">選餐點</h2>
+          <p class="lead">兩家店可以自由搭配，也可以都不選。</p>
+          <nav class="jump" id="jump" aria-label="店家"></nav>
+          <div id="menu"></div>
+          <p class="skip">不需要餐點？<button class="linkbtn" type="button" id="skipBtn">不點餐，直接下一步</button></p>
+        </section>
+
+        <section id="step2" class="hidden" aria-labelledby="s2t">
+          <h2 id="s2t" tabindex="-1">確認資料</h2>
+          <div class="errsum hidden" id="errsum" role="alert" tabindex="-1"><h3>請修正以下欄位</h3><ul id="errlist"></ul></div>
+          <div class="review" id="review"></div>
+          <form class="form" id="form" novalidate>
+            <h3>聯絡資料</h3>
+            <fieldset class="field" id="w_type"><legend>身分</legend>
+              <label class="choice"><input type="radio" name="ptype" value="nccu" checked><span>政大學生<small>活動當天用學生證報到</small></span></label>
+              <label class="choice"><input type="radio" name="ptype" value="guest"><span>校外人士<small>不用學號，報到時出示付款完成信裡的 QR Code</small></span></label>
+            </fieldset>
+            <div class="field" id="w_name"><label for="f_name">姓名</label><div class="err" id="e_name"></div><input id="f_name" autocomplete="name" maxlength="30" aria-describedby="e_name"></div>
+            <div class="field" id="w_sid"><label for="f_sid">學號</label><p class="help" id="h_sid">9 碼數字，也是轉帳附言要填的號碼。</p><div class="err" id="e_sid"></div><input id="f_sid" inputmode="numeric" maxlength="9" autocomplete="off" aria-describedby="h_sid e_sid"></div>
+            <div class="field" id="w_phone"><label for="f_phone">手機號碼</label><div class="err" id="e_phone"></div><input id="f_phone" type="tel" inputmode="numeric" maxlength="12" placeholder="0912345678" autocomplete="tel" aria-describedby="e_phone"></div>
+            <div class="field" id="w_email"><label for="f_email">Email</label><p class="help" id="h_email">付款確認通知會寄到這裡。</p><div class="err" id="e_email"></div><input id="f_email" type="email" autocomplete="email" maxlength="120" aria-describedby="h_email e_email"></div>
+            <div class="field" id="w_last5"><label for="f_last5">轉帳帳戶的帳號後五碼</label><p class="help" id="h_last5">核對付款的備用資料，開頭是 0 也要填。</p><div class="err" id="e_last5"></div><input id="f_last5" inputmode="numeric" maxlength="5" autocomplete="off" aria-describedby="h_last5 e_last5" style="max-width:180px"></div>
+            <div class="field" id="w_agree"><p class="privacy" id="privacyText"></p><div class="err" id="e_agree"></div><label class="check"><input type="checkbox" id="f_agree" aria-describedby="e_agree"><span>我已閱讀並同意個人資料蒐集告知</span></label></div>
+          </form>
+        </section>
+
+        <section id="step3" class="hidden"></section>
+      </div>
+      <aside class="summary-col" id="summaryCol" aria-label="訂單摘要">
+        <div class="summary">
+          <h3>訂單摘要</h3>
+          <ul class="sum-list" id="sumList"></ul>
+          <div class="sum-total"><span>總金額</span><span class="num" id="sumTotal">NT$ 0</span></div>
+          <button class="btn full" type="button" id="sumNext">下一步</button>
+          <p class="hint" id="sumHint"></p>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<main id="lookup" class="hidden"><div class="wrap" id="lookupBody"></div></main>
+
+<div class="mbar" id="mbar"><div class="in"><div class="meta" id="mMeta"></div><button class="btn text hidden" type="button" id="mBack">上一步</button><button class="btn" type="button" id="mNext">下一步</button></div></div>
+
+<div class="wrap"><footer><span id="footContact"></span>　主辦：國立政治大學學生會</footer></div>
+
+<script src="assets/api.js"></script>
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const C = { cream:'#F2EFE5', green:'#004E3B', green2:'#009B7A', red:'#D9141A', gold:'#B18B35' };
+
+  // ---------- 幾何圖形（只用第一張海報的語言：三角樹＋星芒） ----------
+  function star(cx, cy, r1, r2, n){ let p = ''; for (let i = 0; i < n * 2; i++) { const r = i % 2 ? r2 : r1, a = Math.PI * i / n - Math.PI / 2; p += (i ? 'L' : 'M') + (cx + r * Math.cos(a)).toFixed(1) + ' ' + (cy + r * Math.sin(a)).toFixed(1); } return `<path d="${p}Z" fill="${C.gold}"/>`; }
+  $('heroArt').innerHTML = `<path d="M0 150 L210 300 L0 300Z" fill="${C.green2}"/><path d="M0 300 L300 470 L0 470Z" fill="${C.red}"/><path d="M0 470 L400 620 L0 620Z" fill="${C.green}"/>${star(6, 70, 46, 22, 8)}${star(330, 220, 24, 12, 8)}${star(260, 370, 16, 8, 8)}${star(390, 330, 10, 5, 8)}`;
+  const glyph = () => `<svg class="glyph" viewBox="0 0 64 64" aria-hidden="true"><path d="M8 18 L30 32 H8Z" fill="${C.green2}"/><path d="M8 32 L42 48 H8Z" fill="${C.red}"/><path d="M8 48 L54 60 H8Z" fill="${C.green}"/>${star(50, 14, 9, 4.5, 8)}</svg>`;
+  function tileBand(cols, h){
+    const s = h, pal = [C.green, C.green2, C.red]; let out = '';
+    for (let i = 0; i < cols; i++) {
+      const t = i % 4, a = pal[i % 3], b = C.cream;
+      let g = `<rect width="${s}" height="${s}" fill="${b}"/>`;
+      if (t === 0) g += `<path d="M0 ${s} A${s/2} ${s/2} 0 0 1 ${s} ${s}Z" fill="${a}"/>`;
+      else if (t === 1) g += `<rect width="${s}" height="${s}" fill="${a}"/>` + [[0,0],[s,0],[0,s],[s,s]].map(([x,y]) => `<circle cx="${x}" cy="${y}" r="${s/2}" fill="${b}"/>`).join('');
+      else if (t === 2) g += `<path d="M0 0 A${s} ${s} 0 0 1 ${s} ${s} L0 ${s}Z" fill="${a}"/>`;
+      else g += `<path d="M0 0 A${s/2} ${s/2} 0 0 0 ${s} 0Z" fill="${a}"/>`;
+      out += `<svg x="${i * s}" y="0" width="${s}" height="${s}" viewBox="0 0 ${s} ${s}">${g}</svg>`;
+    }
+    return out;
+  }
+
+  // ---------- 狀態 ----------
+  let catalog = null, step = 0; const cart = {};
+  const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && innerWidth < 1100);
+  function toast(m){ const t = $('toast'); t.textContent = m; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(() => t.style.display = 'none', 2600); }
+  function say(m){ $('live').textContent = ''; setTimeout(() => $('live').textContent = m, 30); }
+  const all = () => catalog.vendors.flatMap(v => v.items.map(i => ({ ...i, vendor: v.name })));
+  const list = () => all().filter(i => cart[i.id] > 0).map(i => ({ ...i, qty: cart[i.id] }));
+  const total = () => list().reduce((s, i) => s + i.price * i.qty, 0);
+  const count = () => list().reduce((s, i) => s + i.qty, 0);
+  const tbd = '<span class="tbd">待公布</span>';
+
+  // ---------- 首頁 ----------
+  function parseInfo(txt){ const o = {}; (txt || '').split(/\s{2,}|　/).forEach(s => { const m = s.match(/^(日期|時間|地點)[:：]\s*(.*)$/); if (m) o[m[1]] = m[2]; }); return o; }
+  const real = v => v && !/待公布/.test(v);
+  function renderHome(){
+    const info = parseInfo(catalog.event_info);
+    if (real(info['日期'])) { const m = info['日期'].match(/(?:\d{4}\/)?(\d{1,2})\/(\d{1,2})/), w = info['日期'].match(/（(.)）/); if (m) $('evDate').innerHTML = `${+m[1]}/${+m[2]}${w ? `<small>週${esc(w[1])}</small>` : ''}`; }
+    $('evMeta').innerHTML = `<div><b>${real(info['時間']) ? esc(info['時間']) : '時間待公布'}</b></div><div>${real(info['地點']) ? esc(info['地點']) : '地點待公布'}</div>`;
+    const now = new Date(); let note = '', can = false;
+    if (!catalog.is_open && now < new Date(catalog.open_at)) note = `${fmtTime(catalog.open_at)} 開放報名`;
+    else if (!catalog.is_open) note = '報名已截止。已報名的同學可以用 Email 裡的連結查詢訂單。';
+    else if (catalog.spots_left <= 0) note = '名額已滿';
+    else { can = true; note = `報名截止 ${fmtTime(catalog.close_at)}`; }
+    ['openNote','openNote2'].forEach(id => $(id).textContent = note);
+    ['startBtn','startBtn2'].forEach(id => $(id).disabled = !can);
+    // 電影
+    $('poster').innerHTML = catalog.film_image_url ? `<img src="${esc(catalog.film_image_url)}" alt="${esc(catalog.film_title || '電影海報')}">` : `<div class="ph">${glyph()}電影海報待提供</div>`;
+    $('filmBody').innerHTML = `<p style="font-size:20px;font-weight:700;margin:0 0 8px">${catalog.film_title ? esc(catalog.film_title) : '片單待公布'}</p>${catalog.film_note ? `<p>${esc(catalog.film_note)}</p>` : '<p class="muted">冬夜、大銀幕和一杯熱飲。片名確定後會在這裡和學生會社群公布。</p>'}`;
+    const facts = [['日期', real(info['日期']) ? info['日期'] : null], ['時間', real(info['時間']) ? info['時間'] : null], ['地點', real(info['地點']) ? info['地點'] : null], ['現場', catalog.venue_note || null]];
+    $('facts').innerHTML = facts.map(([k, v]) => `<li><b>${k}</b><span>${v ? esc(v) : tbd}</span></li>`).join('');
+    // 餐飲
+    $('vlist').innerHTML = catalog.vendors.map(v => `<li><div class="vn">${esc(v.name)}</div><div class="vi">${esc(v.items.slice(0, 4).map(i => i.name).join('、'))}${v.items.length > 4 ? ' 等' : ''}${v.items.length ? `・$${Math.min(...v.items.map(i => i.price))} 起` : ''}</div></li>`).join('') || '<li class="muted">餐點待公布</li>';
+    $('footContact').textContent = '聯絡我們：' + (catalog.contact_info || '');
+    $('privacyText').textContent = catalog.privacy_notice || '';
+    const faqs = [
+      ['付款後多久會收到確認？', '我們會定期核對入帳紀錄，約 1 個工作天內寄出「付款完成」通知。轉帳後不需要回到網頁填寫資料。'],
+      ['轉帳時忘了填附言怎麼辦？', '系統也會用報名時填的帳號後五碼和金額核對。超過 1 個工作天仍沒收到確認，請私訊學生會，提供轉帳時間和後五碼。請不要重複轉帳。'],
+      ['校外人士可以參加嗎？', '可以。報名時選「校外人士」，不需要學號；轉帳附言填訂單編號，當天出示付款完成信裡的 QR Code 報到。'],
+      ['可以修改餐點嗎？', '網頁上無法自行修改，請私訊學生會，由工作人員協助處理。'],
+      ['下雨怎麼辦？要自備什麼？', '雨備方案與建議攜帶物品待公布，確定後會透過學生會社群通知。'],
+      ['可以取消或退費嗎？', '退費規則待公布。'],
+    ];
+    $('faq').innerHTML = faqs.map(([q, a]) => `<details><summary>${esc(q)}</summary><p>${esc(a)}</p></details>`).join('');
+  }
+
+  // ---------- 菜單 ----------
+  const noteClass = t => /素|蔬/.test(t) ? 'green' : /限定|熱門/.test(t) ? 'red' : 'gold';
+  function renderMenu(){
+    $('jump').innerHTML = catalog.vendors.map((v, i) => `<button type="button" data-jump="v${i}" aria-current="${i === 0}">${esc(v.name)}</button>`).join('');
+    $('menu').innerHTML = catalog.vendors.length ? catalog.vendors.map((v, i) => `
+      <section class="vendor" id="v${i}" aria-labelledby="vh${i}">
+        <div class="vhead">${v.image_url ? `<img src="${esc(v.image_url)}" alt="">` : ''}<div><h3 id="vh${i}" style="font-size:20px">${esc(v.name)}</h3>${v.description ? `<p class="vdesc">${esc(v.description)}</p>` : ''}</div></div>
+        <ul class="menu-list">${v.items.map(row).join('') || '<li class="mi"><span class="muted">目前沒有品項</span></li>'}</ul>
+      </section>`).join('') : `<div class="state-page">${glyph()}<p>目前沒有開放預訂的餐點，可以直接下一步只報名活動。</p></div>`;
+    $('jump').onclick = e => { const b = e.target.closest('[data-jump]'); if (b) $(b.dataset.jump).scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); };
+    $('menu').onclick = e => {
+      const b = e.target.closest('[data-act]'); if (!b) return;
+      const it = all().find(x => x.id === b.dataset.id); if (!it) return;
+      let q = cart[it.id] || 0;
+      if (b.dataset.act === 'plus') {
+        if (it.remaining != null && q >= it.remaining) { toast(`「${it.name}」只剩 ${it.remaining} 份`); return; }
+        if (q >= 10) { toast('單一品項最多 10 份'); return; }
+        if (count() >= 20) { toast('單筆訂單最多 20 份'); return; }
+        q++;
+      } else q = Math.max(0, q - 1);
+      cart[it.id] = q;
+      document.querySelector(`#mi_${CSS.escape(it.id)} .ctl`).innerHTML = ctl(it);
+      updateSummary();
+      say(q ? `${it.name} ${q} 份，總金額 ${total()} 元` : `已移除 ${it.name}，總金額 ${total()} 元`);
+      const nb = document.querySelector(`#mi_${CSS.escape(it.id)} [data-act="${q ? b.dataset.act : 'plus'}"]`); if (nb) nb.focus();
+    };
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) $('jump').querySelectorAll('button').forEach(c => c.setAttribute('aria-current', c.dataset.jump === en.target.id)); }), { rootMargin: '-35% 0px -60% 0px' });
+      document.querySelectorAll('.vendor').forEach(s => io.observe(s));
+    }
+  }
+  function row(i){
+    const out = i.remaining === 0;
+    return `<li class="mi${out ? ' out' : ''}" id="mi_${esc(i.id)}">
+      <div class="tx"><span class="nm">${esc(i.name)}</span>${i.tag ? `<span class="note ${noteClass(i.tag)}">${esc(i.tag)}</span>` : ''}${i.remaining != null && !out ? `<span class="note red">剩 ${i.remaining} 份</span>` : ''}${i.description ? `<div class="ds">${esc(i.description)}</div>` : ''}</div>
+      <div class="pr">$${esc(i.price)}</div>
+      <div class="ctl">${ctl(i)}</div></li>`;
+  }
+  function ctl(i){
+    const q = cart[i.id] || 0;
+    if (i.remaining === 0) return '<span class="soldout">已售完</span>';
+    if (!q) return `<button type="button" class="add" data-act="plus" data-id="${esc(i.id)}">加入<span class="sr"> ${esc(i.name)}</span></button>`;
+    return `<span class="stepper" role="group" aria-label="${esc(i.name)} 數量"><button type="button" data-act="minus" data-id="${esc(i.id)}" aria-label="減少 ${esc(i.name)}">−</button><output>${q}</output><button type="button" class="plus" data-act="plus" data-id="${esc(i.id)}" aria-label="增加 ${esc(i.name)}">＋</button></span>`;
+  }
+
+  // ---------- 摘要與步驟 ----------
+  function updateSummary(){
+    const l = list(), t = total();
+    $('sumList').innerHTML = l.length ? l.map(i => `<li><span>${esc(i.name)} × ${i.qty}</span><span class="num">$${i.price * i.qty}</span></li>`).join('') : '<li class="empty">尚未選擇餐點</li>';
+    $('sumTotal').textContent = money(t);
+    $('mMeta').innerHTML = `${step === 1 ? `已選 ${count()} 份` : '總金額'}<b>${money(t)}</b>`;
+    $('sumNext').textContent = step === 1 ? '下一步' : '確認送出';
+    $('mNext').textContent = step === 1 ? '下一步' : '確認送出';
+    $('sumHint').textContent = step === 2 ? '送出後才會建立訂單並顯示轉帳資訊。' : '';
+    $('mBack').classList.toggle('hidden', step !== 2);
+  }
+  function go(s){
+    step = s;
+    $('home').classList.add('hidden'); $('lookup').classList.add('hidden'); $('flow').classList.remove('hidden');
+    ['step1','step2','step3'].forEach((id, i) => $(id).classList.toggle('hidden', i + 1 !== s));
+    document.querySelectorAll('#progress li').forEach(li => { const n = +li.dataset.s; li.className = n === s ? 'on' : n < s ? 'done' : ''; if (n === s) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current'); });
+    $('layout').classList.toggle('single', s === 3);
+    $('summaryCol').classList.toggle('hidden', s === 3);
+    $('mbar').classList.toggle('on', s !== 3);
+    if (s === 2) renderReview();
+    updateSummary(); scrollTo({ top: 0, behavior: 'auto' });
+    if (s === 2) $('s2t').focus({ preventScroll: true });
+  }
+  const start = () => { history.pushState({ s: 1 }, '', '#order'); go(1); };
+  $('startBtn').onclick = start; $('startBtn2').onclick = start;
+  $('skipBtn').onclick = () => go(2);
+  const next = () => step === 1 ? go(2) : step === 2 ? submit() : null;
+  $('sumNext').onclick = next; $('mNext').onclick = next; $('mBack').onclick = () => go(1);
+  addEventListener('popstate', () => { if (step === 2) go(1); else if (step === 1) { $('flow').classList.add('hidden'); $('mbar').classList.remove('on'); $('home').classList.remove('hidden'); step = 0; } });
+
+  function ptype(){ const c = document.querySelector('input[name=ptype]:checked'); return c ? c.value : 'nccu'; }
+  function syncType(){ $('w_sid').classList.toggle('hidden', ptype() === 'guest'); }
+  document.addEventListener('change', e => { if (e.target.name === 'ptype') syncType(); });
+  function renderReview(){
+    const l = list();
+    $('review').innerHTML = (l.length ? l.map(i => `<div class="rw"><span>${esc(i.name)} × ${i.qty}<div class="s">${esc(i.vendor)}</div></span><span class="num">$${i.price * i.qty}</span></div>`).join('') : '<div class="rw"><span>不點餐，只報名活動</span><span></span></div>')
+      + `<div class="tot"><span>總金額　<button type="button" class="linkbtn" id="editItems">修改餐點</button></span><span class="num">${money(total())}</span></div>`;
+    $('editItems').onclick = () => go(1);
+    $('w_last5').classList.toggle('hidden', total() === 0);
+    syncType();
+  }
+
+  // ---------- 驗證與送出 ----------
+  const FIELDS = [
+    ['name', v => v.length >= 1 && v.length <= 30 && !/[<>]/.test(v), '請填寫姓名（30 字以內）'],
+    ['sid', v => ptype() === 'guest' || /^[0-9]{9}$/.test(v), '學號要是 9 碼數字'],
+    ['phone', v => /^09[0-9]{8}$/.test(v.replace(/[\s-]/g, '')), '請填寫 09 開頭、共 10 碼的手機號碼'],
+    ['email', v => /^[^@\s<>]+@[^@\s<>]+\.[^@\s<>]+$/.test(v), 'Email 格式不正確，例如 name@example.com'],
+    ['last5', v => total() === 0 || /^[0-9]{5}$/.test(v), '請填寫 5 碼數字，開頭是 0 也要填'],
+  ];
+  function validate(){
+    const errs = [];
+    FIELDS.forEach(([k, ok, msg]) => { const inp = $('f_' + k), good = ok(inp.value.trim()); $('w_' + k).classList.toggle('bad', !good); inp.setAttribute('aria-invalid', !good); $('e_' + k).textContent = good ? '' : msg; if (!good) errs.push(['f_' + k, msg]); });
+    const agree = $('f_agree').checked; $('w_agree').classList.toggle('bad', !agree); $('e_agree').textContent = agree ? '' : '請勾選同意個人資料蒐集告知'; if (!agree) errs.push(['f_agree', '請勾選同意個人資料蒐集告知']);
+    $('errlist').innerHTML = errs.map(([id, m]) => `<li><a href="#${id}" data-f="${id}">${esc(m)}</a></li>`).join('');
+    $('errsum').classList.toggle('hidden', !errs.length);
+    if (errs.length) $('errsum').focus();
+    return !errs.length;
+  }
+  $('errlist').onclick = e => { const a = e.target.closest('[data-f]'); if (a) { e.preventDefault(); $(a.dataset.f).focus(); } };
+  let sending = false;
+  async function submit(){
+    if (sending || !validate()) return;
+    sending = true; [$('sumNext'), $('mNext')].forEach(b => { b.disabled = true; b.textContent = '送出中…'; });
+    const p = { participant_type: ptype(), name: $('f_name').value.trim(), student_id: ptype() === 'guest' ? null : $('f_sid').value.trim(),
+      phone: $('f_phone').value.replace(/[\s-]/g, ''), email: $('f_email').value.trim(), payer_last5: total() === 0 ? '00000' : $('f_last5').value.trim(),
+      privacy_agreed: $('f_agree').checked, items: list().map(i => ({ id: i.id, qty: i.qty })) };
+    try {
+      const r = await Api.rpc('public_create_registration', { p });
+      history.replaceState(null, '', location.pathname + '?t=' + r.lookup_token);
+      renderPayment($('step3'), r, true); go(3);
+    } catch (e) {
+      const net = /Failed to fetch|NetworkError|連線/.test(e.message);
+      $('errlist').innerHTML = `<li>${esc(net ? '網路連線失敗，資料都還在，請確認網路後再按一次「確認送出」。不確定是否已送出時，再送一次會提示「已經報名過了」，不會重複建立訂單。' : e.message)}</li>`;
+      $('errsum').classList.remove('hidden'); $('errsum').focus();
+    } finally { sending = false; [$('sumNext'), $('mNext')].forEach(b => b.disabled = false); updateSummary(); }
+  }
+
+  // ---------- 轉帳 ----------
+  const itemsRows = items => items.length ? items.map(i => `<div class="rw"><span>${esc(i.name)} × ${esc(i.qty)}<div class="s">${esc(i.vendor)}</div></span><span class="num">$${i.price * i.qty}</span></div>`).join('') : '<div class="rw"><span>不點餐，只報名活動</span><span></span></div>';
+  function renderPayment(el, r, fresh){
+    if (r.status !== 'pending_payment') return renderTicket(el, r);
+    const overdue = new Date(r.payment_deadline) < new Date();
+    const tab = isMobile ? 'copy' : 'qr';
+    const link = location.origin + location.pathname + '?t=' + r.lookup_token;
+    const guest = r.participant_type === 'guest';
+    el.innerHTML = `
+      <div class="status-line">${overdue ? '<b style="color:var(--red)">付款期限已過</b>' : '<b>待付款</b>'}・訂單 <span class="num">${esc(r.order_no)}</span>・${esc(r.name)}</div>
+      <h2 tabindex="-1" id="payT" style="margin:0">${fresh ? '預約已建立，請完成轉帳' : '尚未確認到付款'}</h2>
+      ${overdue ? '<div class="notice">如果你已經在期限內轉帳，請不要重複付款，私訊學生會提供轉帳時間和帳號後五碼，我們會協助確認。</div>' : ''}
+      ${!fresh && !overdue ? '<p class="muted">已經轉帳的話，系統約 1 個工作天內會更新，請不要重複付款。</p>' : ''}
+      <div class="pay-amount"><span class="sr">應付金額</span><span class="num">${money(r.total_amount)}</span></div>
+      <p class="pay-deadline">${overdue ? '' : `請在 ${esc(fmtTime(r.payment_deadline))} 前轉帳剛好這個金額`}</p>
+      <div class="method" role="tablist" aria-label="轉帳方式">
+        <button type="button" role="tab" id="tb_copy" aria-controls="pn_copy" aria-selected="${tab === 'copy'}">複製帳號</button>
+        <button type="button" role="tab" id="tb_qr" aria-controls="pn_qr" aria-selected="${tab === 'qr'}">掃碼轉帳</button>
+      </div>
+      <div role="tabpanel" id="pn_copy" aria-labelledby="tb_copy" class="${tab === 'copy' ? '' : 'hidden'}"><div class="acct">
+        <div class="r"><span class="k">銀行</span><span class="v t">${esc(r.bank_name)}　<span class="num">${esc(r.bank_code)}</span></span><button type="button" class="copy" data-copy="${esc(r.bank_code)}">複製<span class="sr">銀行代碼</span></button></div>
+        <div class="r"><span class="k">帳號</span><span class="v">${esc(r.account_no)}</span><button type="button" class="copy" data-copy="${esc(String(r.account_no).replace(/\D/g, ''))}">複製<span class="sr">帳號</span></button></div>
+        <div class="r"><span class="k">戶名</span><span class="v t">${esc(r.account_name)}</span><span></span></div>
+      </div></div>
+      <div role="tabpanel" id="pn_qr" aria-labelledby="tb_qr" class="${tab === 'qr' ? '' : 'hidden'}"><div class="qrbox">
+        ${r.qr_image_url ? `<img src="${esc(r.qr_image_url)}" alt="學生會收款 QR Code">` : '<p>收款 QR Code 尚未設定，請改用「複製帳號」。</p>'}
+        <p>用另一支手機掃描；同一支手機請長按圖片儲存，再到銀行 APP 從相簿匯入。掃碼只會帶入帳號，金額和附言要自己填。</p>
+      </div></div>
+      <div class="memo"><div class="k">附言（一定要填）</div><div class="row"><span class="v">${esc(r.memo_code)}</span><button type="button" class="copy" data-copy="${esc(r.memo_code)}">複製<span class="sr">附言</span></button></div><p>${guest ? '你的訂單編號' : '你的學號'}，系統靠它確認是你付的款。</p></div>
+      <div class="after"><h3>轉帳之後</h3><p>轉完就好，不用回到這個頁面。我們核對入帳後（約 1 個工作天）會寄「付款完成」通知到你的 Email，${guest ? '信裡有報到用的 QR Code。' : '活動當天帶學生證報到即可。'}</p></div>
+      <div class="more">
+        <details><summary>訂單內容</summary><div class="in review" style="border:none;margin:0">${itemsRows(r.items)}</div></details>
+        <details><summary>訂單查詢連結</summary><div class="in"><p class="muted" style="margin:0 0 6px;font-size:14px">報名成功信裡也有這個連結。</p><span class="num" style="font-size:13px;word-break:break-all">${esc(link)}</span> <button type="button" class="copy" data-copy="${esc(link)}">複製<span class="sr">查詢連結</span></button></div></details>
+      </div>`;
+    el.onclick = async e => {
+      const t = e.target.closest('[role="tab"]');
+      if (t) { el.querySelectorAll('[role="tab"]').forEach(b => b.setAttribute('aria-selected', b === t)); el.querySelectorAll('[role="tabpanel"]').forEach(p => p.classList.toggle('hidden', p.id !== t.getAttribute('aria-controls'))); return; }
+      const c = e.target.closest('[data-copy]');
+      if (c) { const ok = await copyText(c.dataset.copy); const old = c.innerHTML; c.textContent = ok ? '已複製' : '請長按手動複製'; say(c.textContent); setTimeout(() => { c.innerHTML = old; }, 1800); }
+    };
+    setTimeout(() => { const h = $('payT'); if (h) h.focus({ preventScroll: true }); }, 0);
+  }
+  function renderTicket(el, r){
+    let qr = '';
+    if (r.qr_token && window.qrcode) { const q = qrcode(0, 'M'); q.addData(r.qr_token); q.make(); qr = q.createSvgTag({ cellSize: 5, margin: 2, scalable: true }); }
+    if (!qr && r.qr_token) qr = `<div style="padding:12px;border:1px dashed var(--ink);border-radius:8px;text-align:center"><div style="font-size:13px">報到代碼</div><div class="num" style="font-weight:600;word-break:break-all">${esc(r.qr_token)}</div></div>`;
+    const done = r.status === 'picked_up', guest = r.participant_type === 'guest';
+    el.innerHTML = `
+      <div class="status-line"><b>${done ? '已完成報到與取餐' : '付款已確認'}</b>・訂單 <span class="num">${esc(r.order_no)}</span></div>
+      <h2 style="margin:0">${done ? '祝你觀影愉快' : '報名完成，活動當天見'}</h2>
+      ${!done ? `<div class="ticket"><svg class="band" viewBox="0 0 432 36" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${tileBand(12, 36)}</svg>
+        <div class="tin"><div><div class="label">Admission</div><div class="who">${esc(r.name)}</div><p class="muted" style="margin:0">${guest ? '當天到報到櫃檯出示這個 QR Code，報到後到取餐區取餐。建議先截圖保存。' : '當天帶學生證到報到櫃檯，報到後到取餐區取餐。忘記帶學生證時，可以出示這個 QR Code。'}</p></div>
+        <div class="qr" aria-label="報到用 QR Code">${qr}</div></div></div>` : ''}
+      <div class="more"><details open><summary>訂單內容</summary><div class="in review" style="border:none;margin:0">${itemsRows(r.items)}</div></details>
+      ${r.event_info ? `<details><summary>活動資訊</summary><div class="in">${esc(r.event_info)}</div></details>` : ''}</div>`;
+  }
+
+  // ---------- 查詢 ----------
+  const home = () => `<a class="btn" href="${esc(location.pathname)}">回到首頁</a>`;
+  function showState(html){ $('home').classList.add('hidden'); $('flow').classList.add('hidden'); $('mbar').classList.remove('on'); $('lookup').classList.remove('hidden'); $('lookupBody').innerHTML = html; }
+  async function showLookup(token){
+    if (!/^[0-9a-f]{48}$/.test(token)) return showState(`<div class="state-page">${glyph()}<h2>連結不完整</h2><p class="muted">請直接點 Email 裡的完整連結。找不到信的話，請私訊學生會。</p>${home()}</div>`);
+    showState('<div class="state-page"><p class="muted">查詢中…</p></div>');
+    try {
+      const r = await Api.rpc('public_get_registration', { p_token: token });
+      if (!r) return showState(`<div class="state-page">${glyph()}<h2>找不到這筆訂單</h2><p class="muted">訂單可能已取消。如果你已經付款，請不要重複付款，私訊學生會協助確認。</p>${home()}</div>`);
+      const box = document.createElement('div'); box.style.cssText = 'max-width:600px;margin:16px auto 96px';
+      $('lookupBody').innerHTML = ''; $('lookupBody').appendChild(box); renderPayment(box, r, false);
+    } catch (e) { showState(`<div class="state-page">${glyph()}<h2>目前無法查詢</h2><p class="muted">可能是網路不穩，請稍後再試。</p><button class="btn" type="button" onclick="location.reload()">重新整理</button></div>`); }
+  }
+  $('lookupLink').onclick = e => { e.preventDefault();
+    showState(`<div class="state-page">${glyph()}<h2>查詢訂單</h2><p class="muted">為了保護個人資料，訂單只能用專屬連結查詢。請打開報名成功或付款完成的 Email，點裡面的連結；也可以貼在下面。</p><form id="lkForm" class="field" style="display:flex;gap:8px;text-align:left"><label class="sr" for="lkIn">查詢連結</label><input id="lkIn" style="flex:1" placeholder="貼上 Email 裡的查詢連結"><button class="btn" type="submit">查詢</button></form><p><a href="${esc(location.pathname)}">回到首頁</a></p></div>`);
+    $('lkForm').onsubmit = ev => { ev.preventDefault(); const v = $('lkIn').value.trim(), m = v.match(/[?&]t=([0-9a-f]{48})/) || v.match(/^([0-9a-f]{48})$/); if (m) { history.pushState(null, '', location.pathname + '?t=' + m[1]); showLookup(m[1]); } else toast('連結格式不正確，請貼上完整的查詢連結'); }; };
+
+  // ---------- 啟動 ----------
+  async function init(){
+    const token = new URLSearchParams(location.search).get('t');
+    try { catalog = await Api.rpc('public_get_catalog'); }
+    catch (e) { showState(`<div class="state-page">${glyph()}<h2>目前無法連線</h2><p class="muted">可能是網路不穩，請稍後再試。</p><button class="btn" type="button" onclick="location.reload()">重新整理</button></div>`); return; }
+    renderHome();
+    if (token) return showLookup(token);
+    renderMenu(); updateSummary();
+  }
+  init();
+})();
+</script>
+</body>
+</html>

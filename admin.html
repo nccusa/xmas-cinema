@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>管理後台｜聖誕露天電影院</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#004E3B;--bg:#F2EFE5;--card:#fff;--line:#e6e0d2;--ink:#182026;--muted:#6b7090;--gold:#B18B35;--red:#D9141A;--green:#23855a;--orange:#c77714;--blue:#2f6fd0}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Noto Sans TC",system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:15px}
+header{background:var(--navy);color:#fff;display:flex;align-items:center;gap:14px;padding:12px 20px;position:sticky;top:0;z-index:20}
+header h1{font-size:17px;margin:0}
+header h1 span{color:#f3c56b}
+nav{display:flex;gap:4px;flex-wrap:wrap;flex:1}
+nav button{background:transparent;border:none;color:#c8cde6;font:inherit;padding:8px 12px;border-radius:8px;cursor:pointer;position:relative}
+nav button.on{background:rgba(255,255,255,.12);color:#fff;font-weight:700}
+nav .n{background:var(--red);color:#fff;border-radius:99px;font-size:11px;padding:0 6px;margin-left:4px}
+main{max-width:1200px;margin:0 auto;padding:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+h2{font-size:19px;margin:0 0 12px}
+h3{font-size:16px;margin:16px 0 8px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.kpi .v{font-size:28px;font-weight:700}
+.kpi .k{color:var(--muted);font-size:13px}
+.kpi.alert{border-color:var(--orange);background:#fff8ec}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13px;color:var(--muted);font-weight:500;background:#faf8f2;position:sticky;top:0}
+tr.click{cursor:pointer}tr.click:hover{background:#fbf6e9}
+.tag{display:inline-block;border-radius:99px;padding:1px 9px;font-size:12.5px;font-weight:700;white-space:nowrap}
+.t-pending_payment{background:#fff0d9;color:var(--orange)}.t-paid{background:#e1f4ea;color:var(--green)}.t-picked_up{background:#e7ecf8;color:var(--blue)}.t-cancelled{background:#eee;color:#888}
+.t-suggested{background:#fff0d9;color:var(--orange)}.t-unmatched{background:#fde8e6;color:var(--red)}.t-matched{background:#e1f4ea;color:var(--green)}.t-ignored{background:#eee;color:#888}
+.t-pending_approval{background:#fff0d9;color:var(--orange)}.t-approved{background:#e7ecf8;color:var(--blue)}.t-sent{background:#e1f4ea;color:var(--green)}.t-failed,.t-blocked{background:#fde8e6;color:var(--red)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.grow{flex:1}
+input,select,textarea{font:inherit;border:1px solid #d6cfbd;border-radius:9px;padding:9px 10px;background:#fff;color:var(--ink)}
+textarea{width:100%;min-height:90px;resize:vertical}
+label.f{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
+label.f input,label.f textarea,label.f select{width:100%}
+.btn{border:none;border-radius:9px;padding:9px 16px;font:inherit;font-weight:700;cursor:pointer;background:var(--navy);color:#fff}
+.btn.gold{background:var(--gold)}.btn.green{background:var(--green)}.btn.red{background:var(--red)}
+.btn.line{background:#fff;color:var(--ink);border:1px solid #d6cfbd}
+.btn.sm{padding:5px 10px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.banner{border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:14px}
+.banner.warn{background:#fff6e5;border:1px solid #f0d199}
+.banner.info{background:#eef3fc;border:1px solid #c9d8f3}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(560px,100%);background:#fff;box-shadow:-10px 0 40px rgba(0,0,0,.15);z-index:40;overflow:auto;padding:20px;transform:translateX(105%);transition:transform .2s}
+.drawer.open{transform:none}
+.shade{position:fixed;inset:0;background:rgba(10,15,40,.35);z-index:39;display:none}
+.shade.open{display:block}
+.items-ed .it{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line)}
+.items-ed .it .nm{flex:1}
+.stp button{width:34px;height:34px;border-radius:8px;border:1px solid #d6cfbd;background:#fff;font-size:18px;cursor:pointer}
+.stp span{display:inline-block;min-width:26px;text-align:center;font-weight:700}
+pre.mail{white-space:pre-wrap;background:#faf8f2;border:1px solid var(--line);border-radius:10px;padding:12px;font:inherit;font-size:14px;max-height:360px;overflow:auto}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 18px;border-radius:10px;z-index:60;display:none}
+.login{max-width:380px;margin:12vh auto}
+.hidden{display:none!important}
+.vars code{background:#f1ecdf;border-radius:5px;padding:1px 5px;margin:2px;display:inline-block;font-size:13px;cursor:pointer}
+.menu-row input{width:100%}
+</style>
+</head>
+<body>
+<div id="loginView" class="login card hidden">
+  <h2>管理後台登入</h2>
+  <form id="loginForm">
+    <label class="f">Email<input type="email" id="lEmail" autocomplete="username" required></label>
+    <label class="f">密碼<input type="password" id="lPass" autocomplete="current-password" required></label>
+    <p class="small" id="lErr" style="color:var(--red)"></p>
+    <button class="btn" type="submit" style="width:100%">登入</button>
+  </form>
+</div>
+
+<div id="app" class="hidden">
+  <header>
+    <h1>🎄 <span>聖誕露天電影院</span> 後台</h1>
+    <nav id="nav">
+      <button data-v="dash" class="on">總覽</button>
+      <button data-v="orders">訂單</button>
+      <button data-v="recon">對帳<span class="n hidden" id="nRecon"></span></button>
+      <button data-v="mail">信件<span class="n hidden" id="nMail"></span></button>
+      <button data-v="menu">菜單</button>
+      <button data-v="settings">設定</button>
+      <button data-v="staff">工作人員</button>
+    </nav>
+    <button class="btn line sm" id="outBtn">登出</button>
+  </header>
+  <main>
+    <section data-view="dash"></section>
+    <section data-view="orders" class="hidden"></section>
+    <section data-view="recon" class="hidden"></section>
+    <section data-view="mail" class="hidden"></section>
+    <section data-view="menu" class="hidden"></section>
+    <section data-view="settings" class="hidden"></section>
+    <section data-view="staff" class="hidden"></section>
+  </main>
+</div>
+<div class="shade" id="shade"></div>
+<aside class="drawer" id="drawer"></aside>
+<div class="toast" id="toast"></div>
+
+<script src="assets/api.js"></script>
+<script>
+(function(){
+  Api.storeKey = 'xc_admin_session';
+  const $ = id => document.getElementById(id);
+  const V = n => document.querySelector(`[data-view="${n}"]`);
+  let regs = [], menu = { vendors: [], items: [] }, settings = null, view = 'dash';
+  function toast(m){ const t = $('toast'); t.textContent = m; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(() => t.style.display = 'none', 2600); }
+  async function run(fn, okMsg){ try { const r = await fn(); if (okMsg) toast(okMsg); return r; } catch (e) { toast('⚠ ' + e.message); if (/登入|JWT|權限/.test(e.message) && !Api.session) showLogin(e.message); throw e; } }
+  // 台北時間 <-> datetime-local
+  function toLocalInput(iso){ if (!iso) return ''; const p = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Taipei', year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false }).format(new Date(iso)); return p.replace(' ', 'T'); }
+  function fromLocalInput(v){ return v ? new Date(v + ':00+08:00').toISOString() : null; }
+
+  // ---------- 登入 ----------
+  async function boot(){
+    Api.loadSession();
+    if (!Api.session) return showLogin();
+    try { const ok = await Api.rpc('is_admin'); if (!ok) throw new Error('這個帳號不是管理員'); }
+    catch (e) { await Api.logout(); return showLogin(e.message); }
+    $('loginView').classList.add('hidden'); $('app').classList.remove('hidden');
+    await loadAll(); show('dash');
+  }
+  function showLogin(m){ $('app').classList.add('hidden'); $('loginView').classList.remove('hidden'); $('lErr').textContent = m || ''; }
+  $('loginForm').onsubmit = async e => { e.preventDefault(); try { await Api.login($('lEmail').value.trim(), $('lPass').value); $('lPass').value = ''; boot(); } catch (err) { $('lErr').textContent = '登入失敗：' + err.message; } };
+  $('outBtn').onclick = async () => { await Api.logout(); showLogin(); };
+  $('nav').onclick = e => { const b = e.target.closest('[data-v]'); if (b) show(b.dataset.v); };
+  function show(v){ view = v; document.querySelectorAll('#nav [data-v]').forEach(b => b.classList.toggle('on', b.dataset.v === v)); document.querySelectorAll('[data-view]').forEach(s => s.classList.toggle('hidden', s.dataset.view !== v)); ({ dash: renderDash, orders: renderOrders, recon: renderRecon, mail: renderMail, menu: renderMenu, settings: renderSettings, staff: renderStaff })[v](); }
+
+  async function loadAll(){
+    const [r, v, i, s] = await Promise.all([
+      Api.select('registrations', 'select=*,order_items(*)&order=created_at.desc'),
+      Api.select('vendors', 'select=*&order=sort,name'),
+      Api.select('menu_items', 'select=*&order=sort,name'),
+      Api.select('settings', 'select=*&id=eq.1')
+    ]);
+    regs = r; menu = { vendors: v, items: i }; settings = s[0];
+  }
+  async function badges(){
+    try { const d = await Api.rpc('admin_dashboard'); setBadge('nRecon', d.txn_review); setBadge('nMail', d.email_pending + d.email_blocked); return d; } catch (e) { return null; }
+  }
+  function setBadge(id, n){ $(id).textContent = n; $(id).classList.toggle('hidden', !n); }
+
+  // ---------- 總覽 ----------
+  async function renderDash(){
+    const d = await badges(); if (!d) return;
+    const overdue = regs.filter(r => r.status === 'pending_payment' && new Date(r.payment_deadline) < new Date()).length;
+    V('dash').innerHTML = `
+      ${settings.account_no.includes('尚未') ? '<div class="banner warn">⚠ 收款帳號還沒設定，請到「設定」填寫。</div>' : ''}
+      ${!settings.site_url ? '<div class="banner warn">⚠ 報名頁網址還沒設定，信件裡的查詢連結會缺少，系統會擋下信件。請到「設定」填寫。</div>' : ''}
+      <div class="banner info">寄信程式尚未啟用：信件會先排在佇列裡，等 Gmail 授權設定完成後才會實際寄出。</div>
+      <div class="kpis">
+        <div class="kpi"><div class="v">${d.total}</div><div class="k">有效報名／上限 ${settings.capacity}</div></div>
+        <div class="kpi"><div class="v">${d.pending}</div><div class="k">待付款</div></div>
+        <div class="kpi"><div class="v">${d.paid}</div><div class="k">已付款（待取餐）</div></div>
+        <div class="kpi"><div class="v">${d.checked_in}</div><div class="k">已報到</div></div>
+        <div class="kpi"><div class="v">${d.picked_up}</div><div class="k">全部完成（報到＋取餐）</div></div>
+        <div class="kpi"><div class="v">${d.guests}</div><div class="k">校外人士</div></div>
+        <div class="kpi"><div class="v">${money(d.revenue)}</div><div class="k">已收金額</div></div>
+        <div class="kpi ${d.txn_review ? 'alert' : ''}"><div class="v">${d.txn_review}</div><div class="k">對帳待處理</div></div>
+        <div class="kpi ${d.email_pending ? 'alert' : ''}"><div class="v">${d.email_pending}</div><div class="k">信件待核准</div></div>
+        <div class="kpi ${overdue ? 'alert' : ''}"><div class="v">${overdue}</div><div class="k">逾期未付款</div></div>
+      </div>
+      <div class="card" style="margin-top:16px"><h2>備餐統計（給店家）</h2>
+        <table><thead><tr><th>店家</th><th>品項</th><th>總份數（含待付款）</th><th>已付款份數</th><th>已取餐</th></tr></thead><tbody>
+        ${d.prep.map(p => `<tr><td>${esc(p.vendor)}</td><td>${esc(p.item)}</td><td>${p.qty}</td><td><b>${p.qty_paid || 0}</b></td><td>${p.qty_picked || 0}</td></tr>`).join('') || '<tr><td colspan="5" class="muted">還沒有訂單</td></tr>'}
+        </tbody></table>
+        <p class="small muted">報名截止後以「已付款份數」為準提供給店家。</p>
+      </div>`;
+  }
+
+  // ---------- 訂單 ----------
+  let oq = '', ost = '';
+  function renderOrders(){
+    const q = oq.toLowerCase();
+    const list = regs.filter(r => (!ost || r.status === ost || (ost === 'overdue' && r.status === 'pending_payment' && new Date(r.payment_deadline) < new Date()) || (ost === 'balance' && r.status !== 'cancelled' && r.total_amount !== r.paid_amount && r.status !== 'pending_payment'))
+      && (!q || [r.name, r.student_id || '', r.phone, r.order_no, r.email].some(x => String(x).toLowerCase().includes(q))));
+    V('orders').innerHTML = `<div class="card">
+      <div class="row"><input id="oq" class="grow" placeholder="搜尋姓名、學號、手機、Email、訂單編號" value="${esc(oq)}">
+      <select id="ost"><option value="">全部狀態</option>${Object.entries(STATUS_TEXT).map(([k,v]) => `<option value="${k}" ${ost===k?'selected':''}>${v}</option>`).join('')}<option value="overdue" ${ost==='overdue'?'selected':''}>逾期未付款</option><option value="balance" ${ost==='balance'?'selected':''}>需補／退差額</option></select>
+      <button class="btn line" id="reload">重新整理</button></div>
+      ${ost === 'overdue' && list.length ? `<div class="banner warn" style="margin-top:12px">這些同學已超過付款期限。<b>請先匯出並上傳最新明細</b>，確認仍未付款後，再設定新期限（會產生「延長期限通知」信，需核准才寄出）。<div class="row" style="margin-top:8px"><input type="datetime-local" id="newDl"><button class="btn gold" id="extendAll">為下方 ${list.length} 人設定新期限</button></div></div>` : ''}
+      <p class="small muted">共 ${list.length} 筆</p>
+      <div style="overflow:auto"><table><thead><tr><th>訂單</th><th>姓名</th><th>學號</th><th>手機</th><th>應付／已付</th><th>狀態</th><th>報名時間</th></tr></thead><tbody>
+      ${list.map(r => `<tr class="click" data-id="${r.id}"><td>${esc(r.order_no)}</td><td>${esc(r.name)}${r.internal_note ? ' 📝' : ''}</td><td>${r.participant_type === 'guest' ? '<span class="tag t-approved">校外</span>' : esc(r.student_id)}</td><td>${esc(r.phone)}</td><td>${r.total_amount}／${r.paid_amount}${r.status !== 'pending_payment' && r.total_amount !== r.paid_amount && r.status !== 'cancelled' ? ' <span class="tag t-unmatched">差額</span>' : ''}</td><td><span class="tag t-${r.status}">${STATUS_TEXT[r.status]}</span></td><td class="small">${esc(fmtTime(r.created_at))}</td></tr>`).join('')}
+      </tbody></table></div></div>`;
+    $('oq').oninput = e => { oq = e.target.value; clearTimeout($('oq')._t); $('oq')._t = setTimeout(() => { renderOrders(); const el = $('oq'); el.focus(); el.setSelectionRange(el.value.length, el.value.length); }, 250); };
+    $('ost').onchange = e => { ost = e.target.value; renderOrders(); };
+    $('reload').onclick = async () => { await run(loadAll, '已更新'); renderOrders(); };
+    V('orders').querySelector('tbody').onclick = e => { const tr = e.target.closest('[data-id]'); if (tr) openOrder(tr.dataset.id); };
+    if ($('extendAll')) $('extendAll').onclick = async () => {
+      const dl = fromLocalInput($('newDl').value); if (!dl) return toast('請先選新期限');
+      if (!confirm(`確定為 ${list.length} 位同學設定新期限 ${fmtTime(dl)}？`)) return;
+      for (const r of list) await run(() => Api.rpc('admin_update_registration', { p_reg: r.id, p: { payment_deadline: dl } }));
+      await loadAll(); toast('已設定，請到「信件」核准延長通知'); renderOrders();
+    };
+  }
+  function openDrawer(html){ $('drawer').innerHTML = html; $('drawer').classList.add('open'); $('shade').classList.add('open'); }
+  function closeDrawer(){ $('drawer').classList.remove('open'); $('shade').classList.remove('open'); }
+  $('shade').onclick = closeDrawer;
+  function openOrder(id){
+    const r = regs.find(x => x.id === id); if (!r) return;
+    const qty = {}; (r.order_items || []).forEach(oi => { if (oi.menu_item_id) qty[oi.menu_item_id] = oi.qty; });
+    const editable = !['cancelled','picked_up'].includes(r.status);
+    const itemsEd = menu.vendors.map(v => `<h3>${esc(v.name)}</h3>` + menu.items.filter(i => i.vendor_id === v.id).map(i => `<div class="it"><span class="nm">${esc(i.name)} <span class="muted small">$${i.price}${i.active ? '' : '（已下架）'}</span></span><span class="stp"><button type="button" data-m="${i.id}">−</button><span id="q_${i.id}">${qty[i.id] || 0}</span><button type="button" data-p="${i.id}">＋</button></span></div>`).join('')).join('');
+    openDrawer(`
+      <div class="row"><h2 class="grow" style="margin:0">${esc(r.order_no)}　${esc(r.name)}</h2><button class="btn line sm" id="dClose">關閉</button></div>
+      <p><span class="tag t-${r.status}">${STATUS_TEXT[r.status]}</span>　應付 ${money(r.total_amount)}／已付 ${money(r.paid_amount)}
+      ${r.status !== 'pending_payment' && r.total_amount > r.paid_amount ? `<b style="color:var(--red)">　需補 ${r.total_amount - r.paid_amount} 元</b>` : ''}
+      ${r.paid_amount > r.total_amount ? `<b style="color:var(--red)">　需退 ${r.paid_amount - r.total_amount} 元</b>` : ''}</p>
+      <p class="small muted">報名 ${esc(fmtTime(r.created_at))}${r.paid_at ? '｜付款確認 ' + esc(fmtTime(r.paid_at)) + '（' + esc(r.paid_method) + '）' : ''}${r.checked_in_at ? '｜報到 ' + esc(fmtTime(r.checked_in_at)) : ''}${r.picked_up_at ? '｜全部取餐 ' + esc(fmtTime(r.picked_up_at)) : ''}</p>
+      <h3>內部備註（工作人員掃描時也看得到）</h3>
+      <textarea id="dNote">${esc(r.internal_note)}</textarea>
+      <button class="btn sm" id="saveNote">儲存備註</button>
+      <h3>基本資料</h3>
+      <label class="f">姓名<input id="dName" value="${esc(r.name)}"></label>
+      <label class="f">身分／學號（不可修改）<input value="${r.participant_type === 'guest' ? '校外人士（附言代碼 ' + esc(r.order_no) + '）' : esc(r.student_id)}" disabled></label>
+      <label class="f">手機<input id="dPhone" value="${esc(r.phone)}"></label>
+      <label class="f">Email<input id="dEmail" value="${esc(r.email)}"></label>
+      <label class="f">付款帳號後五碼<input id="dLast5" value="${esc(r.payer_last5)}" maxlength="5"></label>
+      <label class="f">付款期限<input type="datetime-local" id="dDl" value="${toLocalInput(r.payment_deadline)}"></label>
+      <button class="btn sm" id="saveInfo">儲存基本資料</button>
+      ${editable ? `<h3>修改餐點</h3><div class="items-ed" id="itemsEd">${itemsEd}</div>
+      <label class="f">修改原因（必填，例如：同學 IG 私訊要求換成熱拿鐵）<input id="dReason"></label>
+      <button class="btn gold sm" id="saveItems">儲存餐點修改</button>` : ''}
+      <h3>其他操作</h3>
+      <div class="row">
+        ${r.status === 'pending_payment' || r.total_amount > r.paid_amount ? `<input id="payAmt" type="number" placeholder="金額" style="width:100px" value="${r.total_amount - r.paid_amount}"><input id="payNote" class="grow" placeholder="人工入帳原因（必填）"><button class="btn green sm" id="markPaid">人工入帳</button>` : ''}
+      </div>
+      <div class="row" style="margin-top:10px">
+        ${r.checked_in_at || r.status === 'picked_up' ? '<button class="btn line sm" id="undoPick">撤銷報到與取餐紀錄</button>' : ''}
+        ${r.status !== 'cancelled' && r.status !== 'picked_up' ? '<button class="btn red sm" id="cancelReg">取消這筆報名</button>' : ''}
+      </div>`);
+    $('dClose').onclick = closeDrawer;
+    const after = async msg => { await loadAll(); toast(msg); renderOrders(); openOrder(id); };
+    $('saveNote').onclick = async () => { await run(() => Api.rpc('admin_update_registration', { p_reg: id, p: { internal_note: $('dNote').value } })); after('備註已儲存'); };
+    $('saveInfo').onclick = async () => {
+      const p = { name: $('dName').value, phone: $('dPhone').value.replace(/[\s-]/g,''), email: $('dEmail').value.trim(), payer_last5: $('dLast5').value.trim() };
+      const dl = fromLocalInput($('dDl').value); if (dl && dl !== new Date(r.payment_deadline).toISOString()) { p.payment_deadline = dl; if (r.status === 'pending_payment' && !confirm('變更付款期限會產生一封「延長期限通知」信（需核准才寄出），確定？')) return; }
+      await run(() => Api.rpc('admin_update_registration', { p_reg: id, p })); after('基本資料已儲存');
+    };
+    if ($('itemsEd')) {
+      $('itemsEd').onclick = e => { const m = e.target.dataset.m, p = e.target.dataset.p, k = m || p; if (!k) return; qty[k] = Math.max(0, Math.min(20, (qty[k] || 0) + (p ? 1 : -1))); $('q_' + k).textContent = qty[k]; };
+      $('saveItems').onclick = async () => {
+        const reason = $('dReason').value.trim(); if (!reason) return toast('請填寫修改原因');
+        const items = Object.entries(qty).filter(([,q]) => q > 0).map(([id, q]) => ({ id, qty: q }));
+        const res = await run(() => Api.rpc('admin_update_order', { p_reg: id, p_items: items, p_reason: reason }));
+        after(res.balance > 0 ? `已修改，需補 ${res.balance} 元` : res.balance < 0 ? `已修改，需退 ${-res.balance} 元` : '餐點已修改');
+      };
+    }
+    if ($('markPaid')) $('markPaid').onclick = async () => { const amt = parseInt($('payAmt').value, 10); const note = $('payNote').value.trim(); if (!amt || !note) return toast('請填金額和原因'); await run(() => Api.rpc('admin_mark_paid', { p_reg: id, p_amount: amt, p_note: note })); after('已入帳'); };
+    if ($('undoPick')) $('undoPick').onclick = async () => { const n = prompt('撤銷原因'); if (!n) return; await run(() => Api.rpc('admin_undo_pickup', { p_reg: id, p_note: n })); after('已撤銷取餐狀態'); };
+    if ($('cancelReg')) $('cancelReg').onclick = async () => { if (!confirm('確定取消這筆報名？名額與限量餐點會釋出。')) return; await run(() => Api.rpc('admin_update_registration', { p_reg: id, p: { status: 'cancelled' } })); closeDrawer(); await loadAll(); renderOrders(); toast('已取消'); };
+  }
+
+  // ---------- 對帳 ----------
+  function parseLine(line){
+    const out = []; let cur = '', q = false;
+    for (let i = 0; i < line.length; i++) { const ch = line[i];
+      if (q) { if (ch === '"') { if (line[i+1] === '"') { cur += '"'; i++; } else q = false; } else cur += ch; }
+      else if (ch === '"') q = true; else if (ch === ',') { out.push(cur); cur = ''; } else cur += ch; }
+    out.push(cur); return out.map(c => c.replace(/^=/, '').trim());
+  }
+  function parsePostCSV(text){
+    text = text.replace(/^﻿/, '');
+    const lines = text.split(/\r?\n/); let period = ''; const rows = []; let started = false, last = null, skipped = 0;
+    for (const ln of lines) {
+      if (!ln.trim()) continue;
+      const c = parseLine(ln);
+      if (c[0] === '存簿帳號') { period = c[3] || ''; continue; }
+      if (/交易日期/.test(c[0])) { started = true; continue; }
+      if (!started) continue;
+      const m = c[0].match(/^(\d{2,3})\/(\d{2})\/(\d{2}) (\d{2}:\d{2}:\d{2})$/); if (!m) continue;
+      const summary = (c[1] || '').replace(/\s/g, ''), note = (c[6] || '').normalize('NFKC'), memo = (c[7] || '').normalize('NFKC').trim();
+      if (summary === '續上一筆') { if (last) { if (/^\d{3}\D/.test(note) && !last.bank) last.bank = note; if (memo) last.memo = (last.memo + ' ' + memo).trim(); } continue; }
+      last = null;
+      const dep = parseInt((c[4] || '').replace(/[^0-9]/g, ''), 10) || 0;
+      if (dep <= 0) continue;
+      if (c[2]) { skipped++; continue; }
+      if (/利息|薪資|委發款項|票證/.test(summary)) { skipped++; continue; }
+      const tok = (note.split(/\s+/)[0] || '').replace(/[^0-9*]/g, '');
+      const last5 = /\d{5}$/.test(tok) ? tok.slice(-5) : null;
+      const iso = `${parseInt(m[1],10) + 1911}-${m[2]}-${m[3]}T${m[4]}+08:00`;
+      last = { txn_at: iso, amount: dep, last5, memo, bank: '', summary };
+      rows.push(last);
+    }
+    return { period, rows, skipped };
+  }
+  let parsed = null;
+  async function renderRecon(){
+    await badges();
+    const [txns, batches] = await Promise.all([
+      Api.select('bank_txns', 'select=*&status=in.(suggested,unmatched)&order=txn_at.desc'),
+      Api.select('import_batches', 'select=*&order=created_at.desc&limit=8')
+    ]);
+    const byId = Object.fromEntries(regs.map(r => [r.id, r]));
+    V('recon').innerHTML = `
+      <div class="card"><h2>匯入郵局交易明細</h2>
+        <p class="small muted">從電腦版網路郵局匯出 CSV 後選擇檔案。檔案只會在這台電腦的瀏覽器裡解析，只上傳「時間、金額、帳號後五碼、附言」，完整帳號與餘額不會離開你的電腦。重複匯入同一段期間沒關係，系統會自動略過已匯入的交易。</p>
+        <div class="row"><input type="file" id="csv" accept=".csv,text/csv"><button class="btn gold" id="doImport" disabled>匯入並比對</button></div>
+        <div id="preview" class="small" style="margin-top:8px"></div>
+      </div>
+      <div class="card"><h2>待人工處理（${txns.length}）</h2>
+        ${txns.length ? `<div style="overflow:auto"><table><thead><tr><th>入帳時間</th><th>金額</th><th>後五碼</th><th>附言</th><th>狀態／說明</th><th>建議訂單</th><th>處理</th></tr></thead><tbody>
+        ${txns.map(t => { const s = byId[t.suggested_registration_id]; return `<tr data-t="${t.id}"><td class="small">${esc(fmtTime(t.txn_at))}</td><td><b>${t.amount}</b></td><td>${esc(t.account_last5 || '—')}</td><td>${esc(t.memo || '—')}</td><td><span class="tag t-${t.status}">${t.status === 'suggested' ? '建議配對' : '找不到'}</span><div class="small muted">${esc(t.match_note || '')}</div></td><td class="small">${s ? `${esc(s.order_no)} ${esc(s.name)}<br>${esc(s.student_id || '校外')}｜應付 ${s.total_amount - s.paid_amount}｜後五碼 ${esc(s.payer_last5)}` : '—'}</td>
+          <td><div class="row">${s && s.status === 'pending_payment' ? `<button class="btn green sm" data-ok="${s.id}">確認配對</button>` : ''}<input placeholder="訂單編號或學號" style="width:130px" data-in><button class="btn sm line" data-assign>指定</button><button class="btn sm line" data-ignore>略過</button></div></td></tr>`; }).join('')}
+        </tbody></table></div>` : '<p class="muted">目前沒有需要處理的交易 🎉</p>'}
+      </div>
+      <div class="card"><h2>最近匯入紀錄</h2><table><thead><tr><th>時間</th><th>期間</th><th>筆數／新增</th><th>自動入帳</th><th>建議</th><th>找不到</th></tr></thead><tbody>
+        ${batches.map(b => `<tr><td class="small">${esc(fmtTime(b.created_at))}</td><td class="small">${esc(b.file_period || '')}</td><td>${b.rows_total}／${b.rows_new}</td><td>${b.matched}</td><td>${b.suggested}</td><td>${b.unmatched}</td></tr>`).join('') || '<tr><td colspan="6" class="muted">尚無紀錄</td></tr>'}
+      </tbody></table></div>`;
+    $('csv').onchange = async e => {
+      const f = e.target.files[0]; if (!f) return;
+      const buf = await f.arrayBuffer(); let text = new TextDecoder('utf-8').decode(buf);
+      if (!/交易日期/.test(text)) { try { text = new TextDecoder('big5').decode(buf); } catch (er) {} }
+      parsed = parsePostCSV(text);
+      $('preview').innerHTML = parsed.rows.length ? `期間 ${esc(parsed.period)}：找到 <b>${parsed.rows.length}</b> 筆轉入，略過 ${parsed.skipped} 筆非付款項目（利息、薪資等）。` : '<span style="color:var(--red)">找不到轉入紀錄，請確認是郵局匯出的交易明細 CSV。</span>';
+      $('doImport').disabled = !parsed.rows.length;
+    };
+    $('doImport').onclick = async () => {
+      $('doImport').disabled = true;
+      const res = await run(() => Api.rpc('admin_import_txns', { p_rows: parsed.rows, p_period: parsed.period }));
+      toast(`新增 ${res.new} 筆：自動入帳 ${res.matched}、建議 ${res.suggested}、找不到 ${res.unmatched}`);
+      parsed = null; await loadAll(); renderRecon();
+    };
+    V('recon').onclick = reconClick;
+  }
+  async function reconClick(e){
+    const tr = e.target.closest('[data-t]'); if (!tr) return;
+    const tid = tr.dataset.t;
+    const isOk = e.target.dataset.ok, isAssign = e.target.hasAttribute('data-assign'), isIgnore = e.target.hasAttribute('data-ignore');
+    if (!isOk && !isAssign && !isIgnore) return;
+    try {
+      if (isOk) { await run(() => Api.rpc('admin_resolve_txn', { p_txn: tid, p_reg: isOk }), '已入帳'); }
+      else if (isAssign) {
+        const key = tr.querySelector('[data-in]').value.trim().toUpperCase(); const r = regs.find(x => x.order_no === key || x.student_id === key);
+        if (!r) return toast('找不到這筆訂單');
+        if (!confirm(`把這筆款項入帳到 ${r.order_no} ${r.name}（應付 ${r.total_amount - r.paid_amount}）？`)) return;
+        await run(() => Api.rpc('admin_resolve_txn', { p_txn: tid, p_reg: r.id }), '已入帳');
+      } else { const n = prompt('略過原因（例如：非活動款項、已退款）'); if (!n) return; await run(() => Api.rpc('admin_ignore_txn', { p_txn: tid, p_note: n }), '已略過'); }
+    } catch (er) { return; }
+    await loadAll(); renderRecon();
+  }
+
+  // ---------- 信件 ----------
+  let mailTab = 'pending_approval';
+  const VARS = ['姓名','學號','附言代碼','身分','訂單編號','餐點明細','總金額','已付金額','付款期限','收款銀行','收款帳號','戶名','查詢連結','活動名稱','活動資訊','聯絡方式'];
+  async function renderMail(){
+    await badges();
+    const [tpls, queue] = await Promise.all([
+      Api.select('email_templates', 'select=*&order=key'),
+      Api.select('email_queue', 'select=id,registration_id,template_key,to_email,subject,body,status,error,created_at,sent_at&order=created_at.desc&limit=500')
+    ]);
+    const counts = {}; queue.forEach(q => counts[q.status] = (counts[q.status] || 0) + 1);
+    const tabs = [['pending_approval','待核准'],['approved','等待寄出'],['sent','已寄出'],['failed','寄送失敗'],['blocked','被系統擋下'],['cancelled','已取消']];
+    const list = queue.filter(q => q.status === mailTab);
+    const lbl = Object.fromEntries(tpls.map(t => [t.key, t.label]));
+    V('mail').innerHTML = `
+      <div class="banner info">寄信程式尚未啟用（等 Gmail 授權設定完成）。在這之前，信件只會排在佇列裡，不會寄出任何一封。</div>
+      <div class="card"><h2>信件佇列</h2>
+        <div class="row">${tabs.map(([k,v]) => `<button class="btn sm ${mailTab===k?'':'line'}" data-mt="${k}">${v}（${counts[k] || 0}）</button>`).join('')}</div>
+        ${mailTab === 'pending_approval' && list.length ? `<div class="row" style="margin:12px 0"><label><input type="checkbox" id="mAll"> 全選</label><span class="grow"></span><button class="btn line sm" id="mCancel">取消選取的信</button><button class="btn green" id="mApprove">核准寄出選取的信</button></div>` : ''}
+        ${['failed','blocked'].includes(mailTab) && list.length ? `<div class="row" style="margin:12px 0"><label><input type="checkbox" id="mAll"> 全選</label><span class="grow"></span><button class="btn line sm" id="mCancel">取消選取的信</button>${mailTab === 'failed' ? '<button class="btn green sm" id="mApprove">重新寄送</button>' : ''}</div>` : ''}
+        ${mailTab === 'blocked' && list.length ? '<p class="small muted">被擋下通常是信件裡還有變數沒代入（例如沒設定報名頁網址），或 Email 格式錯誤。修正後請取消這些信，系統下次會重新產生。</p>' : ''}
+        <table><thead><tr><th></th><th>類型</th><th>收件人</th><th>主旨</th><th>時間</th></tr></thead><tbody>
+        ${list.map(q => `<tr><td><input type="checkbox" data-q="${q.id}"></td><td class="small">${esc(lbl[q.template_key] || q.template_key)}</td><td>${esc(q.to_email)}</td><td><details><summary>${esc(q.subject)}</summary><pre class="mail">${esc(q.body)}</pre>${q.error ? `<div class="small" style="color:var(--red)">${esc(q.error)}</div>` : ''}</details></td><td class="small">${esc(fmtTime(q.sent_at || q.created_at))}</td></tr>`).join('') || '<tr><td colspan="5" class="muted">沒有信件</td></tr>'}
+        </tbody></table>
+      </div>
+      <div class="card"><h2>信件範本</h2>
+        <p class="small muted">修改後必須按「核准並啟用」才會使用新內容。點下面的變數可以插入到內文游標位置。</p>
+        <div class="vars small">${VARS.map(v => `<code data-var="${v}">{{${v}}}</code>`).join('')}</div>
+        ${tpls.map(t => `<div class="card" style="background:#fdfbf6" data-tpl="${t.key}">
+          <div class="row"><h3 class="grow" style="margin:0">${esc(t.label)}</h3>
+          <span class="tag ${t.approved_at && t.enabled ? 't-sent' : 't-pending_approval'}">${t.approved_at && t.enabled ? '已核准啟用' : t.approved_at ? '已核准・停用中' : '尚未核准'}</span></div>
+          <label class="f">主旨<input data-f="subject" value="${esc(t.subject)}"></label>
+          <label class="f">內文<textarea data-f="body" rows="12">${esc(t.body)}</textarea></label>
+          <div class="row"><button class="btn line sm" data-act="save">儲存修改</button><button class="btn line sm" data-act="preview">用第一筆訂單預覽</button>
+          <span class="grow"></span>${t.enabled ? '<button class="btn line sm" data-act="disable">停用</button>' : ''}<button class="btn gold sm" data-act="approve">核准並啟用</button></div>
+          <div data-out></div></div>`).join('')}
+      </div>`;
+    let lastTa = null;
+    V('mail').querySelectorAll('textarea[data-f]').forEach(ta => ta.onfocus = () => lastTa = ta);
+    V('mail').onclick = async e => {
+      const mt = e.target.dataset.mt; if (mt) { mailTab = mt; return renderMail(); }
+      const vv = e.target.dataset.var; if (vv && lastTa) { const s = lastTa.selectionStart; lastTa.value = lastTa.value.slice(0, s) + '{{' + vv + '}}' + lastTa.value.slice(lastTa.selectionEnd); lastTa.focus(); return; }
+      if (e.target.id === 'mAll') { V('mail').querySelectorAll('[data-q]').forEach(c => c.checked = e.target.checked); return; }
+      const ids = [...V('mail').querySelectorAll('[data-q]:checked')].map(c => c.dataset.q);
+      if (e.target.id === 'mApprove') { if (!ids.length) return toast('請先勾選信件'); if (!confirm(`確定核准 ${ids.length} 封信寄出？`)) return; await run(() => Api.rpc('admin_set_email_status', { p_ids: ids, p_status: 'approved' }), '已核准'); return renderMail(); }
+      if (e.target.id === 'mCancel') { if (!ids.length) return toast('請先勾選信件'); if (!confirm(`確定取消 ${ids.length} 封信？`)) return; await run(() => Api.rpc('admin_set_email_status', { p_ids: ids, p_status: 'cancelled' }), '已取消'); return renderMail(); }
+      const box = e.target.closest('[data-tpl]'); const act = e.target.dataset.act; if (!box || !act) return;
+      const key = box.dataset.tpl, subject = box.querySelector('[data-f="subject"]').value, body = box.querySelector('[data-f="body"]').value;
+      if (act === 'save') { await run(() => Api.patch('email_templates', 'key=eq.' + encodeURIComponent(key), { subject, body }), '已儲存，請記得重新核准'); return renderMail(); }
+      if (act === 'preview') { const r = regs[regs.length - 1]; if (!r) return toast('還沒有訂單可以預覽'); const p = await run(() => Api.rpc('admin_preview_email', { p_key: key, p_reg: r.id })); box.querySelector('[data-out]').innerHTML = `<p class="small muted">以 ${esc(r.order_no)} ${esc(r.name)} 預覽（未儲存的修改不會顯示）：</p><pre class="mail"><b>${esc(p.subject)}</b>\n\n${esc(p.body)}</pre>`; return; }
+      if (act === 'approve') { if (!confirm('核准後，這個範本就會用來寄信給同學。確定內容沒問題？')) return; await run(() => Api.patch('email_templates', 'key=eq.' + encodeURIComponent(key), { subject, body })); await run(() => Api.rpc('admin_approve_template', { p_key: key }), '已核准啟用'); return renderMail(); }
+      if (act === 'disable') { await run(() => Api.patch('email_templates', 'key=eq.' + encodeURIComponent(key), { enabled: false }), '已停用'); return renderMail(); }
+    };
+  }
+
+  // ---------- 菜單 ----------
+  function renderMenu(){
+    V('menu').innerHTML = `
+      <div class="banner warn">⚠ 菜單會直接顯示在公開的報名頁上，修改前請確認名稱與價格正確。已成立的訂單會保留下單時的價格，不受影響。</div>
+      ${menu.vendors.map(v => `<div class="card" data-vendor="${v.id}">
+        <div class="row"><input data-vf="name" value="${esc(v.name)}" class="grow" style="font-weight:700"><input data-vf="description" value="${esc(v.description)}" placeholder="店家說明" class="grow"><input data-vf="image_url" value="${esc(v.image_url || '')}" placeholder="店家照片網址" class="grow"><input data-vf="sort" type="number" value="${v.sort}" style="width:70px" title="排序"><label><input type="checkbox" data-vf="active" ${v.active ? 'checked' : ''}> 顯示</label><button class="btn sm" data-sv>儲存店家</button></div>
+        <table style="margin-top:10px"><thead><tr><th style="width:22%">品名</th><th style="width:26%">說明</th><th>價格</th><th>限量（空白＝不限）</th><th>標籤</th><th>排序</th><th>上架</th><th></th></tr></thead><tbody>
+        ${menu.items.filter(i => i.vendor_id === v.id).map(i => itemRow(i)).join('')}
+        ${itemRow({ id: '', vendor_id: v.id, name: '', description: '', price: '', stock_limit: null, tag: '', sort: 99, active: true })}
+        </tbody></table></div>`).join('')}
+      <div class="card"><h2>新增店家</h2><div class="row"><input id="newV" placeholder="店家名稱" class="grow"><button class="btn" id="addV">新增</button></div></div>`;
+    V('menu').onclick = async e => {
+      if (e.target.id === 'addV') { const n = $('newV').value.trim(); if (!n) return; await run(() => Api.insert('vendors', { name: n, sort: menu.vendors.length + 1 }), '已新增店家'); await loadAll(); return renderMenu(); }
+      if (e.target.hasAttribute('data-sv')) { const box = e.target.closest('[data-vendor]'); const g = f => box.querySelector(`[data-vf="${f}"]`); await run(() => Api.patch('vendors', 'id=eq.' + box.dataset.vendor, { name: g('name').value.trim(), description: g('description').value.trim(), image_url: g('image_url').value.trim() || null, sort: parseInt(g('sort').value,10) || 0, active: g('active').checked }), '店家已儲存'); await loadAll(); return renderMenu(); }
+      if (e.target.hasAttribute('data-si')) {
+        const tr = e.target.closest('tr'); const g = f => tr.querySelector(`[data-if="${f}"]`);
+        const row = { name: g('name').value.trim(), description: g('description').value.trim(), price: parseInt(g('price').value, 10), stock_limit: g('stock').value === '' ? null : parseInt(g('stock').value, 10), tag: g('tag').value.trim() || null, sort: parseInt(g('sort').value,10) || 0, active: g('active').checked };
+        if (!row.name || isNaN(row.price) || row.price < 0) return toast('請填寫品名與正確價格');
+        if (tr.dataset.item) await run(() => Api.patch('menu_items', 'id=eq.' + tr.dataset.item, row), '品項已儲存');
+        else await run(() => Api.insert('menu_items', { ...row, vendor_id: tr.dataset.vendor }), '已新增品項');
+        await loadAll(); return renderMenu();
+      }
+    };
+  }
+  function itemRow(i){
+    return `<tr class="menu-row" data-item="${i.id}" data-vendor="${i.vendor_id}"><td><input data-if="name" value="${esc(i.name)}" placeholder="${i.id ? '' : '＋ 新品項名稱'}"></td><td><input data-if="description" value="${esc(i.description)}"></td><td><input data-if="price" type="number" min="0" value="${esc(i.price)}" style="width:80px"></td><td><input data-if="stock" type="number" min="0" value="${i.stock_limit == null ? '' : i.stock_limit}" style="width:80px"></td><td><input data-if="tag" value="${esc(i.tag || '')}" style="width:70px" placeholder="熱門"></td><td><input data-if="sort" type="number" value="${i.sort}" style="width:60px"></td><td><input type="checkbox" data-if="active" ${i.active ? 'checked' : ''}></td><td><button class="btn sm ${i.id ? 'line' : 'gold'}" data-si>${i.id ? '儲存' : '新增'}</button></td></tr>`;
+  }
+
+  // ---------- 設定 ----------
+  function renderSettings(){
+    const s = settings;
+    const f = (k, label, type = 'text', hint = '') => `<label class="f">${label}${type === 'textarea' ? `<textarea data-s="${k}">${esc(s[k] || '')}</textarea>` : `<input data-s="${k}" type="${type}" value="${esc(type === 'datetime-local' ? toLocalInput(s[k]) : (s[k] ?? ''))}">`}</label>${hint ? `<div class="small muted">${hint}</div>` : ''}`;
+    V('settings').innerHTML = `<div class="card"><h2>活動與報名設定</h2>
+      <div class="banner warn">⚠ 這些內容大多會顯示在公開的報名頁和信件裡，上線前請再確認一次。</div>
+      ${f('event_name','活動名稱')}${f('event_info','活動資訊（日期、時間、地點）','text','用兩個空白或全形空白分隔，報名頁會分成小標籤顯示')}
+      ${f('registration_open_at','開放報名時間（台北時間）','datetime-local')}${f('registration_close_at','報名截止時間','datetime-local')}${f('payment_deadline','付款期限（新報名預設值）','datetime-local','修改這裡不會影響已報名同學的期限；個別延長請到「訂單」處理')}
+      ${f('capacity','名額上限','number')}
+      <h3>首頁介紹</h3>${f('film_title','放映電影片名','text','還沒確定可以先空白，首頁會顯示「片單待公布」')}${f('film_note','電影介紹','textarea')}${f('film_image_url','電影海報或場地照片網址','text','需取得放映與圖片使用授權')}${f('venue_note','現場體驗說明（座位、自備物品、雨備等）','textarea')}
+      <h3>收款資訊</h3>${f('bank_name','收款銀行')}${f('bank_code','銀行代碼')}${f('account_no','收款帳號（郵局 14 碼）')}${f('account_name','戶名')}${f('qr_image_url','收款 QR Code 圖片網址','text','把郵局收款碼圖片放到網站上後，貼上圖片網址')}
+      <h3>其他</h3>${f('contact_info','聯絡方式')}${f('site_url','報名頁網址','text','例如 https://nccusa.github.io/xmas-cinema/，信件的查詢連結會用到')}${f('email_cap_24h','每 24 小時寄信上限','number','一般 Gmail 上限是 500，建議 450')}${f('privacy_notice','個人資料蒐集告知','textarea')}
+      <div style="margin-top:14px"><button class="btn gold" id="saveS">儲存設定</button></div></div>`;
+    $('saveS').onclick = async () => {
+      const p = {}; V('settings').querySelectorAll('[data-s]').forEach(el => { const k = el.dataset.s; p[k] = el.type === 'datetime-local' ? fromLocalInput(el.value) : el.type === 'number' ? parseInt(el.value, 10) : el.value.trim(); });
+      if (p.qr_image_url === '') p.qr_image_url = null; if (p.film_image_url === '') p.film_image_url = null;
+      p.updated_at = new Date().toISOString();
+      await run(() => Api.patch('settings', 'id=eq.1', p), '設定已儲存'); await loadAll(); renderSettings();
+    };
+  }
+
+  // ---------- 工作人員 ----------
+  async function renderStaff(){
+    const list = await run(() => Api.rpc('admin_list_staff'));
+    V('staff').innerHTML = `<div class="card"><h2>工作人員與權限</h2>
+      <p class="small muted">管理員：可以使用整個後台。現場人員：只能使用掃描頁（查詢與交付），看不到完整名單，也不能改價格或訂單。</p>
+      <table><thead><tr><th>Email</th><th>名稱</th><th>角色</th><th></th></tr></thead><tbody>
+      ${list.map(s => `<tr><td>${esc(s.email)}</td><td>${esc(s.display_name || '')}</td><td>${s.role === 'admin' ? '管理員' : '現場人員'}</td><td><button class="btn sm line" data-rm="${s.user_id}">移除權限</button></td></tr>`).join('')}
+      </tbody></table>
+      <h3>加入工作人員</h3>
+      <p class="small muted">步驟：① 到 Supabase 後台 Authentication → Users → Add user，建立帳號（Email＋密碼）② 回到這裡輸入同一個 Email 授權。</p>
+      <div class="row"><input id="sEmail" placeholder="Email" class="grow"><input id="sName" placeholder="名稱（例如：活動部小明）"><select id="sRole"><option value="staff">現場人員</option><option value="admin">管理員</option></select><button class="btn" id="sAdd">授權</button></div></div>`;
+    V('staff').onclick = async e => {
+      if (e.target.id === 'sAdd') { await run(() => Api.rpc('admin_grant_role', { p_email: $('sEmail').value, p_role: $('sRole').value, p_name: $('sName').value }), '已授權'); return renderStaff(); }
+      if (e.target.dataset.rm) { if (!confirm('確定移除這個人的權限？')) return; await run(() => Api.rpc('admin_revoke_role', { p_user: e.target.dataset.rm }), '已移除'); return renderStaff(); }
+    };
+  }
+  boot();
+})();
+</script>
+</body>
+</html>
