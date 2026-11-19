@@ -110,6 +110,10 @@ input[type=checkbox]{width:17px;height:17px;accent-color:var(--green)}
 .tbl td{padding:11px 12px;border-bottom:1px solid var(--rule);vertical-align:middle}
 .tbl tr:last-child td{border-bottom:0}
 .tbl tr.click{cursor:pointer;transition:background .1s}
+.photo{display:flex;align-items:center;gap:6px}
+.photo .pv{width:44px;height:44px;border-radius:10px;background:var(--sunk);display:grid;place-items:center;overflow:hidden;flex:none;color:var(--dim)}
+.photo .pv img{width:100%;height:100%;object-fit:cover}
+.photo label.btn{cursor:pointer;white-space:nowrap}.photo label.busy{opacity:.6;pointer-events:none}
 .tbl .selc{width:44px;padding:0 0 0 12px}
 .tbl .selc input{width:20px;height:20px;accent-color:var(--green,#004E3B);cursor:pointer;vertical-align:middle}
 .tbl tr.picked td{background:#EEF5F1}
@@ -273,8 +277,8 @@ pre.mail{white-space:pre-wrap;background:var(--sunk);border:1px solid var(--rule
 <div class="dialog" id="dialog" role="alertdialog" aria-modal="true"><div class="box" id="dialogBox"></div></div>
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
-<script src="assets/icons.js?v=20261120d"></script>
-<script src="assets/api.js?v=20261120d"></script>
+<script src="assets/icons.js?v=20261120e"></script>
+<script src="assets/api.js?v=20261120e"></script>
 <script>
 (function(){
   Api.storeKey = 'xc_admin_session';
@@ -733,23 +737,24 @@ pre.mail{white-space:pre-wrap;background:var(--sunk);border:1px solid var(--rule
         <div class="row" style="align-items:flex-end">
           <label class="field grow" style="margin:0"><span>店家名稱</span><input data-vf="name" value="${esc(v.name)}" style="font-weight:700"></label>
           <label class="field grow" style="margin:0"><span>店家說明</span><input data-vf="description" value="${esc(v.description)}"></label>
-          <label class="field grow" style="margin:0"><span>照片網址</span><input data-vf="image_url" value="${esc(v.image_url || '')}"></label>
+          <div class="field" style="margin:0"><span class="small muted" style="display:block;margin-bottom:4px">店家照片</span>${photoCell(v.image_url, 'vendor')}</div>
           <label class="field" style="margin:0;width:76px"><span>排序</span><input data-vf="sort" type="number" value="${v.sort}"></label>
           <label class="row small" style="min-height:40px"><input type="checkbox" data-vf="active" ${v.active ? 'checked' : ''}>顯示</label>
           <button class="btn sec" type="button" data-sv>儲存店家</button>
         </div>
-        <div class="tblwrap" style="margin-top:14px"><table class="tbl"><thead><tr><th style="min-width:150px">品名</th><th style="min-width:170px">說明</th><th>價格</th><th>限量</th><th>已售</th><th>標籤</th><th>排序</th><th>上架</th><th></th></tr></thead><tbody>
+        <div class="tblwrap" style="margin-top:14px"><table class="tbl"><thead><tr><th>照片</th><th style="min-width:150px">品名</th><th style="min-width:170px">說明</th><th>價格</th><th>限量</th><th>已售</th><th>標籤</th><th>排序</th><th>上架</th><th></th></tr></thead><tbody>
         ${menu.items.filter(i => i.vendor_id === v.id).map(i => itemRow(i)).join('')}
         ${itemRow({ id: '', vendor_id: v.id, name: '', description: '', price: '', stock_limit: null, tag: '', sort: 99, active: true })}
         </tbody></table></div></div>`).join('')}
+      <div class="note info">${icon('info')}<span>照片會自動縮小成適合手機的大小再上傳。上傳或移除後，記得按該列的「儲存」。請只使用店家提供或自己拍的照片。</span></div>
       <div class="card"><h2>${icon('circle-plus')}新增店家</h2><div class="row"><input class="in grow" id="newV" placeholder="店家名稱"><button class="btn" type="button" id="addV">新增店家</button></div></div>`;
     page().onclick = async e => {
       const b = e.target.closest('button'); if (!b) return;
       if (b.id === 'addV') { const n = $('newV').value.trim(); if (!n) return; await run(() => Api.insert('vendors', { name: n, sort: menu.vendors.length + 1 }), '已新增店家'); await loadAll(); return renderMenu(); }
-      if (b.hasAttribute('data-sv')) { const box = b.closest('[data-vendor]'); const g = f => box.querySelector(`[data-vf="${f}"]`); await run(() => Api.patch('vendors', 'id=eq.' + box.dataset.vendor, { name: g('name').value.trim(), description: g('description').value.trim(), image_url: g('image_url').value.trim() || null, sort: parseInt(g('sort').value, 10) || 0, active: g('active').checked }), '店家已儲存'); await loadAll(); return renderMenu(); }
+      if (b.hasAttribute('data-sv')) { const box = b.closest('[data-vendor]'); const g = f => box.querySelector(`[data-vf="${f}"]`); await run(() => Api.patch('vendors', 'id=eq.' + box.dataset.vendor, { name: g('name').value.trim(), description: g('description').value.trim(), image_url: box.querySelector('.vphoto [data-photo]').dataset.photo || null, sort: parseInt(g('sort').value, 10) || 0, active: g('active').checked }), '店家已儲存'); await loadAll(); return renderMenu(); }
       if (b.hasAttribute('data-si')) {
         const tr = b.closest('tr'); const g = f => tr.querySelector(`[data-if="${f}"]`);
-        const row = { name: g('name').value.trim(), description: g('description').value.trim(), price: parseInt(g('price').value, 10), stock_limit: g('stock').value === '' ? null : parseInt(g('stock').value, 10), tag: g('tag').value.trim() || null, sort: parseInt(g('sort').value, 10) || 0, active: g('active').checked };
+        const row = { image_url: tr.querySelector('[data-photo]') ? (tr.querySelector('[data-photo]').dataset.photo || null) : undefined, name: g('name').value.trim(), description: g('description').value.trim(), price: parseInt(g('price').value, 10), stock_limit: g('stock').value === '' ? null : parseInt(g('stock').value, 10), tag: g('tag').value.trim() || null, sort: parseInt(g('sort').value, 10) || 0, active: g('active').checked };
         if (!row.name || isNaN(row.price) || row.price < 0) return toast('請填寫品名和正確的價格', 'err');
         if (tr.dataset.item) await run(() => Api.patch('menu_items', 'id=eq.' + tr.dataset.item, row), '品項已儲存');
         else await run(() => Api.insert('menu_items', { ...row, vendor_id: tr.dataset.vendor }), '已新增品項');
@@ -757,9 +762,37 @@ pre.mail{white-space:pre-wrap;background:var(--sunk);border:1px solid var(--rule
       }
     };
   }
+  function photoCell(url, kind){
+    return `<div class="photo${kind === 'vendor' ? ' vphoto' : ''}"><span data-photo="${esc(url || '')}" class="pv">${url ? `<img src="${esc(url)}" alt="">` : icon('camera')}</span>
+      <label class="btn sm sec">${url ? '換照片' : '上傳'}<input type="file" accept="image/*" data-upload hidden></label>${url ? `<button class="btn sm sec" type="button" data-rmphoto title="移除照片">${icon('x')}</button>` : ''}</div>`;
+  }
+  // 在瀏覽器縮圖：長邊最多 900px、JPEG，避免手機用行動網路載入太慢
+  async function shrink(file){
+    const img = await new Promise((res, rej) => { const u = URL.createObjectURL(file), im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error('這個檔案不是可以讀取的圖片')); im.src = u; });
+    const k = Math.min(1, 900 / Math.max(img.naturalWidth, img.naturalHeight)), c = document.createElement('canvas');
+    c.width = Math.round(img.naturalWidth * k); c.height = Math.round(img.naturalHeight * k);
+    const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
+    return new Promise(res => c.toBlob(res, 'image/jpeg', .82));
+  }
+  document.addEventListener('change', async e => {
+    const inp = e.target.closest('[data-upload]'); if (!inp || !inp.files[0]) return;
+    const box = inp.closest('.photo'), pv = box.querySelector('[data-photo]'), lab = inp.closest('label');
+    lab.classList.add('busy'); const old = lab.firstChild.textContent; lab.firstChild.textContent = '上傳中…';
+    try {
+      const blob = await shrink(inp.files[0]);
+      const url = await Api.upload('menu/' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8) + '.jpg', blob);
+      pv.dataset.photo = url; pv.innerHTML = `<img src="${esc(url)}" alt="">`; lab.firstChild.textContent = '換照片';
+      toast('照片已上傳，記得按「儲存」');
+    } catch (er) { toast('上傳失敗：' + er.message, 'err'); lab.firstChild.textContent = old; }
+    finally { lab.classList.remove('busy'); inp.value = ''; }
+  });
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-rmphoto]'); if (!b) return;
+    const pv = b.closest('.photo').querySelector('[data-photo]'); pv.dataset.photo = ''; pv.innerHTML = icon('camera'); b.remove(); toast('已移除，記得按「儲存」');
+  });
   function sold(id){ let n = 0; regs.forEach(r => { if (r.status !== 'cancelled') (r.order_items || []).forEach(o => { if (o.menu_item_id === id) n += o.qty; }); }); return n; }
   function itemRow(i){
-    return `<tr data-item="${i.id}" data-vendor="${i.vendor_id}"><td><input class="in" data-if="name" value="${esc(i.name)}" placeholder="${i.id ? '' : '＋ 新品項名稱'}"></td><td><input class="in" data-if="description" value="${esc(i.description)}"></td><td><input class="in num" data-if="price" type="number" min="0" value="${esc(i.price)}" style="width:80px"></td><td><input class="in num" data-if="stock" type="number" min="0" value="${i.stock_limit == null ? '' : i.stock_limit}" placeholder="不限" style="width:80px"></td><td class="num">${i.id ? sold(i.id) : ''}</td><td><input class="in" data-if="tag" value="${esc(i.tag || '')}" style="width:76px" placeholder="熱門"></td><td><input class="in num" data-if="sort" type="number" value="${i.sort}" style="width:64px"></td><td><input type="checkbox" data-if="active" ${i.active ? 'checked' : ''} aria-label="上架"></td><td><button class="btn sm ${i.id ? 'sec' : ''}" type="button" data-si>${i.id ? '儲存' : '新增'}</button></td></tr>`;
+    return `<tr data-item="${i.id}" data-vendor="${i.vendor_id}"><td>${photoCell(i.image_url, i.id ? 'item' : '')}</td><td><input class="in" data-if="name" value="${esc(i.name)}" placeholder="${i.id ? '' : '＋ 新品項名稱'}"></td><td><input class="in" data-if="description" value="${esc(i.description)}"></td><td><input class="in num" data-if="price" type="number" min="0" value="${esc(i.price)}" style="width:80px"></td><td><input class="in num" data-if="stock" type="number" min="0" value="${i.stock_limit == null ? '' : i.stock_limit}" placeholder="不限" style="width:80px"></td><td class="num">${i.id ? sold(i.id) : ''}</td><td><input class="in" data-if="tag" value="${esc(i.tag || '')}" style="width:76px" placeholder="熱門"></td><td><input class="in num" data-if="sort" type="number" value="${i.sort}" style="width:64px"></td><td><input type="checkbox" data-if="active" ${i.active ? 'checked' : ''} aria-label="上架"></td><td><button class="btn sm ${i.id ? 'sec' : ''}" type="button" data-si>${i.id ? '儲存' : '新增'}</button></td></tr>`;
   }
 
   // ---------- 設定 ----------
@@ -771,7 +804,7 @@ pre.mail{white-space:pre-wrap;background:var(--sunk);border:1px solid var(--rule
       <div class="card"><h2>${icon('film')}活動</h2><p>報名頁首頁和信件會用到。</p>
         ${f('event_name', '活動名稱')}${f('event_info', '活動資訊（日期、時間、地點）', 'text', '格式：日期：2026/12/9（三）　時間：18:00　地點：達賢圖書館大草坪（用全形空白分隔）')}
         <div class="grid2">${f('film_title', '放映電影片名', 'text', '還沒確定可以先空白，首頁會顯示「片單待公布」')}${f('film_image_url', '電影海報或場地照片網址', 'text', '需要取得放映與圖片使用授權')}</div>
-        ${f('film_note', '電影介紹', 'textarea')}${f('venue_note', '現場說明（座位、自備物品、雨備）', 'textarea')}</div>
+        ${f('film_note', '電影介紹', 'textarea')}${f('venue_note', '現場說明（座位、自備物品、雨備）', 'textarea')}${f('pickup_note', '取餐說明（顯示在選餐頁）', 'textarea', '例如：開演前 30 分鐘在草坪入口取餐，熱飲現場製作。空白時會顯示預設說明。')}</div>
       <div class="card"><h2>${icon('calendar')}報名與名額</h2>
         <div class="grid2">${f('registration_open_at', '開放報名時間（台北時間）', 'datetime-local')}${f('registration_close_at', '報名截止時間', 'datetime-local')}${f('payment_deadline', '付款期限（新報名的預設值）', 'datetime-local', '改這裡不會影響已經報名的人；個別延長請到「訂單」')}${f('capacity', '名額上限', 'number')}</div></div>
       <div class="card"><h2>${icon('wallet')}收款資訊</h2>

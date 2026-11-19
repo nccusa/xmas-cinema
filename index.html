@@ -5,19 +5,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>聖誕露天電影院｜報名＋預訂餐點｜政大學生會</title>
 <meta name="description" content="政大學生會聖誕露天電影院：線上報名、預訂餐點、事先轉帳，活動當天報到取餐。">
-<meta name="theme-color" content="#F2EFE5">
+<meta name="theme-color" content="#0C211B">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="國立政治大學學生會">
+<meta property="og:title" content="聖誕露天電影院｜12/9 冬夜場・線上報名＋預訂餐點">
+<meta property="og:description" content="政大學生會聖誕露天電影院：大銀幕、熱飲和三明治。線上報名、預訂餐點，活動當天報到取餐。校外人士也可以報名。">
+<meta property="og:url" content="https://nccusa.github.io/xmas-cinema/">
+<meta property="og:image" content="https://nccusa.github.io/xmas-cinema/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="聖誕露天電影院 12/9 週三，國立政治大學學生會">
+<meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="robots" content="noindex,nofollow"><!-- 測試期間不讓搜尋引擎收錄；正式開放報名前移除 -->
 <link rel="icon" href="icons/site-64.png">
 <link rel="apple-touch-icon" href="icons/site-apple-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;800&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <style>
 :root{
   --cream:#F2EFE5; --paper:#F8F6EF; --white:#FFFDF8; --green:#004E3B; --green-d:#003A2C; --green2:#009B7A; --red:#D9141A; --redtext:#B3121A; --gold:#B18B35; --ink:#182026;
   --muted:#5E646A; --line:#D8D2C2; --line2:#E6E1D4; --field:#A9A391;
-  --r:10px; --font:"Noto Sans TC","PingFang TC","Heiti TC","Microsoft JhengHei",system-ui,sans-serif; --num:"Inter","Noto Sans TC",system-ui,sans-serif;
+  --night:#0C211B; --night2:#112C24; --gold-l:#E8C468; --r:12px; --rc:16px; --font:"Noto Sans TC","PingFang TC","Heiti TC","Microsoft JhengHei",system-ui,sans-serif; --num:"Inter","Noto Sans TC",system-ui,sans-serif;
   --ease:cubic-bezier(.2,.8,.2,1);
 }
 *{box-sizing:border-box}
@@ -48,11 +59,12 @@ h3{font-weight:700;font-size:18px;margin:0 0 6px}
 .top{display:flex;align-items:center;justify-content:space-between;padding:16px 0}
 .brand{font-weight:500;font-size:14px;display:flex;align-items:center;gap:8px;color:var(--ink);text-decoration:none}
 .brand svg{width:18px;height:18px}
-.toplink{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--ink);text-decoration:none;padding:8px 12px;border-radius:99px;border:1px solid var(--line)}
+.toplink{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--ink);text-decoration:none;padding:8px 12px;border-radius:var(--r);border:1px solid var(--line)}
 .toplink:hover{border-color:var(--green)}
 
 /* 按鈕 */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:12px 26px;border-radius:var(--r);border:1px solid var(--green);background:var(--green);color:var(--cream);font-weight:700;font-size:16.5px;cursor:pointer;text-decoration:none;transition:background .15s,transform .12s}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:12px 26px;border-radius:var(--r);border:1px solid var(--green);background:var(--green);color:var(--cream);font-weight:700;font-size:16.5px;cursor:pointer;text-decoration:none;transition:background .15s,transform .12s;box-shadow:inset 0 -2px 0 var(--gold),0 8px 18px -10px rgba(0,58,44,.6)}
+.btn.line,.btn.danger{box-shadow:none}
 .btn:hover{background:var(--green-d)}
 .btn:active{transform:scale(.98)}
 .btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
@@ -62,10 +74,32 @@ h3{font-weight:700;font-size:18px;margin:0 0 6px}
 .btn.line:hover{background:rgba(0,78,59,.06)}
 .linkbtn{background:none;border:none;color:var(--green);font-size:15px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:6px 0;display:inline-flex;align-items:center;gap:4px}
 
-/* 首屏 */
-.hero{position:relative;min-height:min(80vh,700px);display:flex;align-items:center;overflow:hidden}
-.hero-art{position:absolute;left:0;top:0;bottom:0;width:46%;pointer-events:none}
+/* 首屏：夜空、大銀幕、聖誕樹 */
+.night{background:var(--night);color:var(--cream)}
+.night2{background:var(--night2);color:var(--cream)}
+.cream{background:var(--cream)}.paper{background:var(--paper)}
+.night .muted,.night2 .muted{color:#B9C2B8}
+.night a,.night2 a{color:var(--gold-l)}
+.eyebrow{font-family:var(--num);font-size:12.5px;font-weight:700;letter-spacing:.24em;color:var(--gold);margin:0 0 10px;text-transform:uppercase}
+.night .eyebrow,.night2 .eyebrow{color:var(--gold-l)}
+body:has(#home:not(.hidden)) .topwrap{background:var(--night)}
+body:has(#home:not(.hidden)) .brand{color:var(--cream)}
+body:has(#home:not(.hidden)) .brand path{fill:var(--gold-l)}
+body:has(#home:not(.hidden)) .toplink{color:var(--cream);border-color:rgba(242,239,229,.28)}
+body:has(#home:not(.hidden)) .toplink:hover{border-color:var(--gold-l)}
+.hero{position:relative;min-height:min(84vh,720px);display:flex;align-items:center;overflow:hidden;isolation:isolate}
+.sky{position:absolute;inset:0;z-index:-2;background:
+  radial-gradient(1.5px 1.5px at 12% 18%,#fff8 50%,transparent 51%),radial-gradient(1px 1px at 28% 8%,#fff9 50%,transparent 51%),
+  radial-gradient(1.5px 1.5px at 52% 22%,#fff7 50%,transparent 51%),radial-gradient(1px 1px at 66% 12%,#fffa 50%,transparent 51%),
+  radial-gradient(2px 2px at 82% 30%,#F3D27A99 50%,transparent 51%),radial-gradient(1px 1px at 91% 9%,#fff9 50%,transparent 51%),
+  radial-gradient(1px 1px at 44% 40%,#fff6 50%,transparent 51%),radial-gradient(1.5px 1.5px at 74% 52%,#fff5 50%,transparent 51%),
+  radial-gradient(1px 1px at 8% 60%,#fff6 50%,transparent 51%),radial-gradient(1.5px 1.5px at 36% 70%,#fff4 50%,transparent 51%),
+  radial-gradient(ellipse 70% 60% at 72% 30%,rgba(243,210,122,.10),transparent 70%),
+  linear-gradient(180deg,var(--night) 0%,#0B1F19 55%,#0F2A22 100%)}
+.beam{position:absolute;z-index:-1;right:-6%;top:-10%;width:70%;height:90%;background:linear-gradient(200deg,rgba(255,244,214,.16),rgba(255,244,214,0) 70%);clip-path:polygon(100% 0,96% 0,0 100%,58% 100%);pointer-events:none;opacity:.8}
+.hero-art{position:absolute;left:0;top:0;bottom:0;width:44%;pointer-events:none;z-index:-1}
 .hero-art svg{width:100%;height:100%;display:block}
+.hero-art .st{filter:drop-shadow(0 0 6px rgba(243,210,122,.85))}
 .hero-art .tier{transform-box:fill-box;transform-origin:left center}
 .loaded .hero-art .tier{animation:grow .9s var(--ease) both}
 .loaded .hero-art .tier:nth-of-type(2){animation-delay:.12s}
@@ -74,40 +108,66 @@ h3{font-weight:700;font-size:18px;margin:0 0 6px}
 @keyframes grow{from{transform:scaleX(0)}}
 @keyframes twinkle{from{transform:scale(0) rotate(-90deg);opacity:0}}
 .hero .wrap{width:100%}
-.hero-copy{margin-left:auto;max-width:560px;text-align:right;padding:40px 0 56px}
-.when{display:flex;justify-content:flex-end;align-items:baseline;gap:10px;font-family:var(--num);font-weight:800;font-size:clamp(32px,3.8vw,46px);line-height:1;letter-spacing:-.01em}
-.when small{font-size:.42em;font-weight:500}
-.facts-inline{list-style:none;padding:0;margin:20px 0 30px;display:grid;gap:6px;justify-items:end}
-.facts-inline li{display:flex;align-items:center;gap:8px}
-.facts-inline .i{color:var(--green)}
+.hero-copy{margin-left:auto;max-width:600px;text-align:right;padding:36px 0 60px;display:flex;flex-direction:column;align-items:flex-end}
+.screen{position:relative;padding:26px 30px 22px;border-radius:var(--rc);background:radial-gradient(ellipse at 50% 40%,rgba(255,248,226,.16),rgba(255,248,226,.05) 70%);border:1px solid rgba(255,248,226,.32);box-shadow:0 0 60px rgba(243,210,122,.18),inset 0 0 40px rgba(255,248,226,.06);margin-bottom:24px;backdrop-filter:blur(2px)}
+.screen::after{content:"";position:absolute;left:12%;right:12%;bottom:-10px;height:10px;background:radial-gradient(ellipse at 50% 0,rgba(0,0,0,.35),transparent 70%)}
+.screen h1{margin:0;color:#FFFDF6;text-shadow:0 0 28px rgba(255,240,200,.35)}
+.screen .eyebrow{margin-bottom:6px}
+.stub{position:relative;display:inline-flex;align-items:center;gap:14px;padding:10px 26px;background:var(--cream);color:var(--ink);border-radius:12px;
+  -webkit-mask:radial-gradient(circle 9px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 9px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat;
+          mask:radial-gradient(circle 9px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 9px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat}
+.stub::before{content:"";position:absolute;inset:5px 14px;border:1.5px dashed rgba(24,32,38,.25);border-radius:7px;pointer-events:none}
+.stub b{font-family:var(--num);font-weight:800;font-size:clamp(30px,3.6vw,42px);line-height:1;letter-spacing:-.01em;color:var(--red)}
+.stub .wk{font-weight:700;font-size:16px}
+.stub .cut{width:0;align-self:stretch;border-left:1.5px dashed rgba(24,32,38,.3);margin:2px 2px}
+.stub .lbl{font-size:14px;font-weight:700;line-height:1.3;text-align:left}.stub .lbl small{font-weight:400;color:var(--muted);font-size:12px}
+.facts-inline{list-style:none;padding:0;margin:18px 0 26px;display:grid;gap:6px;justify-items:end}
+.facts-inline li{display:flex;align-items:center;gap:8px;flex-direction:row-reverse}
+.facts-inline .i{color:var(--gold-l)}
+.night .tbd{color:#9FAAA0}
 .tbd{color:var(--muted)}
 .cta{display:flex;gap:10px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
 .cta-note{margin-top:12px;font-size:14px;color:var(--muted)}
+.night .cta-note{color:#B9C2B8}
+.neterr{display:inline-flex;align-items:center;gap:6px;color:#FFD4C9}
+.btn.hero-cta{background:var(--red);border-color:var(--red);color:#fff;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18),0 0 0 1px rgba(243,210,122,.55),0 10px 28px -8px rgba(217,20,26,.6);min-height:56px;padding:12px 30px;font-size:17.5px}
+.btn.hero-cta:hover{background:#BD1016}
+.btn.hero-cta:disabled{box-shadow:none}
+.resume{margin:0 0 8px}
+.night .resume{background:rgba(255,253,246,.08);border-color:rgba(255,253,246,.22);color:var(--cream)}
+.night .resume .t span{color:#C9D0C6}
+.tiles{height:28px;overflow:hidden;line-height:0;background:var(--cream)}
+.tiles svg{width:100%;height:28px;display:block}
 
 /* 首頁段落 */
-.sec{padding:76px 0;border-top:1px solid var(--line)}
-.film{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:56px;align-items:center}
-.poster{aspect-ratio:4/5;background:var(--paper);border:1px solid var(--line2);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--muted);font-size:14px;text-align:center}
-.poster img{width:100%;height:100%;object-fit:cover}
-.poster .glyph{width:64px;height:64px}
-.film .title{font-size:22px;font-weight:700;margin:0 0 8px}
-.dl{list-style:none;padding:0;margin:22px 0 0;border-top:1px solid var(--line)}
-.dl li{display:grid;grid-template-columns:28px 72px 1fr;gap:8px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
-.dl .i{color:var(--green)}
-.dl b{font-weight:500;color:var(--muted)}
-.food-intro{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:56px}
-.vcards{display:grid;gap:12px}
-.vcard{display:grid;grid-template-columns:48px 1fr;gap:14px;padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--paper)}
-.vcard .ic{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;background:var(--green);color:var(--cream)}
-.vcard:nth-child(2n) .ic{background:var(--red)}
-.vcard .ic .i{width:24px;height:24px}
+.sec{padding:80px 0}
+.film{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:64px;align-items:center}
+.poster{position:relative;aspect-ratio:4/5;border-radius:var(--rc);overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center;transform:rotate(-2deg);box-shadow:0 24px 50px -18px rgba(0,0,0,.65);background:#0A1A15;padding:0 22px}
+.poster::before,.poster::after{content:"";position:absolute;top:0;bottom:0;width:18px;background:#05100C radial-gradient(circle 4px at 50% 50%,#2B3B35 95%,transparent) 0 0/18px 22px repeat-y;z-index:1}
+.poster::before{left:0}.poster::after{right:0}
+.poster img{position:absolute;inset:0 18px;width:calc(100% - 36px);height:100%;object-fit:cover}
+.poster .soon{position:relative;display:grid;justify-items:center;gap:6px;color:var(--cream);padding:0 12px}
+.poster .soon svg{position:absolute;left:-30px;right:-30px;top:-70px;width:calc(100% + 60px);height:calc(100% + 140px)}
+.poster .soon .tw{fill:var(--gold-l);filter:drop-shadow(0 0 5px rgba(243,210,122,.8))}
+.poster .q{font-family:var(--num);font-weight:800;font-size:120px;line-height:1;color:var(--gold-l);text-shadow:0 0 30px rgba(243,210,122,.45)}
+.poster .soon b{font-size:20px}
+.poster .soon span:last-child{font-size:13.5px;color:#B9C2B8}
+.film .title{font-size:24px;font-weight:700;margin:0 0 8px}
+.dl{list-style:none;padding:0;margin:24px 0 0;border-top:1px solid rgba(242,239,229,.16)}
+.dl li{display:grid;grid-template-columns:28px 72px 1fr;gap:8px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(242,239,229,.16)}
+.dl .i{color:var(--gold-l)}
+.dl b{font-weight:500;color:#B9C2B8}
+.food-intro{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:64px;align-items:center}
+.vcards{display:grid;gap:14px}
+.vcard{display:grid;grid-template-columns:64px 1fr;gap:16px;align-items:center;padding:18px;border-radius:var(--rc);background:var(--white);box-shadow:0 1px 0 var(--line2),0 10px 24px -18px rgba(24,32,38,.35)}
+.vcard .ill svg{width:64px;height:64px;display:block}
 .vcard b{display:block;font-size:17px}
 .vcard span{color:var(--muted);font-size:15px}
-.how{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:28px;counter-reset:s}
-.how li{border-top:2px solid var(--ink);padding-top:16px;position:relative}
-.how .ic{display:flex;align-items:center;gap:10px;margin-bottom:8px;color:var(--green);font-family:var(--num);font-weight:600}
-.how .ic .i{width:26px;height:26px}
-.how p{margin:4px 0 0;color:var(--muted);font-size:15px}
+.how{list-style:none;padding:0;margin:8px 0 0;display:grid;grid-template-columns:repeat(3,1fr);gap:32px}
+.how li{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start}
+.how .big{font-weight:800;font-size:76px;line-height:.85;color:var(--gold);letter-spacing:-.04em}
+.how h3{font-size:19px;margin:4px 0 6px}
+.how p{margin:0;color:var(--muted);font-size:15px}
 .faq{max-width:760px}
 .faq details{border-bottom:1px solid var(--line)}
 .faq details:first-child{border-top:1px solid var(--line)}
@@ -116,7 +176,29 @@ h3{font-weight:700;font-size:18px;margin:0 0 6px}
 .faq summary .i{color:var(--green);transition:transform .2s var(--ease)}
 .faq details[open] summary .i{transform:rotate(180deg)}
 .faq p{margin:0 0 18px;color:var(--muted)}
-.closing{text-align:center;padding:72px 0}
+.closing{text-align:center;padding:80px 0 88px;background:radial-gradient(ellipse 60% 70% at 50% 0,rgba(243,210,122,.12),transparent 70%),var(--night)}
+.closing h2{font-size:clamp(26px,3.4vw,38px);margin-bottom:24px}
+.closing .cta-note{color:#B9C2B8}
+.foot{background:var(--night);color:#C9D0C6;font-size:14px}
+.foot .tiles{background:var(--night)}
+.fin{display:flex;flex-wrap:wrap;gap:18px 32px;align-items:center;justify-content:space-between;padding-top:28px;padding-bottom:calc(40px + env(safe-area-inset-bottom))}
+.fbrand{display:flex;gap:12px;align-items:center}.fbrand b{display:block;color:var(--cream);font-size:16px}
+.fglyph{width:40px;height:40px;flex:none}
+.flinks{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center}
+.flinks a{display:inline-flex;align-items:center;gap:6px;color:var(--gold-l);text-decoration:none;font-weight:700}
+.flinks a:hover{text-decoration:underline}
+.fsmall{flex-basis:100%;margin:0;font-size:12.5px;color:#8F9A90}
+body:has(#home:not(.hidden)) .foot .tiles{display:none}
+body:has(#home:not(.hidden)) .fin{border-top:1px solid rgba(242,239,229,.12)}
+body:has(#home.hidden) .foot{background:var(--cream);color:var(--muted)}
+body:has(#home.hidden) .foot .tiles{background:var(--cream)}
+body:has(#home.hidden) .fbrand b{color:var(--ink)}
+body:has(#home.hidden) .flinks a{color:var(--green)}
+.hbar .in{max-width:1120px}
+.hbar .hmeta{flex:1;min-width:0;line-height:1.3}.hbar .hmeta b{display:block;font-size:15px}.hbar .hmeta span{font-size:13px;color:var(--muted)}
+.hbar.on{display:block}
+body:has(#home.hidden) .hbar{display:none!important}
+.hbar .btn.hero-cta{min-height:50px;padding:0 22px;font-size:16px}
 
 /* ---------- 報名流程 ---------- */
 .flow{padding-top:4px;padding-bottom:170px}
@@ -138,6 +220,12 @@ h3{font-weight:700;font-size:18px;margin:0 0 6px}
 .layout.single{grid-template-columns:minmax(0,620px);justify-content:center}
 .stepview{view-transition-name:flowstep}
 .lead{color:var(--muted);margin:0 0 8px;max-width:600px}
+.pickup{display:flex;gap:12px;align-items:flex-start;margin:14px 0 4px;padding:12px 16px;border-radius:var(--rc);background:#FDF6E4;border:1px solid #EEDDB2;max-width:640px;font-size:14.5px}
+.pickup .i{color:#8a6516;width:22px;height:22px;margin-top:1px}
+.pickup b{display:block}.pickup span{color:#5E5232}
+.cfdl{display:flex;gap:10px;align-items:flex-start;margin:12px 0 0;padding:12px 14px;border-radius:var(--r);background:var(--white);border:1px solid var(--line);font-size:14.5px}
+.cfdl .i{color:var(--green);margin-top:3px;flex:none}
+.mnext{display:grid;justify-items:center;gap:2px}.mnext small{font-size:12px;color:var(--muted);line-height:1}.mnext small:empty{display:none}
 .enter{animation:enter .32s var(--ease) both}
 .enter.back-dir{animation-name:enterback}
 @keyframes enter{from{opacity:0;transform:translateX(24px)}}
@@ -156,40 +244,46 @@ html[data-dir=back]::view-transition-new(flowstep){animation:vt-in-l .32s var(--
 .vtabs{position:sticky;top:0;z-index:5;background:var(--cream);display:flex;gap:8px;padding:12px 0;margin-top:8px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line)}
 .testbar:not(.hidden) ~ * .vtabs{top:31px}
 .vtabs::-webkit-scrollbar{display:none}
-.vtabs button{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 16px;border-radius:99px;border:1px solid var(--line);background:var(--white);cursor:pointer;font-size:15px;color:var(--muted);transition:all .15s}
+.vtabs.even{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr))}
+.vtabs.even button{justify-content:center;white-space:normal;line-height:1.3;text-align:center;padding:6px 10px;min-height:46px;font-size:14.5px}
+.vtabs button{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 16px;border-radius:var(--r);border:1px solid var(--line);background:var(--white);cursor:pointer;font-size:15px;color:var(--muted);transition:all .15s}
 .vtabs button[aria-current="true"]{background:var(--ink);color:var(--cream);border-color:var(--ink)}
 .vtabs .n{font-family:var(--num);font-size:12px;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:var(--red);color:#fff;display:inline-grid;place-items:center}
-.vendor{scroll-margin-top:84px;padding:30px 0 6px}
-.vhead{display:flex;gap:16px;align-items:center;margin-bottom:12px}
+.vendor{scroll-margin-top:84px;margin:24px 0 0;background:var(--white);border:1px solid var(--line2);border-radius:var(--rc);overflow:hidden}
+.vhead{display:flex;gap:16px;align-items:center;padding:16px 18px;border-bottom:1px solid var(--line2);background:var(--paper)}
 .vhead .ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--green);color:var(--cream);flex:none}
 .vendor:nth-of-type(2n) .vhead .ic{background:var(--red)}
 .vhead img{width:160px;aspect-ratio:4/3;object-fit:cover;border-radius:var(--r);flex:none}
 .vhead .vdesc{color:var(--muted);font-size:15px;margin:0}
-.items{list-style:none;padding:0;margin:0;display:grid;gap:10px}
-.mi{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 16px;align-items:center;padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--white);transition:border-color .2s,box-shadow .2s}
-.mi.has{border-color:var(--green);box-shadow:inset 4px 0 0 var(--green)}
+.items{list-style:none;padding:0;margin:0}
+.mi{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 16px;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line2);transition:background .2s,box-shadow .2s}
+.mi:last-child{border-bottom:0}
+.mi.wimg{grid-template-columns:64px minmax(0,1fr) auto}
+.mi .th{width:64px;height:64px;border-radius:var(--r);object-fit:cover;background:var(--paper)}
+.mi .side{display:grid;justify-items:end;gap:6px}
+.mi.has{background:#F1F7F3;box-shadow:inset 4px 0 0 var(--green)}
 .mi .nm{font-weight:700;font-size:17px}
 .mi .tag{display:inline-block;font-size:12.5px;font-weight:700;margin-left:6px;padding:1px 8px;border-radius:99px;vertical-align:2px}
 .tag.red{background:#FBE3E3;color:var(--redtext)}.tag.green{background:#DDF0E8;color:var(--green)}.tag.gold{background:#F4ECD8;color:#6E5418}
 .mi .ds{color:var(--muted);font-size:14px;margin-top:2px}
-.mi .pr{font-family:var(--num);font-weight:600;font-size:16px;margin-top:6px}
+.mi .pr{font-family:var(--num);font-weight:600;font-size:16px;text-align:right}
 .mi.out{opacity:.55}
 .ctl{display:flex;justify-content:flex-end;align-items:center}
-.add{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 18px;border-radius:99px;border:1.5px solid var(--green);background:transparent;color:var(--green);font-weight:700;cursor:pointer;transition:background .15s,transform .12s}
+.add{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 18px;border-radius:var(--r);border:1.5px solid var(--green);background:transparent;color:var(--green);font-weight:700;cursor:pointer;transition:background .15s,transform .12s}
 .add:hover{background:rgba(0,78,59,.06)}
 .add:active{transform:scale(.95)}
-.qty{display:inline-flex;align-items:center;gap:2px;padding:3px;border-radius:99px;background:var(--green);color:var(--cream);animation:pop .22s var(--ease)}
-.qty button{width:38px;height:38px;border-radius:50%;border:0;background:transparent;color:inherit;display:grid;place-items:center;cursor:pointer}
+.qty{display:inline-flex;align-items:center;gap:2px;padding:3px;border-radius:var(--r);background:var(--green);color:var(--cream);animation:pop .22s var(--ease)}
+.qty button{width:38px;height:38px;border-radius:9px;border:0;background:transparent;color:inherit;display:grid;place-items:center;cursor:pointer}
 .qty button:hover{background:rgba(255,255,255,.12)}
 .qty output{min-width:28px;text-align:center;font-family:var(--num);font-weight:800;font-size:17px}
 .qty output.bump{animation:bump .25s var(--ease)}
 @keyframes pop{from{transform:scale(.85);opacity:.4}}
 @keyframes bump{40%{transform:scale(1.35)}}
 .soldout{font-size:14px;color:var(--muted)}
-.skip{margin-top:36px;padding:18px;border:1px dashed var(--line);border-radius:14px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;color:var(--muted)}
+.skip{margin-top:24px;padding:18px;border:1px dashed var(--line);border-radius:var(--rc);display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;color:var(--muted)}
 
 /* 摘要 */
-.summary{position:sticky;top:24px;border:1px solid var(--line);border-radius:16px;padding:22px;background:var(--white)}
+.summary{position:sticky;top:24px;border:1px solid var(--line);border-radius:var(--rc);padding:22px;background:var(--white)}
 .summary h3{font-size:15px;font-weight:500;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px}
 .sum-list{margin:0;padding:0;list-style:none;max-height:40vh;overflow:auto}
 .sum-list li{display:flex;justify-content:space-between;gap:12px;padding:7px 0;font-size:15px;animation:enter .25s var(--ease)}
@@ -204,7 +298,7 @@ html[data-dir=back]::view-transition-new(flowstep){animation:vt-in-l .32s var(--
 .form{max-width:560px;margin-top:32px}
 .form h3{margin-bottom:16px}
 .who-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.form .who-card{position:relative;display:grid;gap:4px;padding:16px;border:1.5px solid var(--line);border-radius:14px;background:var(--white);cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.form .who-card{position:relative;display:grid;gap:4px;padding:16px;border:1.5px solid var(--line);border-radius:var(--rc);background:var(--white);cursor:pointer;transition:border-color .15s,box-shadow .15s}
 .who-card input{position:absolute;opacity:0;pointer-events:none}
 .who-card > span:not(.chk) .i{width:26px;height:26px;color:var(--green)}
 .who-card .chk .i{width:14px;height:14px}
@@ -235,7 +329,7 @@ fieldset.field{border:none;margin:0 0 22px;padding:0}
 .errsum h3{font-size:16px;margin:0 0 4px}
 .errsum ul{margin:0;padding-left:18px}
 .errsum a{color:var(--redtext)}
-.review{border:1px solid var(--line);border-radius:14px;background:var(--white);padding:4px 16px}
+.review{border:1px solid var(--line);border-radius:var(--rc);background:var(--white);padding:4px 16px}
 .review .rw{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:11px 0;border-bottom:1px solid var(--line2);font-size:15px}
 .review .rw .s{color:var(--muted);font-size:13px}
 .review .tot{display:flex;justify-content:space-between;align-items:center;padding:12px 0}
@@ -251,19 +345,19 @@ fieldset.field{border:none;margin:0 0 22px;padding:0}
 .method{display:inline-flex;gap:4px;padding:4px;border-radius:12px;background:var(--paper);border:1px solid var(--line2);margin-bottom:12px}
 .method button{display:inline-flex;align-items:center;gap:6px;border:0;background:none;font-size:14px;padding:8px 12px;border-radius:9px;color:var(--muted);cursor:pointer}
 .method button[aria-selected="true"]{background:var(--white);color:var(--ink);font-weight:700;box-shadow:0 1px 3px rgba(24,32,38,.12)}
-.acct{border:1px solid var(--line);border-radius:14px;background:var(--white);padding:0 16px}
+.acct{border:1px solid var(--line);border-radius:var(--rc);background:var(--white);padding:0 16px}
 .acct .r{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line2)}
 .acct .r:last-child{border-bottom:0}
 .acct .k{color:var(--muted);font-size:14px}
 .acct .v{font-family:var(--num);font-weight:600;font-size:18px;word-break:break-all}
 .acct .v.t{font-family:var(--font);font-size:16px;font-weight:500}
-.copy{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:99px;border:1px solid var(--line);background:var(--paper);color:var(--green);font-size:14px;font-weight:700;cursor:pointer;transition:all .15s}
+.copy{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:var(--r);border:1px solid var(--line);background:var(--paper);color:var(--green);font-size:14px;font-weight:700;cursor:pointer;transition:all .15s}
 .copy:hover{border-color:var(--green)}
 .copy.done{background:var(--green);border-color:var(--green);color:var(--cream)}
-.qrbox{padding:20px;text-align:center;border:1px solid var(--line);border-radius:14px;background:var(--white)}
+.qrbox{padding:20px;text-align:center;border:1px solid var(--line);border-radius:var(--rc);background:var(--white)}
 .qrbox img{width:min(220px,70%);background:#fff;padding:8px;border-radius:var(--r)}
 .qrbox p{font-size:14px;color:var(--muted);margin:10px auto 0;max-width:420px}
-.memo{margin:22px 0;padding:16px 18px;border-radius:14px;background:var(--white);border:1px solid var(--line);box-shadow:inset 5px 0 0 var(--red)}
+.memo{margin:22px 0;padding:16px 18px;border-radius:var(--rc);background:var(--white);border:1px solid var(--line);box-shadow:inset 5px 0 0 var(--red)}
 .memo .k{display:flex;align-items:center;gap:8px;font-weight:700}
 .memo .k .i{color:var(--redtext)}
 .memo .row{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:4px}
@@ -276,16 +370,17 @@ fieldset.field{border:none;margin:0 0 22px;padding:0}
 .after .ic{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--paper);border:1px solid var(--line);color:var(--green)}
 .after b{display:block}
 .after span{color:var(--muted);font-size:15px}
-.testpay{margin:24px 0;padding:18px;border-radius:14px;border:2px dashed var(--red);background:#FFF5F4}
+.testpay{margin:24px 0;padding:18px;border-radius:var(--rc);border:2px dashed var(--red);background:#FFF5F4}
 .testpay b{display:flex;align-items:center;gap:8px;color:var(--redtext)}
 .testpay p{margin:6px 0 12px;font-size:14px;color:var(--muted)}
 .testpay .btn{background:var(--red);border-color:var(--red)}
-.resume{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:12px 0 0;padding:14px 16px;border:1px solid var(--line);border-radius:var(--r);background:var(--paper)}
+.resume{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:12px 0 0;padding:14px 16px;border:1px solid var(--line);border-radius:var(--rc);background:var(--paper)}
 .resume .t{flex:1;min-width:200px}
 .resume .t b{display:block}
 .resume .t span{color:var(--muted);font-size:14px}
 .resume .acts{display:flex;gap:8px;flex-wrap:wrap}
-.draftnote{display:flex;gap:6px;align-items:flex-start;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:4px 0 14px}
+.draftnote{display:grid;grid-template-columns:16px minmax(0,1fr);gap:2px 8px;align-items:start;font-size:13px;color:var(--muted);margin:4px 0 14px}
+.draftnote .linkbtn{grid-column:2;justify-self:start;font-size:13px;padding:2px 0}
 .draftnote svg{width:16px;height:16px;flex:none;margin-top:2px}
 .confirm .cf-rows{border-top:1px solid var(--ink);margin:4px 0 0}
 .confirm .cf-rows .rw{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:15px}
@@ -320,7 +415,7 @@ fieldset.field{border:none;margin:0 0 22px;padding:0}
 .celebrate .tier{transform-box:fill-box;transform-origin:left center;animation:grow .7s var(--ease) both}
 .celebrate .tier:nth-of-type(2){animation-delay:.1s}.celebrate .tier:nth-of-type(3){animation-delay:.2s}
 .celebrate .st{transform-box:fill-box;transform-origin:center;animation:twinkle .6s var(--ease) both .45s}
-.ticket{border:1px solid var(--ink);border-radius:16px;overflow:hidden;margin:24px 0;background:var(--white);animation:rise .5s var(--ease) both .2s}
+.ticket{border:1px solid var(--ink);border-radius:var(--rc);overflow:hidden;margin:24px 0;background:var(--white);animation:rise .5s var(--ease) both .2s}
 @keyframes rise{from{opacity:0;transform:translateY(16px)}}
 .ticket .band{display:block;width:100%;height:36px}
 .ticket .tin{display:grid;grid-template-columns:1fr auto;gap:24px;padding:22px;align-items:center}
@@ -342,37 +437,51 @@ fieldset.field{border:none;margin:0 0 22px;padding:0}
 /* 抽屜（手機購物清單） */
 .scrim{position:fixed;inset:0;background:rgba(24,32,38,.36);opacity:0;pointer-events:none;transition:opacity .2s;z-index:30}
 .scrim.on{opacity:1;pointer-events:auto}
-.sheet{visibility:hidden;position:fixed;left:0;right:0;bottom:0;z-index:31;background:var(--cream);border-radius:20px 20px 0 0;padding:10px 20px calc(20px + env(safe-area-inset-bottom));max-height:75vh;overflow:auto;transform:translateY(105%);transition:transform .26s var(--ease),visibility 0s .26s}
+.sheet{visibility:hidden;position:fixed;left:0;right:0;bottom:0;z-index:31;background:var(--cream);border-radius:var(--rc) var(--rc) 0 0;padding:10px 20px calc(20px + env(safe-area-inset-bottom));max-height:75vh;overflow:auto;transform:translateY(105%);transition:transform .26s var(--ease),visibility 0s .26s}
 .sheet.on{transform:none;visibility:visible;transition:transform .26s var(--ease)}
 .sheet .grab{width:44px;height:5px;border-radius:9px;background:var(--line);margin:0 auto 14px}
 
 .toast{position:fixed;left:50%;top:16px;transform:translate(-50%,-20px);opacity:0;display:flex;align-items:center;gap:8px;background:var(--ink);color:var(--cream);padding:10px 18px;border-radius:99px;z-index:50;font-size:15px;max-width:90vw;transition:all .25s var(--ease);pointer-events:none}
 .toast.on{opacity:1;transform:translate(-50%,0)}
-footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font-size:14px;color:var(--muted)}
 .state-page{max-width:560px;margin:48px auto 96px;text-align:center}
 .state-page .glyph{width:72px;height:72px;margin:0 auto 16px;display:block}
-.skel{background:linear-gradient(90deg,var(--line2) 25%,var(--paper) 50%,var(--line2) 75%);background-size:200% 100%;animation:shimmer 1.2s linear infinite;border-radius:14px;height:86px;margin-bottom:10px}
+.skel{background:linear-gradient(90deg,var(--line2) 25%,var(--paper) 50%,var(--line2) 75%);background-size:200% 100%;animation:shimmer 1.2s linear infinite;border-radius:var(--rc);height:86px;margin-bottom:10px}
 @keyframes shimmer{to{background-position:-200% 0}}
 
 @media (max-width:900px){
   .hero{min-height:0;display:block}
-  .hero-art{position:relative;width:auto;height:280px;margin-bottom:-8px}
-  .hero-copy{text-align:left;margin:0;padding:8px 0 48px}
-  .when{justify-content:flex-start}.facts-inline{justify-items:start}.cta{justify-content:flex-start}
-  .film,.food-intro{grid-template-columns:1fr;gap:28px}
-  .poster{aspect-ratio:16/10}
-  .how{grid-template-columns:1fr;gap:20px}
+  .hero-art{width:62%;height:236px;bottom:auto}
+  .beam{width:100%;height:60%;opacity:.55}
+  .hero-copy{text-align:left;margin:0;padding:118px 0 40px;align-items:flex-start;max-width:none}
+  .screen{padding:18px 20px 16px;background:rgba(12,33,27,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);margin-bottom:18px;width:100%}
+  .facts-inline{justify-items:start;margin:14px 0 22px}.facts-inline li{flex-direction:row}
+  .cta{justify-content:flex-start}
+  .film,.food-intro{grid-template-columns:1fr;gap:32px}
+  .poster{aspect-ratio:4/3;transform:rotate(-1.5deg);max-width:520px}
+  .poster .q{font-size:88px}
+  .how{grid-template-columns:1fr;gap:22px}
+  .how .big{font-size:60px}
   .layout{grid-template-columns:1fr}
   .summary-col{display:none}
   .mbar.on{display:block}
-  .sec{padding:56px 0}
+  .sec{padding:60px 0}
+  .closing{padding:64px 0 72px}
 }
 @media (max-width:560px){
-  .who-cards{grid-template-columns:1fr}
+  h1{font-size:44px}
+  .stub{padding:8px 22px;gap:12px}
+  .form .who-card{padding:12px 12px 12px;gap:2px}
+  .who-card > span:not(.chk) .i{width:22px;height:22px}
+  .who-card b{font-size:15.5px}
+  .who-card small{font-size:12.5px}
+  .who-card .chk{right:8px;top:8px;width:20px;height:20px}
   .vhead img{display:none}
+  .mi{padding:12px 14px;gap:4px 12px}
+  .mi.wimg{grid-template-columns:56px minmax(0,1fr) auto}.mi .th{width:56px;height:56px}
   .ticket .tin{grid-template-columns:1fr}
   .ticket .qr{justify-self:center}
   .steps li span.lbl{font-size:13px}
+  .hbar .hmeta b{font-size:14px}
 }
 </style>
 </head>
@@ -381,67 +490,85 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="sr" id="live" aria-live="polite"></div>
 
-<div class="wrap">
+<div class="topwrap"><div class="wrap">
   <div class="top">
     <a class="brand" href="./"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 4 L22 22 H2Z" fill="#004E3B"/></svg>國立政治大學學生會</a>
     <a href="#" class="toplink" id="lookupLink"></a>
   </div>
-</div>
+</div></div>
 
 <!-- 首頁 -->
 <main id="home">
-  <div class="wrap"><div id="resume" class="resume hidden" role="region" aria-label="上次的進度"></div></div>
-  <section class="hero" aria-labelledby="evTitle">
+  <section class="hero night" aria-labelledby="evTitle">
+    <div class="sky" aria-hidden="true"></div>
+    <div class="beam" aria-hidden="true"></div>
     <div class="hero-art" aria-hidden="true"><svg id="heroArt" viewBox="0 0 460 620" preserveAspectRatio="xMinYMid slice"></svg></div>
     <div class="wrap">
+      <div id="resume" class="resume hidden" role="region" aria-label="上次的進度"></div>
       <div class="hero-copy">
-        <h1 id="evTitle">聖誕<br>露天電影院</h1>
-        <div class="when" id="evDate"><span class="tbd" style="font-size:.6em">日期待公布</span></div>
-        <ul class="facts-inline" id="evMeta"></ul>
-        <div class="cta"><button class="btn" type="button" id="startBtn" disabled></button></div>
+        <div class="screen">
+          <p class="eyebrow">TONIGHT'S SCREENING</p>
+          <h1 id="evTitle">聖誕<br>露天電影院</h1>
+        </div>
+        <div class="stub" id="evDate"><b class="num">12/9</b><span class="wk">週三</span><span class="cut" aria-hidden="true"></span><span class="lbl">冬夜場<br><small>國立政治大學</small></span></div>
+        <ul class="facts-inline" id="evMeta"><li><span data-icon="clock"></span><span class="tbd">時間待公布</span></li><li><span data-icon="map-pin"></span><span class="tbd">地點待公布</span></li></ul>
+        <div class="cta"><button class="btn hero-cta" type="button" id="startBtn" disabled>報名＋預訂餐點</button></div>
         <div class="cta-note" id="openNote">載入中…</div>
       </div>
     </div>
   </section>
+  <div class="tiles" aria-hidden="true"></div>
 
-  <div class="wrap">
-    <section class="sec" aria-labelledby="filmT">
-      <div class="film">
-        <div class="poster" id="poster"></div>
-        <div>
-          <h2 id="filmT">放映電影</h2>
-          <div id="filmBody"></div>
-          <ul class="dl" id="facts"></ul>
-        </div>
+  <section class="sec night2" aria-labelledby="filmT">
+    <div class="wrap film">
+      <div class="poster" id="poster"></div>
+      <div>
+        <p class="eyebrow">NOW SHOWING</p>
+        <h2 id="filmT">放映電影</h2>
+        <div id="filmBody"></div>
+        <ul class="dl" id="facts"></ul>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <section class="sec" aria-labelledby="foodT">
-      <div class="food-intro">
-        <div>
-          <h2 id="foodT">餐點先訂好，現場直接取</h2>
-          <p class="muted">場地規定現場不能有交易，所以餐點要在報名時一起預訂、事先轉帳。兩家店可以自由搭配，也可以只報名不點餐。</p>
-        </div>
-        <div class="vcards" id="vlist"><div class="skel"></div><div class="skel"></div></div>
+  <section class="sec cream" aria-labelledby="foodT">
+    <div class="wrap food-intro">
+      <div>
+        <p class="eyebrow">MENU</p>
+        <h2 id="foodT">餐點先訂好，現場直接取</h2>
+        <p class="muted">場地規定現場不能有交易，所以餐點要在報名時一起預訂、事先轉帳。兩家店可以自由搭配，也可以只報名不點餐。</p>
       </div>
-    </section>
+      <div class="vcards" id="vlist"><div class="skel"></div><div class="skel"></div></div>
+    </div>
+  </section>
 
-    <section class="sec" aria-labelledby="howT">
+  <section class="sec paper" aria-labelledby="howT">
+    <div class="wrap">
+      <p class="eyebrow">HOW IT WORKS</p>
       <h2 id="howT">報名方式</h2>
       <ol class="how" id="how"></ol>
-    </section>
+    </div>
+  </section>
 
-    <section class="sec" aria-labelledby="faqT">
+  <section class="sec cream" aria-labelledby="faqT">
+    <div class="wrap">
+      <p class="eyebrow">FAQ</p>
       <h2 id="faqT">常見問題</h2>
       <div class="faq" id="faq"></div>
-    </section>
+    </div>
+  </section>
 
-    <section class="closing">
-      <button class="btn" type="button" id="startBtn2" disabled></button>
+  <div class="tiles" aria-hidden="true"></div>
+  <section class="closing night">
+    <div class="wrap">
+      <p class="eyebrow">SEE YOU UNDER THE STARS</p>
+      <h2>一起來看場冬夜電影</h2>
+      <button class="btn hero-cta" type="button" id="startBtn2" disabled>報名＋預訂餐點</button>
       <div class="cta-note" id="openNote2"></div>
-    </section>
-  </div>
+    </div>
+  </section>
 </main>
+<div class="mbar hbar" id="hbar"><div class="in"><span class="hmeta"><b>聖誕露天電影院</b><span id="hbarDate">12/9（三）</span></span><button class="btn hero-cta" type="button" id="hbarBtn">報名＋預訂餐點</button></div></div>
 
 <!-- 報名流程 -->
 <main id="flow" class="hidden">
@@ -462,9 +589,10 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
         <section id="step1" aria-labelledby="s1t">
           <h2 id="s1t" tabindex="-1">想吃點什麼？</h2>
           <p class="lead">兩家店可以自由搭配，也可以都不選。價格就是店家原價，沒有額外費用。</p>
+          <div class="pickup" id="pickupNote"></div>
           <nav class="vtabs" id="vtabs" aria-label="店家"></nav>
           <div id="menu"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
-          <div class="skip"><span>不需要餐點？</span><button class="linkbtn" type="button" id="skipBtn"></button></div>
+          <div class="skip" id="skipBox"><span>不需要餐點？只報名活動也可以。</span><button class="linkbtn" type="button" id="skipBtn"></button></div>
         </section>
 
         <section id="step2" class="hidden" aria-labelledby="s2t">
@@ -480,10 +608,10 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
             </fieldset>
             <div class="field" id="w_name"><label for="f_name">姓名</label><div class="err" id="e_name"></div><div class="ipt"><span data-icon="user"></span><input id="f_name" autocomplete="name" maxlength="30" aria-describedby="e_name"><span class="okw"></span></div></div>
             <div class="field" id="w_sid"><label for="f_sid">學號</label><p class="help" id="h_sid">9 碼數字。</p><div class="err" id="e_sid"></div><div class="ipt"><span data-icon="id-card"></span><input id="f_sid" inputmode="numeric" maxlength="9" autocomplete="off" aria-describedby="h_sid e_sid"><span class="okw"></span></div></div>
-            <div class="field" id="w_phone"><label for="f_phone">手機號碼</label><div class="err" id="e_phone"></div><div class="ipt"><span data-icon="phone"></span><input id="f_phone" type="tel" inputmode="numeric" maxlength="12" placeholder="0912345678" autocomplete="tel" aria-describedby="e_phone"><span class="okw"></span></div></div>
+            <div class="field" id="w_phone"><label for="f_phone">手機號碼</label><div class="err" id="e_phone"></div><div class="ipt"><span data-icon="phone"></span><input id="f_phone" type="tel" inputmode="numeric" maxlength="12" placeholder="例如 0912345678" autocomplete="tel" aria-describedby="e_phone"><span class="okw"></span></div></div>
             <div class="field" id="w_email"><label for="f_email">Email</label><p class="help" id="h_email">付款確認通知會寄到這裡。</p><div class="err" id="e_email"></div><div class="ipt"><span data-icon="mail"></span><input id="f_email" type="email" autocomplete="email" maxlength="120" aria-describedby="h_email e_email"><span class="okw"></span></div></div>
-            <div class="field" id="w_last5"><label for="f_last5">轉帳帳戶的帳號後五碼</label><p class="help" id="h_last5">你等一下要用來轉帳的帳戶（請用自己的帳戶）。忘了填備註時，我們會用它核對。開頭是 0 也要填。</p><div class="err" id="e_last5"></div><div class="ipt" style="max-width:220px"><span data-icon="wallet"></span><input id="f_last5" inputmode="numeric" maxlength="5" autocomplete="off" aria-describedby="h_last5 e_last5"><span class="okw"></span></div></div>
-            <p class="draftnote"><span data-icon="shield-check"></span>填到一半的資料只會暫存在這台裝置，送出後或 24 小時後自動清除。<button type="button" class="linkbtn" id="clearDraft">清除已填資料</button></p>
+            <div class="field" id="w_last5"><label for="f_last5">轉帳帳戶的帳號後五碼</label><p class="help" id="h_last5">你等一下要用來轉帳的帳戶（請用自己的帳戶）帳號的最後 5 碼，開頭是 0 也要填。忘了填備註時，我們會用它核對。<br>不記得帳號？打開銀行 App 的「帳戶」或「帳戶總覽」就看得到。用郵局帳戶的話，填存簿帳號（14 碼）的最後 5 碼。</p><div class="err" id="e_last5"></div><div class="ipt" style="max-width:220px"><span data-icon="wallet"></span><input id="f_last5" inputmode="numeric" maxlength="5" autocomplete="off" aria-describedby="h_last5 e_last5"><span class="okw"></span></div></div>
+            <p class="draftnote"><span data-icon="shield-check"></span><span>填到一半的資料只會暫存在這台裝置，送出後或 24 小時後自動清除。</span><button type="button" class="linkbtn" id="clearDraft">清除已填資料</button></p>
             <div class="field" id="w_agree"><p class="privacy" id="privacyText"></p><div class="err" id="e_agree"></div><label class="check"><input type="checkbox" id="f_agree" aria-describedby="e_agree"><span>我已閱讀並同意個人資料蒐集告知</span></label></div>
           </form>
         </section>
@@ -507,19 +635,24 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
 
 <div class="mbar" id="mbar"><div class="in">
   <button class="meta" type="button" id="mMeta" aria-label="查看訂單內容"></button>
-  <button class="btn" type="button" id="mNext">下一步</button>
+  <div class="mnext"><button class="btn" type="button" id="mNext">下一步</button><small id="mHint"></small></div>
 </div></div>
 <div class="scrim" id="scrim"></div>
 <section class="sheet imgsheet" id="imgSheet" role="dialog" aria-modal="true" aria-labelledby="imgT"><div class="grab"></div><h3 id="imgT">長按圖片，選「加入照片」</h3><p class="muted" style="margin:0 0 12px;font-size:14px">存進相簿後，活動當天沒有網路也能出示。</p><img id="imgSheetImg" alt="報到 QR Code 圖片"><p><button type="button" class="btn line" id="imgSheetClose">完成</button></p></section>
 <section class="sheet confirm" id="confirmSheet" role="dialog" aria-modal="true" aria-labelledby="cfT"><div class="grab"></div><h3 id="cfT">確認一下你的訂單</h3><div id="cfBody"></div>
+  <div class="cfdl" id="cfDl"></div>
   <div class="cfwarn"><span data-icon="triangle-alert"></span><span><b>送出後就不能修改餐點。</b>付款前如果想改，只能在訂單頁取消後重新報名；付款後不能修改或加訂。</span></div>
   <div class="cfacts"><button type="button" class="btn line" id="cfBack">回去修改</button><button type="button" class="btn" id="cfGo">確認送出</button></div></section>
 <section class="sheet" id="cartSheet" role="dialog" aria-modal="true" aria-labelledby="cartT"><div class="grab"></div><h3 id="cartT">你的訂單</h3><ul class="sum-list" id="cartList"></ul><div class="sum-total"><span>總金額</span><span class="num" id="cartTotal"></span></div></section>
 
-<div class="wrap"><footer><span id="footContact"></span>　主辦：國立政治大學學生會</footer></div>
+<footer class="foot"><div class="tiles" aria-hidden="true"></div><div class="wrap fin">
+  <div class="fbrand"><svg viewBox="0 0 64 64" aria-hidden="true" id="footGlyph"></svg><div><b>聖誕露天電影院</b><span id="footDate">2026/12/9（三）</span></div></div>
+  <div class="flinks"><a href="https://www.instagram.com/nccu_sa/" target="_blank" rel="noopener" id="footIg"><span data-icon="camera"></span>IG @nccu_sa</a><span id="footContact"></span></div>
+  <p class="fsmall">主辦：國立政治大學學生會</p>
+</div></footer>
 
-<script src="assets/icons.js?v=20261120d"></script>
-<script src="assets/api.js?v=20261120d"></script>
+<script src="assets/icons.js?v=20261120e"></script>
+<script src="assets/api.js?v=20261120e"></script>
 <script>
 (function(){
   const $ = id => document.getElementById(id);
@@ -530,6 +663,7 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
   $('lookupLink').innerHTML = icon('ticket') + '查詢訂單';
   $('backBtn').innerHTML = icon('arrow-left');
   $('skipBtn').innerHTML = '不點餐，直接下一步' + icon('arrow-right');
+  ['startBtn', 'startBtn2', 'hbarBtn'].forEach(id => $(id).innerHTML = icon('ticket') + '報名＋預訂餐點');
   $('errIcon').innerHTML = icon('circle-alert');
   document.querySelectorAll('.okw').forEach(el => el.outerHTML = icon('circle-check', 'ok'));
 
@@ -550,6 +684,25 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
       out += `<svg x="${i * s}" y="0" width="${s}" height="${s}" viewBox="0 0 ${s} ${s}">${g}</svg>`;
     }
     return out;
+  }
+
+  // 首頁店家小插畫（幾何風，紅綠金）
+  function illo(kind){
+    const G = C.green, R = C.red, Y = C.gold, W = '#FFFDF8';
+    if (kind === 'cup-soda') return `<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="${G}"/><path d="M24 12c-3 4 3 6 0 10M32 10c-3 4 3 6 0 10M40 12c-3 4 3 6 0 10" stroke="${Y}" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M16 26h32l-4 26a4 4 0 0 1-4 3H24a4 4 0 0 1-4-3z" fill="${W}"/><rect x="16" y="33" width="32" height="7" fill="${R}"/><path d="M47 31h3a6 6 0 0 1 0 12h-4" stroke="${W}" stroke-width="3.4" fill="none"/></svg>`;
+    if (kind === 'sandwich') return `<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="${R}"/><path d="M10 44 L32 14 L54 44Z" fill="#F4E3BE"/><path d="M12 44 L32 18 L52 44" fill="none" stroke="${Y}" stroke-width="3"/><path d="M10 44h44v4H10z" fill="${C.green2}"/><path d="M10 48h44v3a3 3 0 0 1-3 3H13a3 3 0 0 1-3-3z" fill="#F4E3BE"/><circle cx="26" cy="36" r="3" fill="${R}"/><circle cx="37" cy="33" r="3" fill="${R}"/></svg>`;
+    return `<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="${G}"/><path d="M14 28h36v22H14z" fill="${W}"/><path d="M10 28l6-12h32l6 12z" fill="${R}"/><rect x="28" y="36" width="8" height="14" fill="${Y}"/></svg>`;
+  }
+  document.querySelectorAll('.tiles').forEach(t => t.innerHTML = `<svg viewBox="0 0 1680 28" preserveAspectRatio="xMinYMid slice">${tileBand(60, 28)}</svg>`);
+  $('footGlyph').outerHTML = glyph('fglyph');
+  let canRegister = false;
+  // 瀏覽器頂端顏色：首頁夜空用深色，其他頁用米白
+  new MutationObserver(() => { const m = document.querySelector('meta[name="theme-color"]'); if (m) m.content = $('home').classList.contains('hidden') ? '#F2EFE5' : '#0C211B'; }).observe($('home'), { attributes: true, attributeFilter: ['class'] });
+  // 首頁往下捲、第一顆報名按鈕不在畫面上時，底部出現固定的報名列
+  if ('IntersectionObserver' in window) {
+    const vis = new Map();
+    const io2 = new IntersectionObserver(es => { es.forEach(en => vis.set(en.target.id, en.isIntersecting)); $('hbar').classList.toggle('on', canRegister && !vis.get('startBtn') && !vis.get('startBtn2') && !$('home').classList.contains('hidden')); });
+    ['startBtn', 'startBtn2'].forEach(id => io2.observe($(id)));
   }
 
   // ---------- 狀態 ----------
@@ -615,23 +768,26 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
   const real = v => v && !/待公布/.test(v);
   function renderHome(){
     const info = parseInfo(catalog.event_info);
-    if (real(info['日期'])) { const m = info['日期'].match(/(?:\d{4}\/)?(\d{1,2})\/(\d{1,2})/), w = info['日期'].match(/（(.)）/); if (m) $('evDate').innerHTML = `${+m[1]}/${+m[2]}${w ? `<small>週${esc(w[1])}</small>` : ''}`; }
-    $('evMeta').innerHTML = `<li>${real(info['時間']) ? esc(info['時間']) : '<span class="tbd">時間待公布</span>'}${icon('clock')}</li><li>${real(info['地點']) ? esc(info['地點']) : '<span class="tbd">地點待公布</span>'}${icon('map-pin')}</li>`;
+    if (real(info['日期'])) { const m = info['日期'].match(/(?:\d{4}\/)?(\d{1,2})\/(\d{1,2})/), w = info['日期'].match(/（(.)）/); if (m) { $('evDate').querySelector('b').textContent = `${+m[1]}/${+m[2]}`; $('evDate').querySelector('.wk').textContent = w ? '週' + w[1] : ''; $('hbarDate').textContent = `${+m[1]}/${+m[2]}${w ? `（${w[1]}）` : ''}`; } $('footDate').textContent = info['日期']; }
+    $('evMeta').innerHTML = `<li>${icon('clock')}${real(info['時間']) ? `<span>${esc(info['時間'])}</span>` : '<span class="tbd">時間待公布</span>'}</li><li>${icon('map-pin')}${real(info['地點']) ? `<span>${esc(info['地點'])}</span>` : '<span class="tbd">地點待公布</span>'}</li>`;
     const now = new Date(); let note = '', can = false;
     if (!catalog.is_open && now < new Date(catalog.open_at)) note = `${fmtTime(catalog.open_at)} 開放報名`;
     else if (!catalog.is_open) note = '報名已截止。已經報名的人可以用 Email 裡的連結查詢訂單。';
     else if (catalog.spots_left <= 0) note = '名額已滿';
     else { can = true; note = catalog.test_mode ? '測試模式：現在就可以報名' : `報名截止 ${fmtTime(catalog.close_at)}・剩 ${catalog.spots_left} 個名額`; }
     ['openNote', 'openNote2'].forEach(id => $(id).textContent = note);
-    ['startBtn', 'startBtn2'].forEach(id => { $(id).disabled = !can; $(id).innerHTML = icon('ticket') + '報名＋預訂餐點'; });
-    $('poster').innerHTML = catalog.film_image_url ? `<img src="${esc(catalog.film_image_url)}" alt="${esc(catalog.film_title || '電影海報')}">` : `${glyph()}<span>電影海報待提供</span>`;
+    ['startBtn', 'startBtn2', 'hbarBtn'].forEach(id => { $(id).disabled = !can; $(id).innerHTML = icon('ticket') + '報名＋預訂餐點'; });
+    canRegister = can;
+    $('poster').classList.toggle('has', !!catalog.film_image_url);
+    $('poster').innerHTML = catalog.film_image_url ? `<img src="${esc(catalog.film_image_url)}" alt="${esc(catalog.film_title || '電影海報')}">` : `<div class="soon"><svg viewBox="0 0 200 200" aria-hidden="true">${star(34, 30, 12, 5, 5, 'tw')}${star(168, 22, 8, 3.5, 5, 'tw')}${star(178, 186, 10, 4, 5, 'tw')}${star(20, 192, 6, 2.5, 5, 'tw')}</svg><span class="q">?</span><b>片單即將揭曉</b><span>確定後會公布在這裡和學生會的社群</span></div>`;
     $('filmBody').innerHTML = `<p class="title">${catalog.film_title ? esc(catalog.film_title) : '片單待公布'}</p>${catalog.film_note ? `<p>${esc(catalog.film_note)}</p>` : '<p class="muted">冬夜、大銀幕和一杯熱飲。片名確定後會公布在這裡和學生會的社群。</p>'}`;
     const facts = [['calendar', '日期', real(info['日期']) ? info['日期'] : null], ['clock', '時間', real(info['時間']) ? info['時間'] : null], ['map-pin', '地點', real(info['地點']) ? info['地點'] : null], ['info', '現場', catalog.venue_note || null]];
     $('facts').innerHTML = facts.map(([ic, k, v]) => `<li>${icon(ic)}<b>${k}</b><span>${v ? esc(v) : tbd}</span></li>`).join('');
-    $('vlist').innerHTML = catalog.vendors.map(v => `<div class="vcard"><span class="ic">${icon(vIcon(v))}</span><div><b>${esc(v.name)}</b><span>${esc(v.items.slice(0, 4).map(i => i.name).join('、'))}${v.items.length > 4 ? ' 等' : ''}${v.items.length ? `・$${Math.min(...v.items.map(i => i.price))} 起` : ''}</span></div></div>`).join('') || '<p class="muted">餐點待公布</p>';
+    $('vlist').innerHTML = catalog.vendors.map(v => `<div class="vcard"><span class="ill">${illo(vIcon(v))}</span><div><b>${esc(v.name)}</b><span>${esc(v.items.slice(0, 4).map(i => i.name).join('、'))}${v.items.length > 4 ? ' 等' : ''}${v.items.length ? `・$${Math.min(...v.items.map(i => i.price))} 起` : ''}</span></div></div>`).join('') || '<p class="muted">餐點待公布</p>';
     $('how').innerHTML = [['utensils-crossed', '報名，選好餐點', '政大學生填學號；校外人士也可以報名。'], ['wallet', '轉帳，備註填姓名', '用自己的帳戶轉帳，在「備註」欄填你的姓名。轉完就好，確認入帳後會寄信通知。'], ['ticket', '當天報到、取餐', '政大學生帶學生證，校外人士出示付款完成信裡的 QR Code。']]
-      .map(([ic, t, d], i) => `<li><div class="ic">${icon(ic)}<span>${i + 1}</span></div><h3>${t}</h3><p>${d}</p></li>`).join('');
-    $('footContact').textContent = '聯絡我們：' + (catalog.contact_info || '');
+      .map(([ic, t, d], i) => `<li><span class="big num" aria-hidden="true">${i + 1}</span><div><h3><span class="sr">第 ${i + 1} 步：</span>${t}</h3><p>${d}</p></div></li>`).join('');
+    $('footContact').textContent = catalog.contact_info && !/nccu_sa/i.test(catalog.contact_info) ? '聯絡我們：' + catalog.contact_info : '';
+    $('footIg').lastChild.textContent = catalog.contact_info && /私訊/.test(catalog.contact_info) ? 'IG @nccu_sa（有問題請私訊）' : 'IG @nccu_sa';
     $('privacyText').textContent = catalog.privacy_notice || '';
     const faqs = [
       ['付款後多久會收到確認？', '我們會定期核對入帳紀錄，大約 1 個工作天內寄出「付款完成」通知。轉帳後不需要回到網頁填資料。'],
@@ -654,6 +810,7 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
         <div class="vhead">${v.image_url ? `<img src="${esc(v.image_url)}" alt="">` : `<span class="ic">${icon(vIcon(v))}</span>`}<div><h3 id="vh${i}" style="font-size:20px;margin:0">${esc(v.name)}</h3>${v.description ? `<p class="vdesc">${esc(v.description)}</p>` : ''}</div></div>
         <ul class="items">${v.items.map(row).join('') || '<li class="muted">目前沒有品項</li>'}</ul>
       </section>`).join('') : `<div class="state-page">${glyph()}<p>目前沒有開放預訂的餐點，可以直接下一步，只報名活動。</p></div>`;
+    $('pickupNote').innerHTML = `${icon('hand-platter')}<div><b>取餐方式</b><span>${esc(catalog.pickup_note || '活動當天報到後，到取餐區出示學生證（校外人士出示 QR Code）取餐。取餐時間和地點確定後會公布在這裡。')}</span></div>`;
     renderTabs();
     $('vtabs').onclick = e => { const b = e.target.closest('[data-jump]'); if (b) $(b.dataset.jump).scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); };
     $('menu').onclick = e => {
@@ -682,13 +839,15 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
   }
   function renderTabs(){
     const cur = ($('vtabs').querySelector('[aria-current="true"]') || {}).dataset;
+    const nv = catalog.vendors.length; $('vtabs').classList.toggle('even', nv >= 2 && nv <= 3); $('vtabs').style.setProperty('--n', nv);
     $('vtabs').innerHTML = catalog.vendors.map((v, i) => { const n = v.items.reduce((s, it) => s + (cart[it.id] || 0), 0); return `<button type="button" data-jump="v${i}" aria-current="${cur ? cur.jump === 'v' + i : i === 0}">${icon(vIcon(v))}${esc(v.name)}${n ? `<span class="n">${n}</span>` : ''}</button>`; }).join('');
   }
   function row(i){
     const out = i.remaining === 0, q = cart[i.id] || 0;
-    return `<li class="mi${out ? ' out' : ''}${q ? ' has' : ''}" id="mi_${esc(i.id)}">
-      <div><span class="nm">${esc(i.name)}</span>${i.tag ? `<span class="tag ${noteClass(i.tag)}">${esc(i.tag)}</span>` : ''}${i.remaining != null && !out && i.remaining <= 20 ? `<span class="tag red">剩 ${i.remaining} 份</span>` : ''}${i.description ? `<div class="ds">${esc(i.description)}</div>` : ''}<div class="pr">$${esc(i.price)}</div></div>
-      <div class="ctl">${ctl(i)}</div></li>`;
+    return `<li class="mi${out ? ' out' : ''}${q ? ' has' : ''}${i.image_url ? ' wimg' : ''}" id="mi_${esc(i.id)}">
+      ${i.image_url ? `<img class="th" src="${esc(i.image_url)}" alt="" loading="lazy" decoding="async">` : ''}
+      <div class="info"><span class="nm">${esc(i.name)}</span>${i.tag ? `<span class="tag ${noteClass(i.tag)}">${esc(i.tag)}</span>` : ''}${i.remaining != null && !out && i.remaining <= 20 ? `<span class="tag red">剩 ${i.remaining} 份</span>` : ''}${i.description ? `<div class="ds">${esc(i.description)}</div>` : ''}</div>
+      <div class="side"><div class="pr">$${esc(i.price)}</div><div class="ctl">${ctl(i)}</div></div></li>`;
   }
   function ctl(i){
     const q = cart[i.id] || 0;
@@ -708,9 +867,11 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
     $('mMeta').innerHTML = `<span class="bag">${icon('shopping-bag')}${count() ? `<em>${count()}</em>` : ''}</span><span>${step === 1 ? (count() ? `已選 ${count()} 份` : '還沒選餐點') : '總金額'}<b id="mTotal">${money(t)}</b></span>`;
     if (animate && t !== lastTotal && !reduce) { [$('sumTotal'), $('mTotal')].forEach(el => { el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }); }
     lastTotal = t;
-    const label = step === 1 ? (count() ? '下一步' : '不點餐，下一步') : '確認送出';
+    const label = step === 1 ? '下一步' : '確認送出';
+    $('skipBox').classList.toggle('hidden', count() > 0);
+    $('mHint').textContent = step === 1 && !count() ? '也可以不點餐' : '';
     $('sumNext').innerHTML = label + icon(step === 1 ? 'arrow-right' : 'check'); $('mNext').innerHTML = label + icon(step === 1 ? 'arrow-right' : 'check');
-    $('sumHint').textContent = step === 2 ? '送出後才會建立訂單，並顯示轉帳資訊。' : '';
+    $('sumHint').textContent = step === 2 ? '送出後才會建立訂單，並顯示轉帳資訊。' : count() ? '' : '也可以不點餐，直接下一步。';
   }
   function swap(fn, dir){
     document.documentElement.dataset.dir = dir;
@@ -735,7 +896,7 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
     setTimeout(() => { const h = s === 1 ? $('s1t') : s === 2 ? $('s2t') : $('payT'); if (h) h.focus({ preventScroll: true }); }, 60);
   }
   const start = () => { history.pushState({ s: 1 }, '', '#order'); go(1); };
-  $('startBtn').onclick = start; $('startBtn2').onclick = start;
+  $('startBtn').onclick = start; $('startBtn2').onclick = start; $('hbarBtn').onclick = start;
   $('skipBtn').onclick = () => { history.pushState({ s: 2 }, '', '#order'); go(2); };
   const next = () => { if (step === 1) { history.pushState({ s: 2 }, '', '#order'); go(2); } else if (step === 2) submit(); };
   $('sumNext').onclick = next; $('mNext').onclick = next;
@@ -746,6 +907,26 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
   });
   $('mMeta').onclick = () => { if (!count()) return; $('scrim').classList.add('on'); $('cartSheet').classList.add('on'); };
   $('scrim').onclick = () => { $('scrim').classList.remove('on'); ['cartSheet', 'imgSheet', 'confirmSheet'].forEach(id => $(id).classList.remove('on')); };
+  // 彈出視窗：打開時焦點移進去、Tab 不會跑到後面、Esc 關閉、關閉後焦點回到原本的按鈕
+  const FOCUSABLE = 'button:not([disabled]),a[href],input:not([disabled]),select,textarea,[tabindex]:not([tabindex="-1"])';
+  document.querySelectorAll('.sheet').forEach(sh => {
+    sh.setAttribute('tabindex', '-1');
+    new MutationObserver(() => {
+      const on = sh.classList.contains('on');
+      if (on && !sh._open) { sh._open = true; sh._ret = document.activeElement; setTimeout(() => { if (!sh.contains(document.activeElement)) (sh.querySelector(FOCUSABLE) || sh).focus(); }, 60); }
+      else if (!on && sh._open) { sh._open = false; if (!document.querySelector('.sheet.on')) $('scrim').classList.remove('on'); const r = sh._ret; if (r && r.isConnected && !document.querySelector('.sheet.on')) r.focus(); }
+    }).observe(sh, { attributes: true, attributeFilter: ['class'] });
+  });
+  document.addEventListener('keydown', e => {
+    const sh = document.querySelector('.sheet.on'); if (!sh) return;
+    if (e.key === 'Escape') { e.preventDefault(); sh.classList.remove('on'); return; }
+    if (e.key === 'Tab') {
+      const f = [...sh.querySelectorAll(FOCUSABLE)].filter(el => el.offsetParent !== null); if (!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && (document.activeElement === first || !sh.contains(document.activeElement))) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && (document.activeElement === last || !sh.contains(document.activeElement))) { e.preventDefault(); first.focus(); }
+    }
+  });
 
   function ptype(){ const c = document.querySelector('input[name=ptype]:checked'); return c ? c.value : 'nccu'; }
   function syncType(){ $('w_sid').classList.toggle('hidden', ptype() === 'guest'); }
@@ -761,23 +942,25 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
   }
 
   // ---------- 驗證與送出 ----------
+  // [欄位, 檢查, 格式錯誤訊息, 沒填時的訊息]
   const FIELDS = [
-    ['name', v => v.length >= 1 && v.length <= 30 && !/[<>]/.test(v), '請填寫姓名（30 字以內）'],
-    ['sid', v => ptype() === 'guest' || /^[0-9]{9}$/.test(v), '學號是 9 碼數字'],
-    ['phone', v => /^09[0-9]{8}$/.test(v.replace(/[\s-]/g, '')), '請填 09 開頭、共 10 碼的手機號碼'],
-    ['email', v => /^[^@\s<>]+@[^@\s<>]+\.[^@\s<>]+$/.test(v), 'Email 格式不正確，例如 name@example.com'],
-    ['last5', v => total() === 0 || /^[0-9]{5}$/.test(v), '請填 5 碼數字，開頭是 0 也要填'],
+    ['name', v => v.length >= 1 && v.length <= 30 && !/[<>]/.test(v), '姓名請在 30 字以內，不能有 < > 符號', '請填寫姓名'],
+    ['sid', v => ptype() === 'guest' || /^[0-9]{9}$/.test(v), '學號是 9 碼數字', '請填寫學號'],
+    ['phone', v => /^09[0-9]{8}$/.test(v.replace(/[\s-]/g, '')), '手機號碼格式不正確，請填 09 開頭、共 10 碼', '請填寫手機號碼'],
+    ['email', v => /^[^@\s<>]+@[^@\s<>]+\.[^@\s<>]+$/.test(v), 'Email 格式不正確，例如 name@example.com', '請填寫 Email'],
+    ['last5', v => total() === 0 || /^[0-9]{5}$/.test(v), '帳號後五碼是 5 碼數字，開頭是 0 也要填', '請填寫轉帳帳戶的帳號後五碼'],
   ];
+  const fieldMsg = (f, v) => v === '' ? f[3] : f[2];
   function check(k, show){
-    const f = FIELDS.find(x => x[0] === k), inp = $('f_' + k), good = f[1](inp.value.trim());
-    $('w_' + k).classList.toggle('good', good && inp.value.trim() !== '');
-    if (show || $('w_' + k).classList.contains('bad')) { $('w_' + k).classList.toggle('bad', !good); inp.setAttribute('aria-invalid', !good); $('e_' + k).innerHTML = good ? '' : icon('circle-alert') + esc(f[2]); }
+    const f = FIELDS.find(x => x[0] === k), inp = $('f_' + k), v = inp.value.trim(), good = f[1](v);
+    $('w_' + k).classList.toggle('good', good && v !== '');
+    if (show || $('w_' + k).classList.contains('bad')) { $('w_' + k).classList.toggle('bad', !good); inp.setAttribute('aria-invalid', !good); $('e_' + k).innerHTML = good ? '' : icon('circle-alert') + esc(fieldMsg(f, v)); }
     return good;
   }
   FIELDS.forEach(([k]) => { $('f_' + k).addEventListener('blur', () => { if ($('f_' + k).value.trim()) check(k, true); }); $('f_' + k).addEventListener('input', () => check(k, false)); });
   function validate(){
     const errs = [];
-    FIELDS.forEach(([k, , msg]) => { if (!check(k, true)) errs.push(['f_' + k, msg]); });
+    FIELDS.forEach(f => { if (!check(f[0], true)) errs.push(['f_' + f[0], fieldMsg(f, $('f_' + f[0]).value.trim())]); });
     const agree = $('f_agree').checked; $('w_agree').classList.toggle('bad', !agree); $('e_agree').innerHTML = agree ? '' : icon('circle-alert') + '請勾選同意個人資料蒐集告知'; if (!agree) errs.push(['f_agree', '請勾選同意個人資料蒐集告知']);
     $('errlist').innerHTML = errs.map(([id, m]) => `<li><a href="#${id}" data-f="${id}">${esc(m)}</a></li>`).join('');
     $('errsum').classList.toggle('hidden', !errs.length);
@@ -792,6 +975,9 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
     $('cfBody').innerHTML = `<p class="cf-who">${esc($('f_name').value.trim())}・${guest ? '校外人士' : '學號 ' + esc($('f_sid').value.trim())}・${esc($('f_phone').value.trim())}</p>
       <div class="cf-rows">${l.length ? l.map(i => `<div class="rw"><span>${esc(i.name)} × ${i.qty}<br><small class="muted">${esc(i.vendor)}</small></span><span class="num">$${i.price * i.qty}</span></div>`).join('') : '<div class="rw"><span>不點餐，只報名活動</span><span></span></div>'}</div>
       <div class="cf-tot"><span>總金額</span><span class="num">${money(total())}</span></div>`;
+    const dl = catalog.test_mode ? new Date(Math.max(new Date(catalog.payment_deadline || 0), Date.now() + 3 * 864e5)) : catalog.payment_deadline;
+    $('cfDl').innerHTML = total() > 0 && dl ? `${icon('clock')}<span>送出後請在 <b>${esc(fmtTime(dl))}</b> 前轉帳 <b class="num">${money(total())}</b>，逾期訂單會取消、名額釋出。</span>` : '';
+    $('cfDl').classList.toggle('hidden', !(total() > 0 && dl));
     $('scrim').classList.add('on'); $('confirmSheet').classList.add('on');
     setTimeout(() => $('cfGo').focus(), 50);
   }
@@ -1002,7 +1188,15 @@ footer{border-top:1px solid var(--line);margin-top:24px;padding:24px 0 48px;font
   async function init(){
     const token = new URLSearchParams(location.search).get('t');
     try { catalog = await Api.rpc('public_get_catalog'); }
-    catch (e) { showState(`<div class="state-page">${glyph()}<h2>目前無法連線</h2><p class="muted">可能是網路不穩，請稍後再試。</p><button class="btn" type="button" onclick="location.reload()">${icon('refresh-cw')}重新整理</button></div>`); return; }
+    catch (e) {
+      // 載入失敗：首頁的固定內容照樣顯示，只有報名按鈕改成錯誤狀態
+      catalog = { vendors: [], event_info: '日期：2026/12/9（三）', is_open: false, spots_left: 0, contact_info: 'IG @nccu_sa 私訊', offline: true };
+      renderHome();
+      ['startBtn', 'startBtn2'].forEach(id => { $(id).disabled = false; $(id).innerHTML = icon('refresh-cw') + '重新載入報名'; $(id).onclick = () => location.reload(); });
+      ['openNote', 'openNote2'].forEach(id => $(id).innerHTML = `<span class="neterr">${icon('wifi-off')}目前連不上報名系統，可能是網路不穩。請稍後重新載入。</span>`);
+      if (token) toast('目前無法查詢訂單，請稍後再試', 'wifi-off');
+      return;
+    }
     renderHome();
     if (token) return showLookup(token);
     const d = loadDraft();

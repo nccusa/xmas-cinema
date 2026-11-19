@@ -75,6 +75,13 @@ const Api = {
     const r = await fetch(CFG.url + '/rest/v1/' + table + '?' + filter, { method: 'PATCH', headers: this.headers(true, { Prefer: 'return=representation' }), body: JSON.stringify(row) });
     return this.handle(r);
   },
+  // 上傳圖片到公開資料夾 site-images（只有管理員可以上傳），回傳公開網址
+  async upload(path, blob) {
+    await this.ensureFresh();
+    const r = await fetch(CFG.url + '/storage/v1/object/site-images/' + path, { method: 'POST', headers: this.headers(false, { 'Content-Type': blob.type || 'image/jpeg', 'x-upsert': 'true', 'Cache-Control': 'max-age=31536000' }), body: blob });
+    await this.handle(r);
+    return CFG.url + '/storage/v1/object/public/site-images/' + path;
+  },
   async login(email, password) {
     const r = await fetch(CFG.url + '/auth/v1/token?grant_type=password', {
       method: 'POST', headers: { apikey: CFG.key, 'Content-Type': 'application/json' },
