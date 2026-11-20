@@ -644,7 +644,7 @@ body:has(#home.hidden) .flowtiles{display:block}
 @media (prefers-reduced-motion:reduce){.screening .beam{animation:none}}
 
 /* 加購租借品（野餐墊） */
-#addons .addon{margin-top:22px;border:2px dashed rgba(201,154,46,.55);background:linear-gradient(180deg,rgba(243,210,122,.10),transparent 70%)}
+#addons .addon{margin:6px 0 22px;border:2px dashed rgba(201,154,46,.55);background:linear-gradient(180deg,rgba(243,210,122,.10),transparent 70%)}
 .vcard.rent{border:2px dashed rgba(201,154,46,.55);box-shadow:none}
 </style>
 </head>
@@ -759,11 +759,11 @@ body:has(#home.hidden) .flowtiles{display:block}
         <section id="step1" aria-labelledby="s1t">
           <h2 id="s1t" tabindex="-1">想吃點什麼？</h2>
           <p class="lead">兩家可以混著點。</p>
+          <div id="addons"></div>
           <div class="onlyreg"><button type="button" class="btn line sm" id="onlyReg"></button><span id="onlyRegNote"></span></div>
           <div class="pickup" id="pickupNote"></div>
           <nav class="vtabs" id="vtabs" aria-label="店家"></nav>
           <div id="menu"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
-          <div id="addons"></div>
           
         </section>
 
@@ -1083,7 +1083,7 @@ body:has(#home.hidden) .flowtiles{display:block}
     $('facts').innerHTML = catalog.venue_note ? `<li>${icon('info')}<b>注意事項</b><span>${esc(catalog.venue_note)}</span></li>` : '';
     $('facts').classList.toggle('hidden', !catalog.venue_note);
     $('vlist').innerHTML = foods().map(v => `<div class="vcard"><span class="ill">${illo(vIcon(v))}</span><div><b>${esc(v.name)}</b><span>${esc(v.items.slice(0, 4).map(i => i.name).join('、'))}${v.items.length > 4 ? ' 等' : ''}${v.items.length ? `・$${Math.min(...v.items.map(i => i.price))} 起` : ''}</span></div></div>`).join('') || '<p class="muted">餐點待公布</p>';
-    $('vlist').insertAdjacentHTML('beforeend', rentals().flatMap(v => v.items).map(i => `<div class="vcard rent"><span class="ill">${illo('mat')}</span><div><b>${esc(i.name.replace(/（.*）/, ''))}租借</b><span>報名時可以加租・$${esc(i.price)}／張</span></div></div>`).join(''));
+    $('vlist').insertAdjacentHTML('afterbegin', rentals().flatMap(v => v.items).map(i => `<div class="vcard rent"><span class="ill">${illo('mat')}</span><div><b>${esc(i.name.replace(/（.*）/, ''))}租借</b><span>報名時可以加租・$${esc(i.price)}／張</span></div></div>`).join(''));
     $('how').innerHTML = [1, 2, 3].map(i => [cp('s' + i + '_t'), cp('s' + i + '_d')])
       .map(([t, d], i) => `<li><span class="no num" aria-hidden="true">${i + 1}</span><div><h3><span class="sr">第 ${i + 1} 步：</span>${esc(t)}</h3><p>${esc(d)}</p></div></li>`).join('');
     $('footContact').textContent = catalog.contact_info && !/nccu_sa/i.test(catalog.contact_info) ? '聯絡我們：' + catalog.contact_info : '';
