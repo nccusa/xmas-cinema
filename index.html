@@ -158,6 +158,7 @@ body:has(#home.hidden) .fmark{color:var(--green)}
 .poster .soon .tw{fill:var(--gold-l);filter:drop-shadow(0 0 5px rgba(243,210,122,.8))}
 .poster .q{font-family:var(--num);font-weight:800;font-size:120px;line-height:1;color:var(--gold-l);text-shadow:0 0 30px rgba(243,210,122,.45)}
 .poster .soon b{font-size:20px}
+.poster .ptitle{font-family:var(--serif);font-weight:900;font-size:30px;line-height:1.35;letter-spacing:.06em;color:#FFF3D6;text-shadow:0 0 22px rgba(243,210,122,.45);text-align:center}
 .poster .soon span:last-child{font-size:13.5px;color:#B9C2B8}
 .film .title{font-size:24px;font-weight:700;margin:0 0 8px}
 .dl{list-style:none;padding:0;margin:24px 0 0;border-top:1px solid rgba(242,239,229,.16)}
@@ -774,8 +775,8 @@ body:has(#home.hidden) .flowtiles{display:block}
   <div class="flinks"><a href="https://www.instagram.com/nccu_sa/" target="_blank" rel="noopener" id="footIg"><span data-icon="camera"></span>IG @nccu_sa</a><span id="footContact"></span></div>
 </div></footer>
 
-<script src="assets/icons.js?v=20261120e"></script>
-<script src="assets/api.js?v=20261120e"></script>
+<script src="assets/icons.js?v=20261120f"></script>
+<script src="assets/api.js?v=20261120f"></script>
 <script>
 (function(){
   document.documentElement.classList.add('js');
@@ -907,6 +908,41 @@ body:has(#home.hidden) .flowtiles{display:block}
     an.onfinish = () => { dot.remove(); to.classList.remove('wiggle'); void to.offsetWidth; to.classList.add('wiggle'); };
   }
 
+  // 首頁文案：後台「首頁文案」有填就用後台的，沒填用這裡的預設
+  const COPY_DEFAULT = {
+    film_h: '即將上映', film_empty: '片名確定後，會公布在這裡和學生會 IG @nccu_sa。',
+    fee: '免費入場，餐點另外付',
+    food_h: '熱飲和三明治，報名時先訂', food_lede: '活動場地不能現場收錢，想吃東西的話，報名時一起點、一起轉帳。',
+    food_points: '兩家都是店家原價，沒有加價\n當天報到後，到取餐區領取\n不想吃東西，只報名也可以',
+    how_h: '怎麼報名',
+    s1_t: '報名，選好餐點', s1_d: '政大學生填學號；校外人士也可以報名。',
+    s2_t: '轉帳，備註填姓名', s2_d: '轉帳時在「備註」欄填你的姓名，確認入帳後會寄信通知。',
+    s3_t: '當天報到、取餐', s3_d: '政大學生帶學生證，校外人士出示付款完成信裡的 QR Code。',
+    faq_h: '常見問題', end_h: '', menu_lead: '兩家可以混著點。',
+    faq: [
+      ['付款後多久會收到確認？', '我們會定期核對入帳紀錄，大約 1 個工作天內寄出「付款完成」通知。轉帳後不需要回到網頁填資料。'],
+      ['可以幫朋友一起付款嗎？', '請不要。每個人用自己的帳戶轉自己的訂單，一筆訂單轉一次。代付或合併轉帳會讓我們很難核對，可能延誤確認，甚至被當成沒付款。'],
+      ['轉帳時忘了填備註怎麼辦？', '系統也會用報名時填的帳號後五碼和金額核對。超過 1 個工作天還沒收到確認，請私訊學生會，提供轉帳時間和後五碼。請不要重複轉帳。'],
+      ['校外人士可以參加嗎？', '可以。報名時選「校外人士」，不需要學號；轉帳時在備註欄填姓名，當天出示付款完成信裡的 QR Code 報到。'],
+      ['可以修改餐點嗎？', '送出前會再請你確認一次。送出後如果還沒付款，可以在訂單頁「取消這筆報名」再重新報名；付款後就不能修改或加訂。'],
+      ['下雨怎麼辦？要帶什麼？', '雨備方案還在確認，確定後會在學生會 IG 通知。晚上在戶外很冷，記得多帶一件外套。'],
+      ['可以取消或退費嗎？', '退費規則待公布。'],
+    ],
+  };
+  // 有些欄位清空就代表「不顯示」（例如費用說明），其他欄位清空就用預設
+  const COPY_OPTIONAL = ['fee', 'end_h'];
+  const cp = k => { const sc = (catalog && catalog.site_copy) || {}; if (!(k in sc)) return COPY_DEFAULT[k]; const v = sc[k];
+    if (Array.isArray(v)) return v.length ? v : COPY_DEFAULT[k]; const t = String(v || '').trim(); return t || COPY_OPTIONAL.includes(k) ? t : COPY_DEFAULT[k]; };
+  // 明體只載入用到的字；後台改了標題，就重新產生字集，避免缺字變成別的字型
+  function syncSerif(){
+    const link = document.querySelector('link[href*="Noto+Serif+TC"]'); if (!link) return;
+    const m = link.href.match(/text=([^&]+)/); const have = new Set(decodeURIComponent(m ? m[1] : ''));
+    const need = new Set(); document.querySelectorAll('.sec h2, .closing h2, .marquee h1, .program .no, .ticket .stamp, figcaption, .poster .ptitle').forEach(el => { for (const c of el.textContent) if (c.trim()) need.add(c); });
+    const miss = [...need].filter(c => !have.has(c)); if (!miss.length) return;
+    const all = [...new Set([...have, ...need])].join('');
+    link.href = link.href.replace(/text=[^&]+/, 'text=' + encodeURIComponent(all));
+  }
+
   // ---------- 狀態 ----------
   let catalog = null, step = 0, evDay = '12/9', evWk = '三'; const cart = {};
   // 暫存：填到一半的報名（24 小時）、這台裝置最近的訂單（方便回來看 QR Code）
@@ -970,13 +1006,13 @@ body:has(#home.hidden) .flowtiles{display:block}
   const real = v => v && !/待公布/.test(v);
   function renderHome(){
     const info = parseInfo(catalog.event_info);
-    if (real(info['日期'])) { const m = info['日期'].match(/(?:\d{4}\/)?(\d{1,2})\/(\d{1,2})/), w = info['日期'].match(/（(.)）/); if (m) { evDay = `${+m[1]}/${+m[2]}`; evWk = w ? w[1] : ''; $('evDate').querySelector('b').textContent = evDay; $('evDate').querySelector('.wk').textContent = evWk ? '週' + evWk : ''; $('hbarDate').textContent = `${evDay}${evWk ? `（${evWk}）` : ''}`; $('seeYou').textContent = `${evDay} 見`; } }
+    if (real(info['日期'])) { const m = info['日期'].match(/(?:\d{4}\/)?(\d{1,2})\/(\d{1,2})/), w = info['日期'].match(/（(.)）/); if (m) { evDay = `${+m[1]}/${+m[2]}`; evWk = w ? w[1] : ''; $('evDate').querySelector('b').textContent = evDay; $('evDate').querySelector('.wk').textContent = evWk ? '週' + evWk : ''; $('hbarDate').textContent = `${evDay}${evWk ? `（${evWk}）` : ''}`; $('seeYou').textContent = cp('end_h') || `${evDay} 見`; } }
     // 時間、地點確定了才顯示，不用口號填空位
     const tm = real(info['時間']) ? info['時間'] : '', place = real(info['地點']) ? info['地點'] : '';
     $('stubTime').textContent = tm ? `入場 ${tm}` : ''; $('stubTime').classList.toggle('hidden', !tm); $('evDate').querySelector('.cut').classList.toggle('hidden', !tm);
     $('showing').textContent = place ? `${evDay}${evWk ? `（${evWk}）` : ''}晚上　${place}` : ''; $('showing').classList.toggle('hidden', !place);
     startCountdown(info);
-    $('evMeta').innerHTML = `<li>${icon('clock')}${real(info['時間']) ? `<span>${esc(info['時間'])}</span>` : '<span class="tbd">時間待公布</span>'}</li><li>${icon('map-pin')}${real(info['地點']) ? `<span>${esc(info['地點'])}</span>` : '<span class="tbd">地點待公布</span>'}</li><li>${icon('ticket')}<span>免費入場，餐點另外付</span></li>`;
+    $('evMeta').innerHTML = `<li>${icon('clock')}${real(info['時間']) ? `<span>${esc(info['時間'])}</span>` : '<span class="tbd">時間待公布</span>'}</li><li>${icon('map-pin')}${real(info['地點']) ? `<span>${esc(info['地點'])}</span>` : '<span class="tbd">地點待公布</span>'}</li>${cp('fee') ? `<li>${icon('ticket')}<span>${esc(cp('fee'))}</span></li>` : ''}`;
     const now = new Date(); let note = '', can = false;
     if (!catalog.is_open && now < new Date(catalog.open_at)) note = `${fmtTime(catalog.open_at)} 開放報名`;
     else if (!catalog.is_open) note = '報名已截止。已經報名的人可以用 Email 裡的連結查詢訂單。';
@@ -986,27 +1022,25 @@ body:has(#home.hidden) .flowtiles{display:block}
     ['startBtn', 'startBtn2', 'hbarBtn'].forEach(id => { $(id).disabled = !can; $(id).innerHTML = icon('ticket') + '報名＋預訂餐點'; });
     canRegister = can;
     $('poster').classList.toggle('has', !!catalog.film_image_url); document.querySelector('.poster-wrap').classList.toggle('empty', !catalog.film_image_url); document.querySelector('.film').classList.toggle('nofilm', !catalog.film_image_url);
-    $('poster').innerHTML = catalog.film_image_url ? `<img src="${esc(catalog.film_image_url)}" alt="${esc(catalog.film_title || '電影海報')}">` : `<div class="soon"><svg viewBox="0 0 200 200" aria-hidden="true">${star(34, 30, 12, 5, 5, 'tw')}${star(168, 22, 8, 3.5, 5, 'tw')}${star(178, 186, 10, 4, 5, 'tw')}${star(20, 192, 6, 2.5, 5, 'tw')}</svg><span class="q">?</span><b>片單即將揭曉</b></div>`;
-    $('filmBody').innerHTML = catalog.film_title ? `<p class="title">${esc(catalog.film_title)}</p>${catalog.film_note ? `<p>${esc(catalog.film_note)}</p>` : ''}` : `<p class="muted">片名確定後，會公布在這裡和學生會 IG @nccu_sa。</p>`;
+    $('poster').innerHTML = catalog.film_image_url ? `<img src="${esc(catalog.film_image_url)}" alt="${esc(catalog.film_title || '電影海報')}">` : `<div class="soon"><svg viewBox="0 0 200 200" aria-hidden="true">${star(34, 30, 12, 5, 5, 'tw')}${star(168, 22, 8, 3.5, 5, 'tw')}${star(178, 186, 10, 4, 5, 'tw')}${star(20, 192, 6, 2.5, 5, 'tw')}</svg>${catalog.film_title ? `<b class="ptitle">${catalog.film_title.split(/[：:]/).map(esc).join('<br>')}</b>` : '<span class="q">?</span><b>片單即將揭曉</b>'}</div>`;
+    $('filmBody').innerHTML = catalog.film_title ? `<p class="title">${esc(catalog.film_title)}</p>${catalog.film_note ? `<p>${esc(catalog.film_note)}</p>` : ''}` : `<p class="muted">${esc(cp('film_empty'))}</p>`;
+    $('filmT').textContent = cp('film_h'); $('foodT').textContent = cp('food_h'); $('howT').textContent = cp('how_h'); $('faqT').textContent = cp('faq_h');
+    document.querySelector('.food-intro .lede').textContent = cp('food_lede');
+    document.querySelector('.foodfacts').innerHTML = String(cp('food_points')).split('\n').map(x => x.trim()).filter(Boolean).map((x, i) => `<li>${icon(['wallet', 'hand-platter', 'ticket', 'circle-check'][i] || 'circle-check')}<span>${esc(x)}</span></li>`).join('');
+    const ml = document.querySelector('#step1 .lead'); if (ml) ml.textContent = cp('menu_lead');
     // 日期、時間、地點已經在首屏，這裡只放注意事項（有填才顯示）
     $('facts').innerHTML = catalog.venue_note ? `<li>${icon('info')}<b>注意事項</b><span>${esc(catalog.venue_note)}</span></li>` : '';
     $('facts').classList.toggle('hidden', !catalog.venue_note);
     $('vlist').innerHTML = catalog.vendors.map(v => `<div class="vcard"><span class="ill">${illo(vIcon(v))}</span><div><b>${esc(v.name)}</b><span>${esc(v.items.slice(0, 4).map(i => i.name).join('、'))}${v.items.length > 4 ? ' 等' : ''}${v.items.length ? `・$${Math.min(...v.items.map(i => i.price))} 起` : ''}</span></div></div>`).join('') || '<p class="muted">餐點待公布</p>';
-    $('how').innerHTML = [['utensils-crossed', '報名，選好餐點', '政大學生填學號；校外人士也可以報名。'], ['wallet', '轉帳，備註填姓名', '轉帳時在「備註」欄填你的姓名，確認入帳後會寄信通知。'], ['ticket', '當天報到、取餐', '政大學生帶學生證，校外人士出示付款完成信裡的 QR Code。']]
-      .map(([ic, t, d], i) => `<li><span class="no num" aria-hidden="true">${i + 1}</span><div><h3><span class="sr">第 ${i + 1} 步：</span>${t}</h3><p>${d}</p></div></li>`).join('');
+    $('how').innerHTML = [1, 2, 3].map(i => [cp('s' + i + '_t'), cp('s' + i + '_d')])
+      .map(([t, d], i) => `<li><span class="no num" aria-hidden="true">${i + 1}</span><div><h3><span class="sr">第 ${i + 1} 步：</span>${esc(t)}</h3><p>${esc(d)}</p></div></li>`).join('');
     $('footContact').textContent = catalog.contact_info && !/nccu_sa/i.test(catalog.contact_info) ? '聯絡我們：' + catalog.contact_info : '';
     $('footIg').lastChild.textContent = catalog.contact_info && /私訊/.test(catalog.contact_info) ? 'IG @nccu_sa（有問題請私訊）' : 'IG @nccu_sa';
     $('privacyText').textContent = catalog.privacy_notice || '';
-    const faqs = [
-      ['付款後多久會收到確認？', '我們會定期核對入帳紀錄，大約 1 個工作天內寄出「付款完成」通知。轉帳後不需要回到網頁填資料。'],
-      ['可以幫朋友一起付款嗎？', '請不要。每個人用自己的帳戶轉自己的訂單，一筆訂單轉一次。代付或合併轉帳會讓我們很難核對，可能延誤確認，甚至被當成沒付款。'],
-      ['轉帳時忘了填備註怎麼辦？', '系統也會用報名時填的帳號後五碼和金額核對。超過 1 個工作天還沒收到確認，請私訊學生會，提供轉帳時間和後五碼。請不要重複轉帳。'],
-      ['校外人士可以參加嗎？', '可以。報名時選「校外人士」，不需要學號；轉帳時在備註欄填姓名，當天出示付款完成信裡的 QR Code 報到。'],
-      ['可以修改餐點嗎？', '送出前會再請你確認一次。送出後如果還沒付款，可以在訂單頁「取消這筆報名」再重新報名；付款後就不能修改或加訂。'],
-      ['下雨怎麼辦？要帶什麼？', '雨備方案還在確認，確定後會在學生會 IG 通知。晚上在戶外很冷，記得多帶一件外套。'],
-      ['可以取消或退費嗎？', '退費規則待公布。'],
-    ];
+    const faqs = cp('faq').filter(x => x && x[0]);
     $('faq').innerHTML = faqs.map(([q, a]) => `<details><summary>${esc(q)}${icon('chevron-down')}</summary><p>${esc(a)}</p></details>`).join('');
+    if (cp('end_h')) $('seeYou').textContent = cp('end_h');
+    syncSerif();
     if (catalog.test_mode) { $('testbar').innerHTML = icon('flask-conical') + '測試模式・不用真的轉帳<span class="long">：這裡的報名都是測試資料，付款可以直接模擬</span>'; $('testbar').classList.remove('hidden'); }
   }
 

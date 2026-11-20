@@ -288,6 +288,9 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
 .lastbatch b{display:block;font-family:var(--num);font-size:22px}.lastbatch span{font-size:12.5px;color:var(--dim)}
 .mitem td{vertical-align:middle}
 .editrow > td{background:var(--sunk)}
+.faqrow{display:flex;gap:8px;align-items:flex-start;padding:10px 0;border-bottom:1px dashed var(--rule)}.faqrow .grow{display:grid;gap:6px;min-width:0}.faqrow textarea{min-height:56px}
+.fqbtn{display:flex;flex-direction:column;gap:2px}
+.linkbtn{border:0;background:none;color:var(--green);text-decoration:underline;cursor:pointer;padding:4px 0}
 .egrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px 14px;align-items:start;padding:6px 0}
 .egrid .field{margin:0}.mitem .nm b{display:block}.mitem .nm small{color:var(--dim)}
 .mthumb{width:40px;height:40px;border-radius:9px;object-fit:cover;background:var(--sunk);display:grid;place-items:center;color:var(--dim)}
@@ -343,8 +346,8 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
 <div class="dialog" id="dialog" role="alertdialog" aria-modal="true"><div class="box" id="dialogBox"></div></div>
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
-<script src="assets/icons.js?v=20261120e"></script>
-<script src="assets/api.js?v=20261120e"></script>
+<script src="assets/icons.js?v=20261120f"></script>
+<script src="assets/api.js?v=20261120f"></script>
 <script>
 (function(){
   Api.storeKey = 'xc_admin_session';
@@ -357,6 +360,7 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
     ['recon', '對帳', 'landmark', '匯入郵局明細，處理對不上的款項'],
     ['mail', '信件', 'mail', '核准寄出、修改信件範本'],
     ['menu', '菜單', 'utensils-crossed', '店家、品項、價格、限量與上下架'],
+    ['copy', '首頁文案', 'pencil', '報名頁上的標題、說明、步驟和常見問題'],
     ['settings', '設定', 'settings', '活動資訊、報名時間、收款帳號'],
     ['staff', '工作人員', 'users', '誰可以登入後台和掃描頁'],
     ['test', '測試工具', 'flask-conical', '不用轉帳就能把整個流程跑一遍'],
@@ -448,7 +452,7 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
     document.querySelectorAll('#nav [data-v]').forEach(b => { if (b.dataset.v === v) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
     const p = PAGES.find(x => x[0] === v); $('pageTitle').textContent = p[1]; $('pageSub').textContent = p[3]; $('pageActs').innerHTML = '';
     closeDrawer();
-    ({ dash: renderDash, orders: renderOrders, recon: renderRecon, mail: renderMail, menu: renderMenu, settings: renderSettings, staff: renderStaff, test: renderTest })[v]();
+    ({ dash: renderDash, orders: renderOrders, recon: renderRecon, mail: renderMail, menu: renderMenu, copy: renderCopy, settings: renderSettings, staff: renderStaff, test: renderTest })[v]();
   }
   const page = () => $('page');
   function acts(html){ $('pageActs').innerHTML = html; }
@@ -991,6 +995,69 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
     </div></td></tr>`;
   }
 
+
+  // ---------- 首頁文案 ----------
+  // 預設文字和報名頁 index.html 的 COPY_DEFAULT 一樣（兩邊要一起改）。存的時候只存「和預設不同」的欄位。
+  const COPY_DEFAULT = {
+    film_h: '即將上映', film_empty: '片名確定後，會公布在這裡和學生會 IG @nccu_sa。',
+    fee: '免費入場，餐點另外付',
+    food_h: '熱飲和三明治，報名時先訂', food_lede: '活動場地不能現場收錢，想吃東西的話，報名時一起點、一起轉帳。',
+    food_points: '兩家都是店家原價，沒有加價\n當天報到後，到取餐區領取\n不想吃東西，只報名也可以',
+    how_h: '怎麼報名',
+    s1_t: '報名，選好餐點', s1_d: '政大學生填學號；校外人士也可以報名。',
+    s2_t: '轉帳，備註填姓名', s2_d: '轉帳時在「備註」欄填你的姓名，確認入帳後會寄信通知。',
+    s3_t: '當天報到、取餐', s3_d: '政大學生帶學生證，校外人士出示付款完成信裡的 QR Code。',
+    faq_h: '常見問題', end_h: '', menu_lead: '兩家可以混著點。',
+    faq: [
+      ['付款後多久會收到確認？', '我們會定期核對入帳紀錄，大約 1 個工作天內寄出「付款完成」通知。轉帳後不需要回到網頁填資料。'],
+      ['可以幫朋友一起付款嗎？', '請不要。每個人用自己的帳戶轉自己的訂單，一筆訂單轉一次。代付或合併轉帳會讓我們很難核對，可能延誤確認，甚至被當成沒付款。'],
+      ['轉帳時忘了填備註怎麼辦？', '系統也會用報名時填的帳號後五碼和金額核對。超過 1 個工作天還沒收到確認，請私訊學生會，提供轉帳時間和後五碼。請不要重複轉帳。'],
+      ['校外人士可以參加嗎？', '可以。報名時選「校外人士」，不需要學號；轉帳時在備註欄填姓名，當天出示付款完成信裡的 QR Code 報到。'],
+      ['可以修改餐點嗎？', '送出前會再請你確認一次。送出後如果還沒付款，可以在訂單頁「取消這筆報名」再重新報名；付款後就不能修改或加訂。'],
+      ['下雨怎麼辦？要帶什麼？', '雨備方案還在確認，確定後會在學生會 IG 通知。晚上在戶外很冷，記得多帶一件外套。'],
+      ['可以取消或退費嗎？', '退費規則待公布。'],
+    ],
+  };
+  const COPY_FIELDS = [
+    ['電影區', [['film_h', '標題'], ['film_empty', '片名還沒填時顯示的文字', 'textarea']]],
+    ['首屏', [['fee', '費用說明（時間地點下面那行，空白就不顯示）']]],
+    ['餐點區', [['food_h', '標題'], ['food_lede', '說明', 'textarea'], ['food_points', '重點（一行一點）', 'textarea'], ['menu_lead', '選餐頁開頭那句']]],
+    ['報名方式', [['how_h', '標題'], ['s1_t', '第 1 步標題'], ['s1_d', '第 1 步說明'], ['s2_t', '第 2 步標題'], ['s2_d', '第 2 步說明'], ['s3_t', '第 3 步標題'], ['s3_d', '第 3 步說明']]],
+    ['常見問題與結尾', [['faq_h', '常見問題標題'], ['end_h', '結尾標題（空白＝自動顯示「日期 見」）']]],
+  ];
+  function renderCopy(){
+    const sc = settings.site_copy || {};
+    const val = k => (k in sc && (sc[k] !== '' || ['fee', 'end_h'].includes(k)) ? sc[k] : COPY_DEFAULT[k]);
+    const faqs = Array.isArray(sc.faq) && sc.faq.length ? sc.faq : COPY_DEFAULT.faq;
+    acts(`<a class="btn sec" href="./" target="_blank" rel="noopener">${icon('external-link')}看報名頁</a>`);
+    const fld = ([k, label, type]) => `<label class="field"><span>${label}${sc[k] != null && sc[k] !== '' && sc[k] !== COPY_DEFAULT[k] ? ' <span class="badge b-info flat">已修改</span>' : ''}</span>${type === 'textarea' ? `<textarea data-c="${k}" rows="3">${esc(val(k))}</textarea>` : `<input data-c="${k}" value="${esc(val(k))}">`}<button type="button" class="linkbtn small" data-reset="${k}">恢復預設</button></label>`;
+    page().innerHTML = `
+      <div class="note caution">${icon('triangle-alert')}<span>這裡的文字會直接顯示在公開的報名頁上，所有人都看得到。儲存後重新整理報名頁就會更新。</span></div>
+      ${COPY_FIELDS.map(([t, fs]) => `<div class="card"><h2>${esc(t)}</h2>${fs.map(fld).join('')}</div>`).join('')}
+      <div class="card"><h2>常見問題</h2><p>可以新增、刪除、調整順序。</p><div id="faqEd">${faqs.map(([q, a], i) => faqRow(q, a, i, faqs.length)).join('')}</div>
+        <button class="btn sec sm" type="button" id="faqAdd">${icon('plus')}新增一題</button>
+        <button class="linkbtn small" type="button" id="faqReset" style="margin-left:12px">常見問題恢復預設</button></div>
+      <div class="savebar"><button class="btn" type="button" id="saveC">${icon('check')}儲存首頁文案</button></div>`;
+    page().onclick = e => {
+      const r = e.target.closest('[data-reset]'); if (r) { const el = page().querySelector(`[data-c="${r.dataset.reset}"]`); el.value = COPY_DEFAULT[r.dataset.reset]; el.focus(); return; }
+      if (e.target.closest('#faqAdd')) { const box = $('faqEd'); box.insertAdjacentHTML('beforeend', faqRow('', '', box.children.length, box.children.length + 1)); box.lastElementChild.querySelector('input').focus(); return; }
+      if (e.target.closest('#faqReset')) { $('faqEd').innerHTML = COPY_DEFAULT.faq.map(([q, a], i) => faqRow(q, a, i, COPY_DEFAULT.faq.length)).join(''); return; }
+      const fb = e.target.closest('[data-fq]'); if (fb) { const row = fb.closest('.faqrow'), box = $('faqEd');
+        if (fb.dataset.fq === 'del') row.remove(); else if (fb.dataset.fq === 'up' && row.previousElementSibling) box.insertBefore(row, row.previousElementSibling); else if (fb.dataset.fq === 'down' && row.nextElementSibling) box.insertBefore(row.nextElementSibling, row); return; }
+    };
+    $('saveC').onclick = e => busy(e.currentTarget, async () => {
+      const out = {};
+      page().querySelectorAll('[data-c]').forEach(el => { const v = el.value.trim(); if (v !== COPY_DEFAULT[el.dataset.c]) out[el.dataset.c] = v; });
+      const fq = [...$('faqEd').querySelectorAll('.faqrow')].map(r => [r.querySelector('[data-fqq]').value.trim(), r.querySelector('[data-fqa]').value.trim()]).filter(([q]) => q);
+      if (JSON.stringify(fq) !== JSON.stringify(COPY_DEFAULT.faq)) out.faq = fq;
+      await run(() => Api.patch('settings', 'id=eq.1', { site_copy: out, updated_at: new Date().toISOString() }), '首頁文案已儲存'); await loadAll(); renderCopy();
+    });
+  }
+  function faqRow(q, a){
+    return `<div class="faqrow"><div class="grow"><input class="in" data-fqq value="${esc(q)}" placeholder="問題" aria-label="問題"><textarea class="in" data-fqa rows="2" placeholder="回答" aria-label="回答">${esc(a)}</textarea></div>
+      <div class="fqbtn"><button class="btn quiet sm" type="button" data-fq="up" aria-label="往上">${icon('chevron-up')}</button><button class="btn quiet sm" type="button" data-fq="down" aria-label="往下">${icon('chevron-down')}</button><button class="btn quiet sm" type="button" data-fq="del" aria-label="刪除這題">${icon('trash-2')}</button></div></div>`;
+  }
+
   // ---------- 設定 ----------
   // 活動資訊存成一行文字（報名頁、信件都用這個格式）；後台拆成日期、時間、地點三格
   function parseEventInfo(t){
@@ -1017,7 +1084,7 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
           <label class="field"><span>地點</span><input id="evP" value="${esc(evParts.place)}" placeholder="還沒定就留空"></label>
         </div>
         <p class="small muted" style="margin:-4px 0 12px">留空的欄位，報名頁會顯示「待公布」。</p>
-        <div class="grid2">${f('film_title', '放映電影片名', 'text', '還沒確定可以先空白，首頁會顯示「片單待公布」')}${f('film_image_url', '電影海報或場地照片網址', 'text', '需要取得放映與圖片使用授權')}</div>
+        <div class="grid2">${f('film_title', '放映電影片名', 'text', '還沒確定可以先空白，首頁會顯示「片單待公布」')}<div><label class="field"><span>電影海報</span><input data-s="film_image_url" value="${esc(s.film_image_url || '')}" placeholder="上傳或貼上圖片網址"></label><div class="row" style="margin:-6px 0 12px"><label class="btn sec sm">${icon('upload')}上傳海報<input type="file" accept="image/*" id="posterUp" hidden></label>${s.film_image_url ? `<img src="${esc(s.film_image_url)}" alt="" style="height:56px;border-radius:6px">` : ''}<span class="small muted">海報是片商的著作，請先確認公播授權包含宣傳使用。</span></div></div></div>
         ${f('film_note', '電影介紹', 'textarea')}${f('venue_note', '現場說明（座位、自備物品、雨備）', 'textarea')}${f('pickup_note', '取餐說明（顯示在選餐頁）', 'textarea', '例如：開演前 30 分鐘在草坪入口取餐，熱飲現場製作。空白時會顯示預設說明。')}</div>
       <div class="card"><h2>${icon('calendar')}報名與名額</h2>
         <div class="grid2">${f('registration_open_at', '開放報名時間（台北時間）', 'datetime-local')}${f('registration_close_at', '報名截止時間', 'datetime-local')}${f('payment_deadline', '付款期限（新報名的預設值）', 'datetime-local', '改這裡不會影響已經報名的人；個別延長請到「訂單」')}${f('capacity', '名額上限', 'number')}</div></div>
@@ -1026,6 +1093,8 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
       <div class="card"><h2>${icon('mail')}信件與其他</h2>
         <div class="grid2">${f('contact_info', '聯絡方式')}${f('site_url', '報名頁網址', 'text', '信件裡的查詢連結會用到')}${f('email_cap_24h', '每 24 小時寄信上限', 'number', '一般 Gmail 上限是 500，建議 450')}</div>${f('privacy_notice', '個人資料蒐集告知', 'textarea')}</div>
       <div class="savebar"><button class="btn" type="button" id="saveS">${icon('check')}儲存設定</button></div>`;
+    $('posterUp').onchange = async e => { const f0 = e.target.files[0]; if (!f0) return; const lab = e.target.closest('label'); lab.classList.add('busy');
+      try { const url = await Api.upload('poster/' + Date.now().toString(36) + '.jpg', await shrink(f0)); page().querySelector('[data-s="film_image_url"]').value = url; toast('海報已上傳，記得按「儲存設定」'); } catch (er) { toast('上傳失敗：' + er.message, 'err'); } finally { lab.classList.remove('busy'); e.target.value = ''; } };
     $('saveS').onclick = e => busy(e.currentTarget, async () => {
       const p = { event_info: buildEventInfo($('evD').value, $('evT').value, $('evP').value) }; page().querySelectorAll('[data-s]').forEach(el => { const k = el.dataset.s; p[k] = el.type === 'datetime-local' ? fromLocalInput(el.value) : el.type === 'number' ? parseInt(el.value, 10) : el.value.trim(); });
       if (p.qr_image_url === '') p.qr_image_url = null; if (p.film_image_url === '') p.film_image_url = null;

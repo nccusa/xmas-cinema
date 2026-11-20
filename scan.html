@@ -267,9 +267,9 @@ button{font:inherit;color:inherit}
   <button class="primary" type="button" id="iosOk">知道了</button>
 </section>
 
-<script src="assets/vendor/barcode-detector.js?v=20261120e"></script>
-<script src="assets/icons.js?v=20261120e"></script>
-<script src="assets/api.js?v=20261120e"></script>
+<script src="assets/vendor/barcode-detector.js?v=20261120f"></script>
+<script src="assets/icons.js?v=20261120f"></script>
+<script src="assets/api.js?v=20261120f"></script>
 <script>
 (function(){
   Api.storeKey = 'xc_staff_session';
@@ -347,7 +347,7 @@ button{font:inherit;color:inherit}
     const api = window.BarcodeDetectionAPI;
     if (!api) throw new Error('掃描程式沒有載入，請重新整理');
     if (!zxPrepared) {
-      api.prepareZXingModule({ overrides: { locateFile: (path, prefix) => path.endsWith('.wasm') ? new URL('assets/vendor/zxing_reader.wasm?v=20261120e', location.href).href : prefix + path }, fireImmediately: true });
+      api.prepareZXingModule({ overrides: { locateFile: (path, prefix) => path.endsWith('.wasm') ? new URL('assets/vendor/zxing_reader.wasm?v=20261120f', location.href).href : prefix + path }, fireImmediately: true });
       zxPrepared = true;
     }
     return new api.BarcodeDetector({ formats: want });
