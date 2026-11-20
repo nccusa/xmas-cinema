@@ -852,6 +852,15 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
 
   // ---------- 信件 ----------
   let mailTab = 'pending_approval', mailView = 'queue';
+  const MAIL_TAB_HELP = {
+    pending_approval: '付款完成信、延長期限信要你看過才寄。勾選後按「核准寄出」。',
+    approved: '已核准，排隊中，5 分鐘內會寄出。',
+    sent: '已經寄到對方信箱。',
+    failed: 'Gmail 沒寄成功（原因寫在紅字）。處理後勾選按「重新寄送」。',
+    blocked: '系統發現這封信有問題，先攔下沒寄（原因寫在紅字）。照原因修好後，勾選按「重新產生」；不需要的信可以作廢。',
+    cancelled: '已作廢，不會寄出。如果是誤作廢，勾選後按「重新產生」。'
+  };
+  const MAIL_ACTIONS = { pending_approval: ['cancel', 'approve'], failed: ['cancel', 'retry'], blocked: ['cancel', 'rerender'], cancelled: ['rerender'] };
   const VARS = ['姓名','學號','附言代碼','身分','訂單編號','餐點明細','總金額','已付金額','付款期限','收款銀行','收款帳號','戶名','查詢連結','活動名稱','活動資訊','聯絡方式'];
   async function renderMail(){
     page().innerHTML = `<div class="card empty">${icon('loader-circle', 'spin')}載入中…</div>`;
@@ -865,17 +874,17 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
     const lbl = Object.fromEntries(tpls.map(t => [t.key, t.label]));
     const isTest = id => { const r = regs.find(x => x.id === id); return r && r.is_test; };
     page().innerHTML = `
-      <div class="note info">${icon('info')}<span>寄信程式還沒啟用（等 Gmail 授權設定完成）。在那之前，核准的信只會排在佇列裡，不會真的寄出。</span></div>
+      <div class="note info">${icon('info')}<span>系統每 5 分鐘從 nccusa.info@gmail.com 寄出「等待寄出」的信。報名成功信會自動寄；付款完成、延長期限信要你核准才寄。寄信失敗會通知到 Discord 監控頻道。</span></div>
       <div class="seg" role="tablist" aria-label="信件" style="margin-bottom:14px"><button type="button" data-mv="queue" aria-pressed="${mailView === 'queue'}">${icon('inbox')}寄送佇列<span class="c">${(counts.pending_approval || 0) + (counts.failed || 0) + (counts.blocked || 0)}</span></button><button type="button" data-mv="tpl" aria-pressed="${mailView === 'tpl'}">${icon('pencil')}信件範本<span class="c">${tpls.filter(t => !(t.approved_at && t.enabled)).length}</span></button></div>
       <div class="card ${mailView === 'queue' ? '' : 'hidden'}"><h2>${icon('inbox')}信件佇列</h2>
         <div class="seg" role="group" aria-label="信件狀態" style="margin:8px 0 14px">${tabs.map(([k, v]) => `<button type="button" data-mt="${k}" aria-pressed="${mailTab === k}">${v}<span class="c">${counts[k] || 0}</span></button>`).join('')}</div>
-        ${list.length && ['pending_approval', 'failed', 'blocked'].includes(mailTab) ? `<div class="row" style="margin-bottom:10px"><label class="row small"><input type="checkbox" id="mAll">全選</label><span class="grow"></span><button class="btn sec sm" type="button" id="mCancel">取消選取的信</button>${mailTab !== 'blocked' ? `<button class="btn sm" type="button" id="mApprove">${icon('send')}${mailTab === 'failed' ? '重新寄送' : '核准寄出'}</button>` : ''}</div>` : ''}
-        ${mailTab === 'blocked' && list.length ? '<div class="note caution">' + icon('triangle-alert') + '<span>被擋下通常是信件裡還有變數沒代入（例如沒設定報名頁網址），或 Email 格式錯誤。修正後取消這些信，系統下次會重新產生。</span></div>' : ''}
-        ${list.length ? `<div class="tblwrap"><table class="tbl"><thead><tr><th></th><th>類型</th><th>收件人</th><th>主旨</th><th>時間</th></tr></thead><tbody>
-        ${list.map(q => `<tr><td><input type="checkbox" data-q="${q.id}" aria-label="選取"></td><td class="small">${esc(lbl[q.template_key] || q.template_key)}${isTest(q.registration_id) ? ' <span class="mini test">測試</span>' : ''}</td><td>${esc(q.to_email)}</td><td><details><summary>${esc(q.subject)}</summary><pre class="mail">${esc(q.body)}</pre>${q.error ? `<div class="small" style="color:var(--crit)">${esc(q.error)}</div>` : ''}</details></td><td class="small muted">${esc(fmtTime(q.sent_at || q.created_at))}</td></tr>`).join('')}
+        <p class="small muted" style="margin:-4px 0 12px">${esc(MAIL_TAB_HELP[mailTab] || '')}</p>
+        ${list.length && MAIL_ACTIONS[mailTab] ? `<div class="row" style="margin-bottom:10px"><label class="row small"><input type="checkbox" id="mAll">全選</label><span class="small muted" id="mSel"></span><span class="grow"></span>${MAIL_ACTIONS[mailTab].map(a => `<button class="btn ${a === 'cancel' ? 'sec' : ''} sm" type="button" data-ma="${a}">${a === 'approve' ? icon('send') + '核准寄出' : a === 'retry' ? icon('send') + '重新寄送' : a === 'rerender' ? icon('refresh-cw') + '重新產生' : '作廢'}</button>`).join('')}</div>` : ''}
+        ${list.length ? `<div class="tblwrap"><table class="tbl"><thead><tr>${MAIL_ACTIONS[mailTab] ? '<th></th>' : ''}<th>類型</th><th>收件人</th><th>主旨</th><th>時間</th></tr></thead><tbody>
+        ${list.map(q => `<tr>${MAIL_ACTIONS[mailTab] ? `<td><input type="checkbox" data-q="${q.id}" aria-label="選取"></td>` : ''}<td class="small">${esc(lbl[q.template_key] || q.template_key)}${isTest(q.registration_id) ? ' <span class="mini test">測試</span>' : ''}</td><td>${esc(q.to_email)}</td><td>${q.error && ['blocked', 'failed'].includes(q.status) ? `<div class="small" style="color:var(--crit);margin-bottom:4px">${icon('triangle-alert')}${esc(q.error)}</div>` : ''}<details><summary>${esc(q.subject)}</summary><pre class="mail">${esc(q.body)}</pre></details></td><td class="small muted">${esc(fmtTime(q.sent_at || q.created_at))}</td></tr>`).join('')}
         </tbody></table></div>` : `<div class="empty">${icon('mail-check')}這個分類沒有信件</div>`}
       </div>
-      <div class="card ${mailView === 'tpl' ? '' : 'hidden'}"><h2>${icon('pencil')}信件範本</h2><p>修改後要按「核准並啟用」才會使用新的內容。點下面的變數，可以插入到內文游標的位置。</p>
+      <div class="card ${mailView === 'tpl' ? '' : 'hidden'}"><h2>${icon('pencil')}信件範本</h2><p>修改後要按「核准並啟用」才會使用新的內容；核准前，這個範本要寄的信會先保留在「被擋下」，核准後自動重新產生。變數一定要用下面的按鈕插入，自己打的名稱系統認不得。</p>
         <div class="vars">${VARS.map(v => `<button type="button" data-var="${v}">{{${v}}}</button>`).join('')}</div>
         ${tpls.map(t => `<div class="card" style="background:var(--sunk)" data-tpl="${t.key}">
           <div class="row"><h3 class="grow" style="margin:0;font-size:15px">${esc(t.label)}</h3><span class="badge ${t.approved_at && t.enabled ? 'b-ok' : 'b-caution'}">${t.approved_at && t.enabled ? '已核准・啟用中' : t.approved_at ? '已核准・停用中' : '尚未核准'}</span></div>
@@ -890,13 +899,22 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
       const mv = e.target.closest('[data-mv]'); if (mv) { mailView = mv.dataset.mv; return renderMail(); }
       const mt = e.target.closest('[data-mt]'); if (mt) { mailTab = mt.dataset.mt; return renderMail(); }
       const vv = e.target.closest('[data-var]'); if (vv && lastTa) { const s = lastTa.selectionStart, v = '{{' + vv.dataset.var + '}}'; lastTa.value = lastTa.value.slice(0, s) + v + lastTa.value.slice(lastTa.selectionEnd); lastTa.focus(); lastTa.selectionStart = lastTa.selectionEnd = s + v.length; return; }
-      if (e.target.id === 'mAll') { page().querySelectorAll('[data-q]').forEach(c => c.checked = e.target.checked); return; }
+      if (e.target.id === 'mAll') { page().querySelectorAll('[data-q]').forEach(c => c.checked = e.target.checked); }
+      if (e.target.matches('[data-q], #mAll')) { const n = page().querySelectorAll('[data-q]:checked').length; document.getElementById('mSel').textContent = n ? `已選 ${n} 封` : ''; return; }
       const ids = [...page().querySelectorAll('[data-q]:checked')].map(c => c.dataset.q);
       const b = e.target.closest('button');
-      if (b && b.id === 'mApprove') { if (!ids.length) return toast('請先勾選信件', 'err'); if (!(await ask({ title: `核准 ${ids.length} 封信寄出？`, ok: '核准寄出' }))) return; await run(() => Api.rpc('admin_set_email_status', { p_ids: ids, p_status: 'approved' }), '已核准'); await loadAll(); return renderMail(); }
-      if (b && b.id === 'mCancel') { if (!ids.length) return toast('請先勾選信件', 'err'); if (!(await ask({ title: `取消 ${ids.length} 封信？`, ok: '取消這些信', danger: true, cancel: '先不要' }))) return; await run(() => Api.rpc('admin_set_email_status', { p_ids: ids, p_status: 'cancelled' }), '已取消'); await loadAll(); return renderMail(); }
+      const ma = b && b.dataset.ma;
+      if (ma) {
+        if (!ids.length) return toast('請先勾選左邊的方框，選要處理的信', 'err');
+        if (ma === 'approve' || ma === 'retry') { if (!(await ask({ title: `${ma === 'retry' ? '重新寄送' : '核准寄出'} ${ids.length} 封信？`, body: '5 分鐘內會從學生會信箱寄出，寄出後無法收回。', ok: ma === 'retry' ? '重新寄送' : '核准寄出' }))) return; await run(() => Api.rpc('admin_set_email_status', { p_ids: ids, p_status: 'approved' }), '已核准，5 分鐘內寄出'); }
+        if (ma === 'cancel') { if (!(await ask({ title: `作廢 ${ids.length} 封信？`, body: '作廢的信不會寄出。之後想寄，可以到「已取消」勾選後按「重新產生」。', ok: '作廢', danger: true, cancel: '先不要' }))) return; await run(() => Api.rpc('admin_set_email_status', { p_ids: ids, p_status: 'cancelled' }), '已作廢'); }
+        if (ma === 'rerender') { const res = await run(() => Api.rpc('admin_rerender_emails', { p_ids: ids })); if (res) toast(`重新產生 ${res.ok} 封${res.blocked ? `，${res.blocked} 封還是有問題（看紅字原因）` : ''}${res.skipped ? `，${res.skipped} 封略過（訂單已取消或已有同一封信）` : ''}`, res.blocked ? 'err' : 'ok'); }
+        await loadAll(); return renderMail();
+      }
       const box = e.target.closest('[data-tpl]'); const act = b && b.dataset.act; if (!box || !act) return;
       const key = box.dataset.tpl, subject = box.querySelector('[data-f="subject"]').value, body = box.querySelector('[data-f="body"]').value;
+      const bad = [...new Set([...(subject + body).matchAll(/\{\{([^}]*)\}\}/g)].map(m => m[1]).filter(v => !VARS.includes(v)))];
+      if ((act === 'save' || act === 'approve') && bad.length) return toast(`範本裡有不存在的變數：${bad.map(v => '{{' + v + '}}').join('、')}。請刪掉，改用上方的變數按鈕插入。`, 'err');
       if (act === 'save') { await run(() => Api.patch('email_templates', 'key=eq.' + encodeURIComponent(key), { subject, body }), '已儲存，記得重新核准'); return renderMail(); }
       if (act === 'preview') { const r = regs[0]; if (!r) return toast('還沒有訂單可以預覽', 'err'); const p = await run(() => Api.rpc('admin_preview_email', { p_key: key, p_reg: r.id })); box.querySelector('[data-out]').innerHTML = `<p class="small muted" style="margin:12px 0 0">用 ${esc(r.order_no)} ${esc(r.name)} 預覽（還沒儲存的修改不會出現）：</p><pre class="mail"><b>${esc(p.subject)}</b>\n\n${esc(p.body)}</pre>`; return; }
       if (act === 'approve') { if (!(await ask({ title: '核准這個範本？', body: '核准後就會用它寄信給報名的人。請確認內容沒問題。', ok: '核准並啟用' }))) return; await run(() => Api.patch('email_templates', 'key=eq.' + encodeURIComponent(key), { subject, body })); await run(() => Api.rpc('admin_approve_template', { p_key: key }), '已核准啟用'); return renderMail(); }

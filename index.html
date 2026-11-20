@@ -369,6 +369,7 @@ fieldset.field{border:none;margin:0 0 22px;padding:0}
 .memo{margin:22px 0;padding:16px 18px;border-radius:var(--rc);background:var(--white);border:1px solid var(--line);box-shadow:inset 5px 0 0 var(--red)}
 .memo .k{display:flex;align-items:center;gap:8px;font-weight:700}
 .memo .k .i{color:var(--redtext)}
+.memo .small-note{font-size:14px;color:var(--muted,#5b6560);margin-top:6px}
 .memo .row{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:4px}
 .memo .v{font-family:var(--num);font-weight:800;font-size:32px;letter-spacing:.04em}
 .memo p{margin:2px 0 0;font-size:14px;color:var(--muted)}
@@ -1338,10 +1339,21 @@ body:has(#home.hidden) .flowtiles{display:block}
   // ---------- 轉帳 ----------
   const itemsRows = items => items.length ? items.map(i => `<div class="rw"><span>${esc(i.name)} × ${esc(i.qty)}<div class="s">${esc(i.vendor)}</div></span><span class="num">$${i.price * i.qty}</span></div>`).join('') : '<div class="rw"><span>不點餐，只報名活動</span><span></span></div>';
   const copyBtn = (v, label) => `<button type="button" class="copy" data-copy="${esc(v)}">${icon('copy')}複製<span class="sr">${label}</span></button>`;
+  // 台灣 Pay／TWQR 轉帳碼：帶入收款銀行與帳號（部分銀行也會帶入金額）。不需要郵局 App 產生的臨時碼。
+  function payQr(r){
+    try {
+      const acct = String(r.account_no || '').replace(/\D/g, ''), bank = String(r.bank_code || '').replace(/\D/g, '');
+      if (!window.qrcode || !acct || !bank) return '';
+      const raw = `TWQRP://${r.bank_name || '轉帳'}/158/02/V1?D5=${bank}&D6=${acct.padStart(16, '0')}&D10=901${r.total_amount > 0 ? `&D1=${r.total_amount * 100}` : ''}`;
+      const q = qrcode(0, 'M'); q.addData(encodeURIComponent(raw).replace(/%[0-9A-F]{2}/g, m => m.toLowerCase())); q.make();
+      return q.createDataURL(6, 3);
+    } catch (e) { return ''; }
+  }
   function renderPayment(el, r, fresh){
     if (r.status !== 'pending_payment') return renderTicket(el, r, fresh);
     const late = new Date(r.payment_deadline) < new Date();
-    const tab = isMobile || !r.qr_image_url ? 'copy' : 'qr';
+    const twqr = payQr(r);
+    const tab = isMobile || !(r.qr_image_url || twqr) ? 'copy' : 'qr';
     const link = location.origin + location.pathname + '?t=' + r.lookup_token;
     const guest = r.participant_type === 'guest';
     el.innerHTML = `
@@ -1351,6 +1363,7 @@ body:has(#home.hidden) .flowtiles{display:block}
       ${!fresh && !late ? '<p class="muted">已經轉帳的話，系統大約 1 個工作天內會更新，請不要重複付款。</p>' : ''}
       <div class="pay-amount"><span class="sr">應付金額</span><span class="num">${money(r.total_amount)}</span></div>
       ${late ? '' : `<p class="pay-deadline">${icon('clock')}請在 ${esc(fmtTime(r.payment_deadline))} 前，轉帳剛好這個金額</p>`}
+      <div class="memo"><div class="k">${icon('triangle-alert')}轉帳時，請在「備註」欄填你的姓名</div><div class="row"><span class="v">${esc(r.name)}</span>${copyBtn(r.name, '轉帳備註')}</div><p>沒填的話我們很難確認是你付的款。銀行 App 裡可能叫「備註」「附言」「轉帳說明」或「給收款人的訊息」，填其中一格就好；名字太長填不下，改填訂單編號 <b class="num">${esc(r.order_no)}</b>。</p><p class="small-note"><b>請用自己的帳戶轉自己的訂單，一筆訂單轉一次</b>，不要幫別人付或合併轉帳。</p></div>
       ${r.is_test && r.test_mode ? `<div class="testpay"><b>${icon('flask-conical')}測試模式</b><p>這是測試訂單，不用真的轉帳。按下去就會變成「已付款」，可以接著測報到和取餐。</p><button class="btn" type="button" id="testPay">${icon('circle-check')}模擬已付款</button></div>` : ''}
       <div class="method" role="tablist" aria-label="轉帳方式">
         <button type="button" role="tab" id="tb_copy" aria-controls="pn_copy" aria-selected="${tab === 'copy'}">${icon('copy')}複製帳號</button>
@@ -1362,10 +1375,9 @@ body:has(#home.hidden) .flowtiles{display:block}
         <div class="r"><span class="k">戶名</span><span class="v t">${esc(r.account_name)}</span><span></span></div>
       </div></div>
       <div role="tabpanel" id="pn_qr" aria-labelledby="tb_qr" class="${tab === 'qr' ? '' : 'hidden'}"><div class="qrbox">
-        ${r.qr_image_url ? `<img src="${esc(r.qr_image_url)}" alt="學生會收款 QR Code">` : '<p>收款 QR Code 還沒設定，請改用「複製帳號」。</p>'}
-        <p>用另一支手機掃描；同一支手機請長按圖片儲存，再到銀行 App 從相簿匯入。掃碼只會帶入帳號，金額和備註要自己填。</p>
+        ${r.qr_image_url ? `<img src="${esc(r.qr_image_url)}" alt="收款帳號 QR Code">` : twqr ? `<img src="${twqr}" alt="收款帳號 QR Code" width="220" height="220">` : '<p>收款 QR Code 還沒設定，請改用「複製帳號」。</p>'}
+        <p>用銀行 App 的「掃碼轉帳」掃描；同一支手機請長按圖片儲存，再到銀行 App 從相簿匯入。<b>掃碼通常只會帶入帳號，金額 ${money(r.total_amount)} 和備註「${esc(r.name)}」請自己填。</b></p>
       </div></div>
-      <div class="memo"><div class="k">${icon('triangle-alert')}轉帳時，請在「備註」欄填你的姓名</div><div class="row"><span class="v">${esc(r.name)}</span>${copyBtn(r.name, '轉帳備註')}</div><p>我們靠備註和金額確認是你付的款。每家銀行 App 的叫法不一樣，可能是「備註」「附言」「轉帳說明」或「給收款人的訊息」，填在其中一格就可以。名字太長填不下的話，可以改填訂單編號 <b class="num">${esc(r.order_no)}</b>。</p><p><b>請用自己的帳戶轉自己的訂單，一筆訂單轉一次。</b>不要幫別人付款或把多人的錢合併轉帳，我們會很難核對，可能延誤確認。</p></div>
       <ol class="after">
         <li><span class="ic">${icon('send')}</span><div><b>轉帳，記得填備註</b><span>轉完就好，不用回到這個頁面回報。</span></div></li>
         <li><span class="ic">${icon('mail-check')}</span><div><b>收到「付款完成」信</b><span>我們核對入帳後（大約 1 個工作天）寄到你的 Email${guest ? '，信裡有報到用的 QR Code' : ''}。</span></div></li>
