@@ -88,6 +88,16 @@ button{font:inherit;color:inherit}
 .cam .msg .i{width:28px;height:28px}
 .cam .pill{position:absolute;left:10px;bottom:10px;display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:rgba(15,27,23,.72);font-size:12.5px;color:var(--cream)}
 .cam .torch{position:absolute;right:10px;bottom:10px}
+.cam{transition:height .22s ease}
+/* 讀到人之後：鏡頭縮成一條，把空間讓給結果 */
+.camhold{position:absolute;inset:0;display:none;align-items:center;gap:10px;padding:8px 8px 8px 14px;background:rgba(15,27,23,.92);font-size:14px;color:var(--dim)}
+.camhold .i{width:18px;height:18px;color:var(--gold)}
+.camhold .t{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.camhold button{min-height:40px;padding:0 14px;border-radius:10px;border:1px solid var(--rule);background:var(--deck);color:var(--cream);font-weight:700;display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.stage.reading .camhold{display:flex}
+.stage.reading .cam .pill,.stage.reading .cam .torch,.stage.reading .cam .sweep,.stage.reading .cam .frame,.stage.reading .cam .msg{display:none}
+.stage.reading .cam{aspect-ratio:auto;height:56px;max-height:none}
+.stage.reading .cam video{opacity:.35}
 
 /* 結果面板：整塊換色 */
 .panel{position:relative;border-radius:20px;background:var(--deck);padding:18px 18px 20px;overflow:auto;min-height:0;transition:background-color .18s}
@@ -115,6 +125,28 @@ button{font:inherit;color:inherit}
 .warn .hint{background:rgba(36,24,0,.1)}
 .hint .i{margin-top:2px}
 .idcheck{margin-top:12px;font-size:14px;opacity:.85;display:flex;gap:8px;align-items:center}
+.sub{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:4px 12px;border-radius:999px;background:rgba(0,0,0,.22);font-size:15px;font-weight:700}
+.warn .sub{background:rgba(36,24,0,.12)}
+.hint.alert{background:rgba(0,0,0,.34);border:2px solid rgba(255,255,255,.55);font-weight:700}
+.warn .hint.alert{background:rgba(36,24,0,.14);border-color:rgba(36,24,0,.45)}
+.deliver{margin-top:16px;border-top:1px solid rgba(255,255,255,.22);padding-top:12px}
+.warn .deliver{border-color:rgba(36,24,0,.25)}
+.deliver .dh{display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:16px;font-weight:700}
+.deliver .dh b{font-family:var(--num);font-size:24px}
+.deliver h5{margin:12px 0 0;font-size:14px;font-weight:700;opacity:.8;display:flex;gap:6px;align-items:center}
+.others{margin-top:14px;border-radius:14px;background:rgba(0,0,0,.16)}
+.warn .others{background:rgba(36,24,0,.08)}
+.others summary{list-style:none;display:flex;align-items:center;gap:8px;min-height:48px;padding:0 14px;font-size:15px;cursor:pointer}
+.others summary::-webkit-details-marker{display:none}
+.others summary .i:last-child{margin-left:auto;transition:transform .15s}
+.others[open] summary .i:last-child{transform:rotate(180deg)}
+.others .in{padding:0 14px 10px}
+.others .line{font-size:17px;opacity:.75}
+.others h5{margin:8px 0 0;font-size:13px;font-weight:500;opacity:.8;display:flex;gap:6px;align-items:center}
+.donecount{font-family:var(--num);font-size:clamp(22px,6vw,30px);font-weight:900;margin-top:8px;opacity:.95}
+.legend{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:8px;font-size:15px}
+.legend li{display:flex;gap:10px;align-items:center}
+.legend i{width:16px;height:16px;border-radius:5px;flex:none}
 
 /* 待機畫面 */
 .idle .state{font-size:clamp(24px,6.4vw,34px)}
@@ -169,9 +201,13 @@ button{font:inherit;color:inherit}
 .steps{margin:0;padding-left:22px;line-height:1.9}
 .steps .i{color:var(--gold)}
 
+@media (min-width:700px) and (orientation:portrait){
+  .deliver .rows{display:grid;grid-template-columns:1fr 1fr;column-gap:28px}
+}
 @media (min-width:900px) and (orientation:landscape){
   .stage{grid-template-columns:minmax(320px,42%) 1fr;grid-template-rows:minmax(0,1fr);align-items:start}
-  .cam{aspect-ratio:4/3;max-height:none}
+  .cam,.stage.reading .cam{aspect-ratio:4/3;max-height:none;height:auto}
+  .camhold{top:auto;padding:10px 10px 10px 16px}
   .panel{height:100%}
   .dock{grid-row:3}
 }
@@ -206,10 +242,11 @@ button{font:inherit;color:inherit}
     <button class="chip" id="stBtn" type="button" aria-label="切換站別">站別</button>
     <span class="grow"></span>
     <span class="net" id="net">連線中</span>
+    <button class="iconbtn" id="helpBtn" type="button" aria-label="查看本站操作說明" data-icon="circle-help"></button>
     <button class="iconbtn" id="menuBtn" type="button" aria-label="設定" data-icon="menu"></button>
   </header>
 
-  <div class="stage">
+  <div class="stage" id="stage">
     <div class="cam" id="cam">
       <video id="video" playsinline muted autoplay></video>
       <div class="frame" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -217,6 +254,7 @@ button{font:inherit;color:inherit}
       <span class="pill"><span data-icon="scan-barcode"></span>條碼槍也可以直接掃</span>
       <button class="iconbtn torch hidden" id="torchBtn" type="button" aria-label="手電筒" data-icon="flashlight"></button>
       <div class="msg hidden" id="camMsg"></div>
+      <div class="camhold" id="camHold"><span data-icon="circle-pause"></span><span class="t">鏡頭暫停・正在核對</span><button type="button" id="rescanBtn"><span data-icon="scan-line"></span>重新掃描</button></div>
     </div>
     <section class="panel idle" id="panel" aria-live="assertive" tabindex="-1"></section>
   </div>
@@ -253,6 +291,19 @@ button{font:inherit;color:inherit}
   </ul>
 </section>
 
+<!-- 本站操作說明 -->
+<section class="sheet" id="helpSheet" aria-labelledby="ht" role="dialog" aria-modal="true">
+  <div class="grab"></div>
+  <h3 id="ht">本站怎麼操作</h3>
+  <ol class="steps" id="helpSteps"></ol>
+  <ul class="legend">
+    <li><i style="background:var(--ok)"></i>綠色：可以放行，核對後按下方按鈕</li>
+    <li><i style="background:var(--warn)"></i>橘色：先停一下，照畫面上的說明處理</li>
+    <li><i style="background:var(--bad)"></i>紅色：不能放行，請他找管理員</li>
+  </ul>
+  <button class="primary" type="button" id="helpOk" style="margin-top:18px">知道了</button>
+</section>
+
 <!-- iPhone 加到主畫面教學 -->
 <section class="sheet" id="iosSheet" aria-labelledby="it" role="dialog" aria-modal="true">
   <div class="grab"></div>
@@ -280,7 +331,7 @@ button{font:inherit;color:inherit}
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   const pref = k => { try { return localStorage.getItem('xc_opt_' + k) !== '0'; } catch (e) { return true; } };
   const setPref = (k, v) => { try { localStorage.setItem('xc_opt_' + k, v ? '1' : '0'); } catch (e) {} };
-  let station = null, current = null, busy = false, lastCode = '', lastAt = 0, resetTimer = null;
+  let held = false, station = null, current = null, busy = false, lastCode = '', lastAt = 0, resetTimer = null;
   let stream = null, zx = null, detector = null, scanTimer = null, track = null, torchOn = false, wakeLock = null;
   let recent = []; try { recent = JSON.parse(localStorage.getItem('xc_recent') || '[]'); } catch (e) {}
 
@@ -367,7 +418,7 @@ button{font:inherit;color:inherit}
       let busyDetect = false;
       const loop = async () => {
         if (!stream) return;
-        if (!busyDetect && v.readyState >= 2 && v.videoWidth) {
+        if (!held && !busyDetect && v.readyState >= 2 && v.videoWidth) {
           busyDetect = true;
           try { const codes = await detector.detect(v); if (codes && codes.length) onCode(codes[0].rawValue, 'cam'); } catch (e) {}
           busyDetect = false;
@@ -410,11 +461,16 @@ button{font:inherit;color:inherit}
   function setPanel(tone, html, countdown){
     clearTimeout(resetTimer);
     const p = P(); p.className = 'panel ' + tone; p.innerHTML = html;
+    held = tone === 'ok' || tone === 'warn' || tone === 'bad';
+    $('stage').classList.toggle('reading', held);
     if (!reduce) { void p.offsetWidth; p.classList.add('flash'); }
     if (countdown) { p.insertAdjacentHTML('beforeend', `<div class="countdown" style="animation-duration:${countdown}ms"></div>`); resetTimer = setTimeout(idle, countdown); }
     p.scrollTop = 0;
   }
   function setGo(label, ic, enabled){ const g = $('goBtn'); g.innerHTML = (ic ? icon(ic) : '') + esc(label); g.disabled = !enabled; }
+  // 不能放行的結果：按鈕改成「掃下一位」，鏡頭恢復
+  function nextGo(){ current = { _next: true }; setGo('掃下一位', 'scan-line', true); }
+  $('rescanBtn').onclick = () => idle();
   function idle(){
     current = null;
     const prompt = station.mode === 'pickup' ? '請掃描學生證，交付餐點' : '請掃描學生證或報到 QR Code';
@@ -444,6 +500,28 @@ button{font:inherit;color:inherit}
         + by[v].map(i => `<div class="line${dim ? ' dim' : ''}"><span>${esc(i.name)}</span><b>× ${esc(i.qty)}</b></div>`).join('');
     }).join('') + `</div>`;
   }
+  const qtyOf = list => list.reduce((a, i) => a + (+i.qty || 0), 0);
+  const groupBy = list => { const by = {}; list.forEach(i => (by[i.vendor] = by[i.vendor] || []).push(i)); return by; };
+  const linesHtml = list => list.map(i => `<div class="line"><span>${esc(i.name)}</span><b>× ${esc(i.qty)}</b></div>`).join('');
+  // 這次要交付的店家：指定店家的站就是那家；全部店家／單一櫃檯是還沒取的店家
+  function deliverVendors(r){
+    if (station.vendor) return [station.vendor];
+    const left = vendorsLeft(r); return left.length ? left : Object.keys(groupBy(r.items || []));
+  }
+  function deliverHtml(r, vendors, title){
+    const items = r.items || [], mine = items.filter(i => vendors.includes(i.vendor)), rest = items.filter(i => !vendors.includes(i.vendor));
+    const byMine = groupBy(mine), byRest = groupBy(rest), multi = Object.keys(byMine).length > 1;
+    let h = `<div class="deliver"><div class="dh"><span>${esc(title || '這次交付' + (station.vendor ? '・' + station.vendor : ''))}</span><span>共 <b>${qtyOf(mine)}</b> 份</span></div>`
+      + Object.keys(byMine).map(v => (multi ? `<h5>${icon('store')}${esc(v)}</h5>` : '') + `<div class="rows">${linesHtml(byMine[v])}</div>`).join('') + `</div>`;
+    if (rest.length) {
+      const got = Object.keys(byRest).every(v => byRest[v][0].picked_up_at);
+      h += `<details class="others"><summary>${icon('store')}<span>${got && !station.vendor ? '已經取過的餐點' : '其他店家餐點'} ${qtyOf(rest)} 份</span>${icon('chevron-down')}</summary><div class="in">`
+        + Object.keys(byRest).map(v => { const t = byRest[v][0].picked_up_at; return `<h5>${esc(v)}・${t ? esc(fmtTime(t).slice(-5)) + ' 已取' : '還沒取'}</h5>${linesHtml(byRest[v])}`; }).join('') + `</div></details>`;
+    }
+    return h;
+  }
+  const sub = (ic, text) => `<div class="sub">${icon(ic)}${esc(text)}</div>`;
+  const notInAlert = r => !r.checked_in_at ? `<div class="hint alert">${icon('triangle-alert')}<span>尚未報到：可以先交餐，交完請引導他到報到站。</span></div>` : '';
   const note = r => r.internal_note ? `<div class="hint">${icon('sticky-note')}<span>${esc(r.internal_note)}</span></div>` : '';
   const idcheck = r => `<div class="idcheck">${icon('id-card')}${r.participant_type === 'guest' ? '校外人士：請口頭確認姓名和手機末三碼' : '請核對學生證照片是本人'}</div>`;
   const vendorsLeft = r => { const by = {}; (r.items || []).forEach(i => by[i.vendor] = i.picked_up_at); return Object.keys(by).filter(v => !by[v]); };
@@ -456,31 +534,41 @@ button{font:inherit;color:inherit}
     }
     if (r.status === 'pending_payment') {
       setPanel('warn', `<div class="state">${icon('hourglass')}還沒確認付款</div>${head(r)}<div class="hint">${icon('circle-dollar-sign')}<span>應付 <b class="num">${money(r.total_amount)}</b>，已收 <b class="num">${money(r.paid_amount)}</b>。請他找管理員確認，先不要報到或交餐。</span></div>${itemsHtml(r.items)}${note(r)}`);
-      setGo('先不要放行', 'ban', false); feedback('warn'); log('warn', r.name + ' 未付款'); return;
+      nextGo(); feedback('warn'); log('warn', r.name + ' 未付款'); return;
     }
-    if (r.status === 'cancelled') { setPanel('bad', `<div class="state">${icon('ban')}這筆報名已取消</div>${head(r)}${note(r)}`); setGo('不能放行', 'ban', false); feedback('bad'); log('bad', r.name + ' 已取消'); return; }
+    if (r.status === 'cancelled') { setPanel('bad', `<div class="state">${icon('ban')}這筆報名已取消</div>${head(r)}${note(r)}`); nextGo(); feedback('bad'); log('bad', r.name + ' 已取消'); return; }
     const m = station.mode;
     if (m === 'checkin') {
-      if (r.checked_in_at) { setPanel('warn', `<div class="state">${icon('triangle-alert')}已經報到過了</div>${head(r)}<div class="hint">${icon('clock')}<span>${esc(fmtTime(r.checked_in_at))} 已報到。同一個人重複出現時，請核對證件。</span></div>${note(r)}`); setGo('已報到過', 'check', false); feedback('warn'); log('warn', r.name + ' 重複報到'); return; }
+      if (r.checked_in_at) { setPanel('warn', `<div class="state">${icon('triangle-alert')}已經報到過了</div>${head(r)}<div class="hint">${icon('clock')}<span>${esc(fmtTime(r.checked_in_at))} 已報到。同一個人重複出現時，請核對證件。</span></div>${note(r)}`); nextGo(); feedback('warn'); log('warn', r.name + ' 重複報到'); return; }
       const n = (r.items || []).length;
-      setPanel('ok', `<div class="state">${icon('circle-check')}可以報到</div>${head(r)}<div class="hint">${icon(n ? 'utensils-crossed' : 'info')}<span>${n ? '有預訂餐點，報到後提醒他去取餐區。' : '沒有點餐，報到後就完成了。'}</span></div>${note(r)}${idcheck(r)}`);
+      setPanel('ok', `<div class="state">${icon('circle-check')}可以報到</div>${sub('badge-check', '已付款・尚未報到')}${head(r)}<div class="hint">${icon(n ? 'utensils-crossed' : 'info')}<span>${n ? '有預訂餐點，報到後提醒他去取餐區。' : '沒有點餐，報到後就完成了。'}</span></div>${note(r)}${idcheck(r)}`);
       current = r; setGo('確認報到', 'user-check', true); feedback('ok'); return;
     }
     if (m === 'pickup') {
-      const mine = (r.items || []).filter(i => !station.vendor || i.vendor === station.vendor);
+      const items = r.items || [], mine = items.filter(i => !station.vendor || i.vendor === station.vendor);
       const left = vendorsLeft(r).filter(v => !station.vendor || v === station.vendor);
-      if (!mine.length) { setPanel('warn', `<div class="state">${icon('store')}這一站沒有他的餐點</div>${head(r)}${itemsHtml(r.items, station.vendor)}${note(r)}`); setGo('不用交付', 'ban', false); feedback('warn'); log('warn', r.name + ' 不是這一站'); return; }
-      if (!left.length) { setPanel('warn', `<div class="state">${icon('triangle-alert')}這一站已經取過了</div>${head(r)}${itemsHtml(r.items, station.vendor)}<div class="hint">${icon('ban')}<span>請不要重複交付；有疑問請找管理員。</span></div>${note(r)}`); setGo('已取過', 'check', false); feedback('warn'); log('warn', r.name + ' 重複取餐'); return; }
-      setPanel('ok', `<div class="state">${icon('hand-platter')}請交付這些餐點</div>${head(r)}${itemsHtml(r.items, station.vendor)}${!r.checked_in_at ? `<div class="hint">${icon('triangle-alert')}<span>他還沒報到。可以先交餐，但請提醒他去報到站。</span></div>` : ''}${note(r)}${idcheck(r)}`);
-      current = r; setGo('確認已交付', 'package-check', true); feedback('ok'); return;
+      if (!mine.length) {
+        const by = groupBy(items), where = Object.keys(by).map(v => v + ' ' + qtyOf(by[v]) + ' 份').join('、');
+        setPanel('warn', `<div class="state">${icon('store')}這一站沒有他的餐點</div>${head(r)}<div class="hint">${icon('map-pin')}<span>${items.length ? '他的餐點在：' + esc(where) + '。請他到那一站取餐。' : '他沒有點餐，只報名活動。'}</span></div>${note(r)}`);
+        nextGo(); feedback('warn'); log('warn', r.name + ' 不是這一站'); return;
+      }
+      if (!left.length) {
+        const t = mine[0].picked_up_at;
+        setPanel('warn', `<div class="state">${icon('triangle-alert')}已經取過了</div>${sub('clock', (station.vendor ? '本店' : '全部餐點') + (t ? ' ' + fmtTime(t).slice(-5) : '') + ' 已領取')}${head(r)}<div class="hint alert">${icon('ban')}<span>不要再交付一次；有疑問請找管理員。</span></div>${deliverHtml(r, station.vendor ? [station.vendor] : Object.keys(groupBy(items)), station.vendor ? '本店已交付' : '已交付的餐點')}${note(r)}`);
+        nextGo(); feedback('warn'); log('warn', r.name + ' 重複取餐'); return;
+      }
+      const vs = deliverVendors(r), n = qtyOf(items.filter(i => vs.includes(i.vendor)));
+      setPanel('ok', `<div class="state">${icon('hand-platter')}請交付 ${n} 份</div>${sub('badge-check', station.vendor ? '已付款・本店尚未領取' : '已付款・尚未領取')}${head(r)}${notInAlert(r)}${deliverHtml(r, vs)}${note(r)}${idcheck(r)}`);
+      current = r; current._n = n; setGo(station.vendor ? `確認交付本店 ${n} 份` : `確認交付 ${n} 份`, 'package-check', true); feedback('ok'); return;
     }
-    if (r.status === 'picked_up') { setPanel('warn', `<div class="state">${icon('triangle-alert')}已經完成過了</div>${head(r)}<div class="hint">${icon('clock')}<span>${esc(fmtTime(r.picked_up_at))} 已完成報到和取餐。</span></div>${itemsHtml(r.items)}${note(r)}`); setGo('已完成過', 'check', false); feedback('warn'); log('warn', r.name + ' 重複'); return; }
-    setPanel('ok', `<div class="state">${icon('circle-check')}可以報到並取餐</div>${head(r)}${itemsHtml(r.items)}${note(r)}${idcheck(r)}`);
-    current = r; setGo('確認交付（報到＋取餐）', 'package-check', true); feedback('ok');
+    if (r.status === 'picked_up') { setPanel('warn', `<div class="state">${icon('triangle-alert')}已經完成過了</div>${head(r)}<div class="hint">${icon('clock')}<span>${esc(fmtTime(r.picked_up_at))} 已完成報到和取餐。</span></div>${itemsHtml(r.items)}${note(r)}`); nextGo(); feedback('warn'); log('warn', r.name + ' 重複'); return; }
+    const vs = (r.items || []).length ? deliverVendors(r) : [], n = qtyOf((r.items || []).filter(i => vs.includes(i.vendor)));
+    setPanel('ok', `<div class="state">${icon('circle-check')}${n ? '報到並交付 ' + n + ' 份' : '可以報到'}</div>${sub('badge-check', r.checked_in_at ? '已付款・已報到・尚未領取' : '已付款・尚未報到')}${head(r)}${n ? deliverHtml(r, vs) : `<div class="hint">${icon('info')}<span>沒有點餐，報到後就完成了。</span></div>`}${note(r)}${idcheck(r)}`);
+    current = r; current._n = n; setGo(n ? `確認報到並交付 ${n} 份` : '確認報到（沒有餐點）', 'package-check', true); feedback('ok');
   }
   function showError(msg){
     setPanel('bad', `<div class="state">${icon('wifi-off')}沒有完成</div><div class="who" style="font-size:22px">${esc(msg)}</div><div class="hint">${icon('refresh-cw')}<span>確認網路後再掃一次。</span></div>`);
-    setGo('再掃一次', null, false); feedback('bad');
+    nextGo(); setGo('再掃一次', 'scan-line', true); feedback('bad');
     if (/登入/.test(msg)) showLogin(msg);
   }
 
@@ -498,6 +586,7 @@ button{font:inherit;color:inherit}
   $('goBtn').onclick = async () => {
     if (!current) return;
     if (current._find) return openSheet('findSheet');
+    if (current._next) return idle();
     const r = current, m = station.mode, g = $('goBtn');
     g.disabled = true; g.innerHTML = icon('loader-circle', 'spin') + '處理中…';
     try {
@@ -505,12 +594,14 @@ button{font:inherit;color:inherit}
                 : m === 'pickup' ? await Api.rpc('staff_pickup', { p_reg: r.id, p_vendor: station.vendor })
                 : await Api.rpc('staff_confirm_pickup', { p_reg: r.id });
       if (!res.ok) { show({ found: true, ...res }); return; }
-      const what = m === 'checkin' ? '已報到' : m === 'pickup' ? '已交付餐點' : '已報到並取餐';
+      const n = r._n || 0;
+      const what = m === 'checkin' ? '報到完成' : m === 'pickup' ? '交付完成' : (n ? '報到並交付完成' : '報到完成');
       const left = vendorsLeft(res);
+      const count = n ? `<div class="donecount">${n} 份${station.vendor ? '・' + esc(station.vendor) : ''}</div>` : '';
       const more = m === 'checkin' && (res.items || []).length ? `<div class="hint">${icon('utensils-crossed')}<span>請提醒他到取餐區取餐。</span></div>`
                  : m === 'pickup' && left.length ? `<div class="hint">${icon('store')}<span>還有別家店的餐點沒取：${esc(left.join('、'))}</span></div>` : '';
-      setPanel('done', `<div class="state">${icon('check-check')}${what}</div><div class="who">${esc(res.name)}</div>${more}<p style="opacity:.8;margin:12px 0 0">可以掃下一位了。</p>`, 5000);
-      setGo('請掃描下一位', null, false); feedback('ok'); log('ok', res.name + ' ' + what); current = null;
+      setPanel('done', `<div class="state">${icon('check-check')}${what}</div>${count}<div class="who">${esc(res.name)}</div>${more}<p style="opacity:.8;margin:12px 0 0">已記錄。可以掃下一位了；同一個人再掃會顯示「已經取過了」。</p>`, 5000);
+      setGo('請掃描下一位', null, false); feedback('ok'); log('ok', res.name + ' ' + what + (n ? ' ' + n + ' 份' : '')); current = null;
     } catch (e) { showError(e.message); }
   };
 
@@ -543,6 +634,15 @@ button{font:inherit;color:inherit}
     if (!isIOS) $('iosSheet').querySelector('.steps').innerHTML = '<li>打開瀏覽器右上角的選單（⋮）</li><li>點「安裝應用程式」或「加到主畫面」</li><li>按「安裝」</li>';
   }
   $('mInstall').onclick = install; $('iosOk').onclick = closeSheets;
+
+  // ---------- 本站操作說明 ----------
+  const HELP = {
+    checkin: ['掃學生證，或來賓手機上的報到 QR Code；沒帶的話按「查詢」用姓名或手機找。', '畫面變綠：核對證件照片是本人（來賓口頭確認姓名和手機末三碼），再按「確認報到」。', '有點餐的人，報到後提醒他到取餐區。這一站不交付餐點。'],
+    pickup: ['掃學生證或 QR Code；沒帶的話按「查詢」。', '畫面變綠：只交付「這次交付」列出的品項，數量點清楚再按「確認交付」。其他店家的餐點已經收起來，不用理會。', '看到「尚未報到」可以先交餐，交完請他去報到站。'],
+    both: ['掃學生證或 QR Code；沒帶的話按「查詢」。', '畫面變綠：核對證件，交付「這次交付」列出的品項，再按一次確認，報到和取餐會一起記錄。', '沒有點餐的人，按「確認報到」就完成了。']
+  };
+  $('helpBtn').onclick = () => { $('ht').textContent = stName() + '怎麼操作'; $('helpSteps').innerHTML = HELP[station.mode].map(t => `<li>${esc(t)}</li>`).join('') + '<li>橘色或紅色先不要放行，照畫面上的說明處理；按「掃下一位」繼續。</li>'; openSheet('helpSheet'); };
+  $('helpOk').onclick = closeSheets;
 
   // ---------- 連線狀態 ----------
   function net(){ $('net').classList.toggle('off', !navigator.onLine); $('net').textContent = navigator.onLine ? '連線正常' : '離線中'; }
