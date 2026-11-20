@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>聖誕露天電影院｜報名＋預訂餐點｜政大學生會</title>
+<title>聖誕露天電影院｜免費報名・餐點預訂｜政大學生會</title>
 <meta name="description" content="政大學生會聖誕露天電影院：線上報名、預訂餐點、事先轉帳，活動當天報到取餐。">
 <meta name="theme-color" content="#0C211B">
 <meta property="og:type" content="website">
@@ -275,6 +275,20 @@ html[data-dir=back]::view-transition-new(flowstep){animation:vt-in-l .32s var(--
 .mi .tag{display:inline-block;font-size:12.5px;font-weight:700;margin-left:6px;padding:1px 8px;border-radius:99px;vertical-align:2px}
 .tag.red{background:#FBE3E3;color:var(--redtext)}.tag.green{background:#DDF0E8;color:var(--green)}.tag.gold{background:#F4ECD8;color:#6E5418}
 .mi .ds{color:var(--muted);font-size:14px;margin-top:2px}
+.hero-film{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin:14px 0 0;font-size:17px;font-weight:700;color:#F3EBDD}
+.hero-film .i{color:var(--gold-l);flex:none}
+.skl{display:inline-block;width:9em;height:.95em;border-radius:6px;background:rgba(255,255,255,.14)}
+.maplink{color:inherit;text-decoration:underline;text-underline-offset:3px;display:inline-flex;align-items:center;gap:4px}
+.maplink .i{width:14px;height:14px;opacity:.8}
+.cta-sub{margin:8px 0 0;font-size:14px;color:#D8D2C4;text-align:right}
+.closing .cta-sub{text-align:center}
+.mi .more{margin-top:2px;font-size:14px;color:var(--muted)}
+.mi .more summary{cursor:pointer;color:var(--green);font-weight:700;width:max-content;list-style:none;padding:4px 0;min-height:24px}
+.mi .more summary::-webkit-details-marker{display:none}
+.mi .more summary::after{content:' ＋'}.mi .more[open] summary::after{content:' －'}
+.mi .more p{margin:2px 0 0}
+#cfPick{margin-top:-6px}
+
 .mi .pr{font-family:var(--num);font-weight:600;font-size:16px;text-align:right}
 .mi.out{opacity:.55}
 .ctl{display:flex;justify-content:flex-end;align-items:center}
@@ -582,6 +596,7 @@ body:has(#home.hidden) .flowtiles{display:block}
   .facts-inline{justify-items:start;margin:14px 0 22px}.facts-inline li{flex-direction:row}
   .presents{justify-content:flex-start}
   .cta{justify-content:flex-start}
+  .hero-film{justify-content:flex-start}.cta-sub{text-align:left}
   .film,.food-intro{grid-template-columns:1fr;gap:32px}
   .poster{aspect-ratio:4/3;transform:rotate(-1.5deg);max-width:520px}
   .poster .q{font-size:88px}
@@ -676,10 +691,12 @@ body:has(#home.hidden) .flowtiles{display:block}
           <h1 id="evTitle"><span class="l1">聖誕</span><span class="l2">露天電影院</span></h1>
           <p class="showing" id="showing"></p>
         </div>
+        <p class="hero-film hidden" id="heroFilm"></p>
         <div class="stub" id="evDate"><b class="num">12/9</b><span class="wk">週三</span><span class="cut hidden" aria-hidden="true"></span><span class="lbl hidden" id="stubTime"></span><span class="tape ts" aria-hidden="true"></span></div>
         <p class="countdown" id="countdown"></p>
-        <ul class="facts-inline" id="evMeta"><li><span data-icon="clock"></span><span class="tbd">時間待公布</span></li><li><span data-icon="map-pin"></span><span class="tbd">地點待公布</span></li><li><span data-icon="ticket"></span><span>免費入場，餐點另外付</span></li></ul>
-        <div class="cta"><button class="btn hero-cta" type="button" id="startBtn" disabled>報名＋預訂餐點</button></div>
+        <ul class="facts-inline" id="evMeta" aria-busy="true"><li><span data-icon="clock"></span><span class="skl" aria-hidden="true"></span></li><li><span data-icon="map-pin"></span><span class="skl" aria-hidden="true"></span></li><li><span data-icon="ticket"></span><span>免費入場，餐點另外付</span></li></ul>
+        <div class="cta"><button class="btn hero-cta" type="button" id="startBtn" disabled>免費報名</button></div>
+        <p class="cta-sub">可加購餐點、租野餐墊</p>
         <div class="cta-note" id="openNote">載入中…</div>
       </div>
     </div>
@@ -734,12 +751,13 @@ body:has(#home.hidden) .flowtiles{display:block}
     <span data-sa="wmark"></span>
     <div class="wrap">
       <h2 id="seeYou">12/9 見</h2>
-      <button class="btn hero-cta" type="button" id="startBtn2" disabled>報名＋預訂餐點</button>
+      <button class="btn hero-cta" type="button" id="startBtn2" disabled>免費報名</button>
+      <p class="cta-sub">可加購餐點、租野餐墊</p>
       <div class="cta-note" id="openNote2"></div>
     </div>
   </section>
 </main>
-<div class="mbar hbar" id="hbar"><div class="in"><span class="hmeta"><b>聖誕露天電影院</b><span id="hbarDate">12/9（三）</span></span><button class="btn hero-cta" type="button" id="hbarBtn">報名＋預訂餐點</button></div></div>
+<div class="mbar hbar" id="hbar"><div class="in"><span class="hmeta"><b>聖誕露天電影院</b><span id="hbarDate">12/9（三）</span></span><button class="btn hero-cta" type="button" id="hbarBtn">免費報名</button></div></div>
 
 <div class="tiles flowtiles" aria-hidden="true"></div>
 <!-- 報名流程 -->
@@ -816,6 +834,7 @@ body:has(#home.hidden) .flowtiles{display:block}
 <section class="sheet imgsheet" id="imgSheet" role="dialog" aria-modal="true" aria-labelledby="imgT"><div class="grab"></div><h3 id="imgT">長按圖片，選「加入照片」</h3><p class="muted" style="margin:0 0 12px;font-size:14px">存進相簿後，活動當天沒有網路也能出示。</p><img id="imgSheetImg" alt="報到 QR Code 圖片"><p><button type="button" class="btn line" id="imgSheetClose">完成</button></p></section>
 <section class="sheet confirm" id="confirmSheet" role="dialog" aria-modal="true" aria-labelledby="cfT"><div class="grab"></div><h3 id="cfT">確認一下你的訂單</h3><div id="cfBody"></div>
   <div class="cfdl" id="cfDl"></div>
+  <div class="cfdl hidden" id="cfPick"></div>
   <div class="cfwarn"><span data-icon="triangle-alert"></span><span id="cfWarnTxt"><b>送出後就不能修改餐點。</b>付款前如果想改，只能在訂單頁取消後重新報名；付款後不能修改或加訂。</span></div>
   <div class="cfacts"><button type="button" class="btn line" id="cfBack">回去修改</button><button type="button" class="btn" id="cfGo">確認送出</button></div></section>
 <section class="sheet" id="cartSheet" role="dialog" aria-modal="true" aria-labelledby="cartT"><div class="grab"></div><div class="sheethead"><h3 id="cartT">你的訂單</h3><button type="button" class="btn line sm" id="cartClose">關閉</button></div><ul class="sum-list" id="cartList"></ul><div class="sum-total"><span>總金額</span><span class="num" id="cartTotal"></span></div></section>
@@ -841,7 +860,7 @@ body:has(#home.hidden) .flowtiles{display:block}
   hydrateIcons();
   $('lookupLink').innerHTML = icon('ticket') + '查詢訂單';
   $('backBtn').innerHTML = icon('arrow-left');
-  ['startBtn', 'startBtn2', 'hbarBtn'].forEach(id => $(id).innerHTML = icon('ticket') + '報名＋預訂餐點');
+  ['startBtn', 'startBtn2', 'hbarBtn'].forEach(id => $(id).innerHTML = icon('ticket') + '免費報名');
   $('errIcon').innerHTML = icon('circle-alert');
   document.querySelectorAll('.okw').forEach(el => el.outerHTML = icon('circle-check', 'ok'));
 
@@ -968,13 +987,13 @@ body:has(#home.hidden) .flowtiles{display:block}
     how_h: '怎麼報名',
     s1_t: '報名，選好餐點', s1_d: '政大學生填學號；校外人士也可以報名。',
     s2_t: '轉帳，備註填姓名', s2_d: '轉帳時在「備註」欄填你的姓名，確認入帳後會寄信通知。',
-    s3_t: '當天報到、取餐', s3_d: '政大學生帶學生證，校外人士出示付款完成信裡的 QR Code。',
+    s3_t: '當天報到、取餐', s3_d: '政大學生帶學生證，校外人士出示報名確認信（或付款完成信）裡的 QR Code。',
     faq_h: '常見問題', end_h: '', menu_lead: '兩家可以混著點。',
     faq: [
       ['付款後多久會收到確認？', '我們會定期核對入帳紀錄，大約 1 個工作天內寄出「付款完成」通知。轉帳後不需要回到網頁填資料。'],
       ['可以幫朋友一起付款嗎？', '請不要。每個人用自己的帳戶轉自己的訂單，一筆訂單轉一次。代付或合併轉帳會讓我們很難核對，可能延誤確認，甚至被當成沒付款。'],
       ['轉帳時忘了填備註怎麼辦？', '系統也會用報名時填的帳號後五碼和金額核對。超過 1 個工作天還沒收到確認，請私訊學生會，提供轉帳時間和後五碼。請不要重複轉帳。'],
-      ['校外人士可以參加嗎？', '可以。報名時選「校外人士」，不需要學號；轉帳時在備註欄填姓名，當天出示付款完成信裡的 QR Code 報到。'],
+      ['校外人士可以參加嗎？', '可以。報名時選「校外人士」，不需要學號；轉帳時在備註欄填姓名，當天出示報名確認信（或付款完成信）裡的 QR Code 報到。'],
       ['可以修改餐點嗎？', '送出前會再請你確認一次。送出後如果還沒付款，可以在訂單頁「取消這筆報名」再重新報名；付款後就不能修改或加訂。'],
       ['下雨怎麼辦？要帶什麼？', '雨備方案還在確認，確定後會在學生會 IG 通知。晚上在戶外很冷，記得多帶一件外套。'],
       ['可以取消或退費嗎？', '退費規則待公布。'],
@@ -1028,7 +1047,7 @@ body:has(#home.hidden) .flowtiles{display:block}
     FKEYS.forEach(k => { $('f_' + k).value = ''; $('w_' + k).classList.remove('good', 'bad'); $('e_' + k).innerHTML = ''; });
     $('f_agree').checked = false;
   }
-  function draftSummary(d){ const n = Object.values(d.cart || {}).reduce((s, q) => s + (q > 0 ? q : 0), 0); return (n ? `已選 ${n} 份餐點` : '還沒選餐點') + (d.f && d.f.name ? `・${d.f.name}` : ''); }
+  function draftSummary(d){ const n = Object.values(d.cart || {}).reduce((s, q) => s + (q > 0 ? q : 0), 0); return (n ? `已選 ${n} 份` : '只報名、無加購') + (d.f && d.f.name ? `・${d.f.name}` : ''); }
   function renderResume(d){
     const el = $('resume'); const o = store.get(ORDER_KEY);
     const order = o && Date.now() - (o.at || 0) < ORDER_TTL && /^[0-9a-f]{48}$/.test(o.token || '') ? o : null;
@@ -1062,18 +1081,23 @@ body:has(#home.hidden) .flowtiles{display:block}
     if (real(info['日期'])) { const m = info['日期'].match(/(?:\d{4}\/)?(\d{1,2})\/(\d{1,2})/), w = info['日期'].match(/（(.)）/); if (m) { evDay = `${+m[1]}/${+m[2]}`; evWk = w ? w[1] : ''; $('evDate').querySelector('b').textContent = evDay; $('evDate').querySelector('.wk').textContent = evWk ? '週' + evWk : ''; $('hbarDate').textContent = `${evDay}${evWk ? `（${evWk}）` : ''}`; $('seeYou').textContent = cp('end_h') || `${evDay} 見`; } }
     // 時間、地點確定了才顯示，不用口號填空位
     const tm = real(info['時間']) ? info['時間'] : '', place = real(info['地點']) ? info['地點'] : '';
-    $('stubTime').textContent = tm ? `入場 ${tm}` : ''; $('stubTime').classList.toggle('hidden', !tm); $('evDate').querySelector('.cut').classList.toggle('hidden', !tm);
+    $('stubTime').textContent = tm || ''; $('stubTime').classList.toggle('hidden', !tm); $('evDate').querySelector('.cut').classList.toggle('hidden', !tm);
     $('showing').textContent = place ? `${evDay}${evWk ? `（${evWk}）` : ''}晚上　${place}` : ''; $('showing').classList.toggle('hidden', !place);
     $('showDay').textContent = evDay ? `${evDay}${evWk ? `（${evWk}）` : ''}晚上・露天放映` : ''; $('showDay').classList.toggle('hidden', !evDay);
     startCountdown(info);
-    $('evMeta').innerHTML = `<li>${icon('clock')}${real(info['時間']) ? `<span>${esc(info['時間'])}</span>` : '<span class="tbd">時間待公布</span>'}</li><li>${icon('map-pin')}${real(info['地點']) ? `<span>${esc(info['地點'])}</span>` : '<span class="tbd">地點待公布</span>'}</li>${cp('fee') ? `<li>${icon('ticket')}<span>${esc(cp('fee'))}</span></li>` : ''}`;
+    // 地點附 Google 地圖連結（用「國立政治大學＋地點」搜尋）；載入失敗時不要顯示「待公布」，改說明載入失敗
+    const mapUrl = pl => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('國立政治大學 ' + pl);
+    $('evMeta').removeAttribute('aria-busy');
+    $('evMeta').innerHTML = catalog.offline ? `<li>${icon('wifi-off')}<span class="tbd">活動資訊載入失敗，請重新整理</span></li>`
+      : `<li>${icon('clock')}${real(info['時間']) ? `<span>${esc(info['時間'])}</span>` : '<span class="tbd">時間待公布</span>'}</li><li>${icon('map-pin')}${real(info['地點']) ? `<a class="maplink" href="${mapUrl(info['地點'])}" target="_blank" rel="noopener">${esc(info['地點'])}<span class="sr">（在 Google 地圖開啟）</span>${icon('external-link')}</a>` : '<span class="tbd">地點待公布</span>'}</li>${cp('fee') ? `<li>${icon('ticket')}<span>${esc(cp('fee'))}</span></li>` : ''}`;
+    $('heroFilm').innerHTML = catalog.film_title ? `${icon('film')}<span>放映《${esc(catalog.film_title)}》</span>` : ''; $('heroFilm').classList.toggle('hidden', !catalog.film_title);
     const now = new Date(); let note = '', can = false;
     if (!catalog.is_open && now < new Date(catalog.open_at)) note = `${fmtTime(catalog.open_at)} 開放報名`;
     else if (!catalog.is_open) note = '報名已截止。已經報名的人可以用 Email 裡的連結查詢訂單。';
     else if (catalog.spots_left <= 0) note = '名額已滿';
     else { can = true; note = catalog.test_mode ? '測試模式：現在就可以報名' : `報名截止 ${fmtTime(catalog.close_at)}・剩 ${catalog.spots_left} 個名額`; }
     ['openNote', 'openNote2'].forEach(id => $(id).textContent = note);
-    ['startBtn', 'startBtn2', 'hbarBtn'].forEach(id => { $(id).disabled = !can; $(id).innerHTML = icon('ticket') + '報名＋預訂餐點'; });
+    ['startBtn', 'startBtn2', 'hbarBtn'].forEach(id => { $(id).disabled = !can; $(id).innerHTML = icon('ticket') + '免費報名'; });
     canRegister = can;
     $('poster').classList.toggle('has', !!catalog.film_image_url); document.querySelector('.poster-wrap').classList.toggle('empty', !catalog.film_image_url); document.querySelector('.film').classList.toggle('nofilm', !catalog.film_image_url);
     $('poster').innerHTML = catalog.film_image_url ? `<img src="${esc(catalog.film_image_url)}" alt="${esc(catalog.film_title || '電影海報')}">` : `<div class="soon"><svg viewBox="0 0 200 200" aria-hidden="true">${star(34, 30, 12, 5, 5, 'tw')}${star(168, 22, 8, 3.5, 5, 'tw')}${star(178, 186, 10, 4, 5, 'tw')}${star(20, 192, 6, 2.5, 5, 'tw')}</svg>${catalog.film_title ? `<b class="ptitle">${catalog.film_title.split(/[：:]/).map(esc).join('<br>')}</b>` : '<span class="q">?</span><b>片單即將揭曉</b>'}</div>`;
@@ -1142,8 +1166,15 @@ body:has(#home.hidden) .flowtiles{display:block}
     const out = i.remaining === 0, q = cart[i.id] || 0;
     return `<li class="mi${out ? ' out' : ''}${q ? ' has' : ''}${i.image_url ? ' wimg' : ''}" id="mi_${esc(i.id)}">
       ${i.image_url ? `<img class="th" src="${esc(i.image_url)}" alt="" loading="lazy" decoding="async">` : ''}
-      <div class="info"><span class="nm">${esc(i.name)}</span>${i.tag ? `<span class="tag ${noteClass(i.tag)}">${esc(i.tag)}</span>` : ''}${i.remaining != null && !out && i.remaining <= 20 ? `<span class="tag red">剩 ${i.remaining} 份</span>` : ''}${i.description ? `<div class="ds">${esc(i.description)}</div>` : ''}</div>
+      <div class="info"><span class="nm">${esc(i.name)}</span>${i.tag ? `<span class="tag ${noteClass(i.tag)}">${esc(i.tag)}</span>` : ''}${i.remaining != null && !out && i.remaining <= 20 ? `<span class="tag red">剩 ${i.remaining} 份</span>` : ''}${descHtml(i)}</div>
       <div class="side"><div class="pr">$${esc(i.price)}</div><div class="ctl">${ctl(i)}</div></div></li>`;
+  }
+  // 品項說明：第一句（到第一個「。」）當一行重點，其餘收進「查看介紹」
+  function descHtml(i){
+    const d = (i.description || '').trim(); if (!d) return '';
+    const k = d.indexOf('。');
+    if (d.length <= 40 || k < 0 || k >= d.length - 1) return `<div class="ds">${esc(d)}</div>`;
+    return `<div class="ds">${esc(d.slice(0, k))}</div><details class="more"><summary>查看介紹</summary><p>${esc(d.slice(k + 1).trim())}</p></details>`;
   }
   function ctl(i){
     const q = cart[i.id] || 0;
@@ -1206,7 +1237,7 @@ body:has(#home.hidden) .flowtiles{display:block}
     const z = total() === 0;
     const s3 = document.querySelector('#steps li[data-s="3"] .lbl'); if (s3) s3.textContent = z ? '完成' : '轉帳';
     $('h_email').textContent = z ? '報名確認和入場資訊會寄到這裡。' : '付款確認通知會寄到這裡。';
-    $('cfGo').textContent = z ? '確認報名' : '確認送出';
+    $('cfGo').textContent = z ? '確認免費報名' : '確認送出';
     $('cfWarnTxt').innerHTML = z ? '<b>送出後就完成報名。</b>之後想點餐，可以在訂單頁取消報名，再重新報名一次。' : '<b>送出後就不能修改餐點。</b>付款前如果想改，只能在訂單頁取消後重新報名；付款後不能修改或加訂。';
   }
 
@@ -1215,17 +1246,17 @@ body:has(#home.hidden) .flowtiles{display:block}
   function updateSummary(animate){
     saveDraft(); syncOnlyReg(); syncZero();
     const l = list(), t = total();
-    const items = l.length ? l.map(i => `<li><span>${esc(i.name)} × ${i.qty}</span><span class="num">$${i.price * i.qty}</span></li>`).join('') : '<li class="empty">還沒選餐點</li>';
+    const items = l.length ? l.map(i => `<li><span>${esc(i.name)} × ${i.qty}</span><span class="num">$${i.price * i.qty}</span></li>`).join('') : '<li class="empty">免費入場・無加購</li>';
     $('sumList').innerHTML = items;
     $('cartList').innerHTML = l.length ? l.map(i => `<li class="crow"><span class="cn">${esc(i.name)}<small class="num">$${i.price} × ${i.qty}　小計 $${i.price * i.qty}</small></span>
-      <span class="qty" role="group" aria-label="${esc(i.name)} 數量"><button type="button" data-cq="minus" data-id="${esc(i.id)}" aria-label="減少 ${esc(i.name)}">${icon(i.qty === 1 ? 'trash-2' : 'minus')}</button><output>${i.qty}</output><button type="button" data-cq="plus" data-id="${esc(i.id)}" aria-label="增加 ${esc(i.name)}">${icon('plus')}</button></span></li>`).join('') : '<li class="empty">還沒選餐點</li>';
+      <span class="qty" role="group" aria-label="${esc(i.name)} 數量"><button type="button" data-cq="minus" data-id="${esc(i.id)}" aria-label="減少 ${esc(i.name)}">${icon(i.qty === 1 ? 'trash-2' : 'minus')}</button><output>${i.qty}</output><button type="button" data-cq="plus" data-id="${esc(i.id)}" aria-label="增加 ${esc(i.name)}">${icon('plus')}</button></span></li>`).join('') : '<li class="empty">免費入場・無加購</li>';
     $('sumTotal').textContent = money(t); $('cartTotal').textContent = money(t);
-    $('mMeta').innerHTML = `<span class="bag">${icon('shopping-bag')}${count() ? `<em>${count()}</em>` : ''}</span><span>${step === 1 ? (count() ? `已選 ${count()} 份` : '還沒選餐點') : '總金額'}<b id="mTotal">${money(t)}</b></span>`;
+    $('mMeta').innerHTML = `<span class="bag">${icon('shopping-bag')}${count() ? `<em>${count()}</em>` : ''}</span><span>${step === 1 ? (count() ? `已選 ${count()} 份` : '免費入場・無加購') : '總金額'}<b id="mTotal">${money(t)}</b></span>`;
     if (animate && t !== lastTotal && !reduce) { [$('sumTotal'), $('mTotal')].forEach(el => { el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }); }
     lastTotal = t;
-    const label = step === 1 ? '下一步' : total() === 0 ? '確認報名' : '確認送出';
+    const label = step === 1 ? '下一步' : total() === 0 ? '確認免費報名' : '確認送出';
     $('sumNext').innerHTML = label + icon(step === 1 ? 'arrow-right' : 'check'); $('mNext').innerHTML = label + icon(step === 1 ? 'arrow-right' : 'check');
-    $('sumHint').textContent = step === 2 ? '送出後才會建立訂單，並顯示轉帳資訊。' : '';
+    $('sumHint').textContent = step !== 2 ? '' : t === 0 ? '免費入場・無加購：送出就完成報名，不用轉帳。' : '按下「確認送出」後才會建立訂單、顯示轉帳資訊；這時還沒有付款。';
   }
   function swap(fn, dir){
     document.documentElement.dataset.dir = dir;
@@ -1351,6 +1382,8 @@ body:has(#home.hidden) .flowtiles{display:block}
       : catalog.payment_hold_hours ? new Date(Math.min(new Date(catalog.payment_deadline || 8.64e15), Date.now() + catalog.payment_hold_hours * 36e5)) : catalog.payment_deadline;
     $('cfDl').innerHTML = total() > 0 && dl ? `${icon('clock')}<span>送出後請在 <b>${esc(fmtTime(dl))}</b> 前轉帳 <b class="num">${money(total())}</b>，逾期訂單會取消、名額釋出。</span>` : '';
     $('cfDl').classList.toggle('hidden', !(total() > 0 && dl));
+    $('cfPick').innerHTML = count() ? `${icon('hand-platter')}<span><b>取餐：</b>${esc(catalog.pickup_note || '活動當天報到後，到取餐區出示學生證（校外人士出示 QR Code）取餐。')}</span>` : '';
+    $('cfPick').classList.toggle('hidden', !count());
     $('scrim').classList.add('on'); $('confirmSheet').classList.add('on');
     setTimeout(() => $('cfGo').focus(), 50);
   }
@@ -1468,7 +1501,7 @@ body:has(#home.hidden) .flowtiles{display:block}
         <div class="tin"><div class="tinfo">${saMark('tmark', '國立政治大學學生會')}<span class="stamp" aria-hidden="true">${r.total_amount === 0 ? '已報名' : '已付款'}</span>${sparks}<div class="who">${esc(r.name)}</div><div class="meta"><span>校外人士</span><span>${itemCount(r)}</span></div><p class="muted" style="margin:12px 0 0">活動當天到報到櫃檯出示這個 QR Code，報到後到取餐區取餐。</p></div>
         <div class="qr" aria-label="報到用 QR Code">${qr}</div></div></div>
       ${r.qr_token ? `<div class="saveqr"><button type="button" class="btn" id="saveQr">${icon('download')}把 QR Code 存到手機</button>${linkBtn}</div>
-      <p class="muted" style="font-size:14px;margin:0">這是你的報到憑證，建議現在就存進相簿。之後也可以點付款完成信裡的連結，或在報名網站用「查詢訂單」找回來。</p>` : ''}`
+      <p class="muted" style="font-size:14px;margin:0">這是你的報到憑證，建議現在就存進相簿。之後也可以點報名確認信（或付款完成信）裡的連結，或在報名網站用「查詢訂單」找回來。</p>` : ''}`
       : `<div class="ticket${celebrate ? ' print' : ''}"><svg class="band" viewBox="0 0 432 36" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${tileBand(12, 36)}</svg>
         <div class="tin"><div class="tinfo">${saMark('tmark', '國立政治大學學生會')}<span class="stamp" aria-hidden="true">${r.total_amount === 0 ? '已報名' : '已付款'}</span>${sparks}<div class="who">${esc(r.name)}</div><div class="meta"><span>學號 <span class="num">${esc(r.student_id)}</span></span><span>${itemCount(r)}</span></div>
         <p style="margin:12px 0 0;display:flex;gap:8px;align-items:flex-start">${icon('id-card')}<span><b>活動當天帶學生證報到就好</b><br><span class="muted">工作人員掃你的學生證，就會看到你的餐點，不需要另外出示 QR Code。</span></span></p></div></div></div>
