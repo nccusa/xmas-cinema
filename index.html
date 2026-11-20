@@ -644,8 +644,10 @@ body:has(#home.hidden) .flowtiles{display:block}
 @media (prefers-reduced-motion:reduce){.screening .beam{animation:none}}
 
 /* 加購租借品（野餐墊） */
-#addons .addon{margin:6px 0 22px;border:2px dashed rgba(201,154,46,.55);background:linear-gradient(180deg,rgba(243,210,122,.10),transparent 70%)}
+#addons .addon{margin:16px 0 8px;border:2px dashed rgba(201,154,46,.55);background:linear-gradient(180deg,rgba(243,210,122,.10),transparent 70%)}
 .vcard.rent{border:2px dashed rgba(201,154,46,.55);box-shadow:none}
+
+#step1 .subh{font-size:22px;margin:30px 0 4px;padding-top:22px;border-top:1px solid var(--line,rgba(0,0,0,.12))}
 </style>
 </head>
 <body>
@@ -758,9 +760,10 @@ body:has(#home.hidden) .flowtiles{display:block}
       <div class="stepview" id="stepview">
         <section id="step1" aria-labelledby="s1t">
           <h2 id="s1t" tabindex="-1">想吃點什麼？</h2>
-          <p class="lead">兩家可以混著點。</p>
-          <div id="addons"></div>
           <div class="onlyreg"><button type="button" class="btn line sm" id="onlyReg"></button><span id="onlyRegNote"></span></div>
+          <div id="addons"></div>
+          <h3 class="subh hidden" id="foodSubT">想吃點什麼？</h3>
+          <p class="lead" id="menuLead">兩家可以混著點。</p>
           <div class="pickup" id="pickupNote"></div>
           <nav class="vtabs" id="vtabs" aria-label="店家"></nav>
           <div id="menu"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
@@ -1078,7 +1081,7 @@ body:has(#home.hidden) .flowtiles{display:block}
     $('filmT').textContent = cp('film_h'); $('foodT').textContent = cp('food_h'); $('howT').textContent = cp('how_h'); $('faqT').textContent = cp('faq_h');
     document.querySelector('.food-intro .lede').textContent = cp('food_lede');
     document.querySelector('.foodfacts').innerHTML = String(cp('food_points')).split('\n').map(x => x.trim()).filter(Boolean).map((x, i) => `<li>${icon(['wallet', 'hand-platter', 'ticket', 'circle-check'][i] || 'circle-check')}<span>${esc(x)}</span></li>`).join('');
-    const ml = document.querySelector('#step1 .lead'); if (ml) ml.textContent = cp('menu_lead');
+    $('menuLead').textContent = cp('menu_lead');
     // 日期、時間、地點已經在首屏，這裡只放注意事項（有填才顯示）
     $('facts').innerHTML = catalog.venue_note ? `<li>${icon('info')}<b>注意事項</b><span>${esc(catalog.venue_note)}</span></li>` : '';
     $('facts').classList.toggle('hidden', !catalog.venue_note);
@@ -1111,6 +1114,11 @@ body:has(#home.hidden) .flowtiles{display:block}
         <ul class="items">${v.items.map(row).join('')}</ul>
       </section>`).join('');
     $('addons').onclick = e => $('menu').onclick(e);
+    // 有租借品時，這一步叫「加購與點餐」，野餐墊在前、餐點在後
+    const hasRent = rentals().length > 0;
+    $('s1t').textContent = hasRent ? '加購與點餐' : '想吃點什麼？';
+    $('foodSubT').classList.toggle('hidden', !hasRent);
+    const sl = document.querySelector('.steps [data-s="1"] .lbl'); if (sl) sl.textContent = hasRent ? '加購・點餐' : '選餐點';
     renderTabs();
     $('vtabs').onclick = e => { const b = e.target.closest('[data-jump]'); if (b) $(b.dataset.jump).scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); };
     $('menu').onclick = e => {
@@ -1165,8 +1173,9 @@ body:has(#home.hidden) .flowtiles{display:block}
   // 只報名、不訂餐：已經選了餐點時，先確認再清空
   function syncOnlyReg(){
     const b = $('onlyReg'); if (!b || b.dataset.armed === '1') return;
-    b.innerHTML = count() ? icon('trash-2') + `清空 ${count()} 份餐點，只報名` : icon('ticket') + '只報名，不訂餐';
-    $('onlyRegNote').textContent = count() ? '' : '不吃東西也可以來看電影。';
+    const hasRent = catalog && rentals().length > 0;
+    b.innerHTML = count() ? icon('trash-2') + `清空已選的 ${count()} 項，只報名` : icon('ticket') + (hasRent ? '只報名，不加購' : '只報名，不訂餐');
+    $('onlyRegNote').textContent = count() ? '' : hasRent ? '不租野餐墊、不點餐，也可以來看電影。' : '不吃東西也可以來看電影。';
   }
   $('onlyReg').onclick = () => {
     const b = $('onlyReg');
