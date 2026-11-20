@@ -608,6 +608,39 @@ body:has(#home.hidden) .flowtiles{display:block}
   .steps li span.lbl{font-size:13px}
   .hbar .hmeta b{font-size:14px}
 }
+
+/* 電影區：放映機光束＋海報後的光暈＋底部膠卷 */
+.screening{overflow:hidden;isolation:isolate}
+.screening::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:
+  radial-gradient(ellipse 38% 55% at 22% 52%,rgba(243,210,122,.13),transparent 70%),
+  radial-gradient(ellipse 60% 80% at 100% 0,rgba(0,155,122,.16),transparent 65%),
+  linear-gradient(180deg,rgba(0,0,0,.18),transparent 22%,transparent 78%,rgba(0,0,0,.22))}
+.screening .beam{position:absolute;z-index:-1;pointer-events:none;top:-6%;right:-4%;width:92%;height:108%;
+  clip-path:polygon(100% 0,96% 0,6% 30%,4% 88%,100% 9%);
+  background:
+    radial-gradient(circle 1.4px at 58% 26%,rgba(255,240,200,.55) 98%,transparent),
+    radial-gradient(circle 1px at 41% 38%,rgba(255,240,200,.45) 98%,transparent),
+    radial-gradient(circle 1.2px at 70% 15%,rgba(255,240,200,.5) 98%,transparent),
+    radial-gradient(circle 1px at 30% 52%,rgba(255,240,200,.4) 98%,transparent),
+    radial-gradient(circle 1.3px at 82% 9%,rgba(255,240,200,.5) 98%,transparent),
+    linear-gradient(252deg,rgba(255,236,190,.20) 0%,rgba(243,210,122,.08) 38%,rgba(243,210,122,0) 78%);
+  filter:blur(.6px);animation:beam 7s ease-in-out infinite}
+@keyframes beam{0%,100%{opacity:.85}45%{opacity:1}52%{opacity:.78}58%{opacity:.95}}
+.screening .reel{position:absolute;left:-2%;right:-2%;bottom:18px;height:26px;z-index:-1;pointer-events:none;opacity:.5;transform:rotate(-1.2deg);
+  background:radial-gradient(circle 3.5px at 50% 50%,#1D3A31 92%,transparent) 0 0/22px 13px repeat-x,
+    radial-gradient(circle 3.5px at 50% 50%,#1D3A31 92%,transparent) 0 13px/22px 13px repeat-x,#06140F;
+  box-shadow:0 0 0 1px rgba(232,196,104,.10)}
+.screening .poster-wrap::before{content:"";position:absolute;inset:-28px;z-index:-1;border-radius:28px;pointer-events:none;background:radial-gradient(closest-side,rgba(243,210,122,.22),transparent)}
+.showday{display:inline-flex;align-items:center;gap:10px;margin:0 0 14px;padding:5px 14px;border:1px solid rgba(232,196,104,.45);border-radius:999px;color:var(--gold-l);font-size:14px;font-weight:700;letter-spacing:.12em;background:rgba(6,20,15,.45)}
+.showday::before{content:"";width:7px;height:7px;border-radius:50%;background:#FF5A4E;box-shadow:0 0 0 3px rgba(255,90,78,.18),0 0 10px rgba(255,90,78,.7)}
+.screening .film .title{font-size:28px;letter-spacing:.02em}
+.screening #filmBody p:not(.title){max-width:34em;color:#D7DCD4}
+@media (max-width:760px){
+  .screening .beam{width:150%;right:-30%;clip-path:polygon(100% 0,94% 0,8% 22%,6% 46%,100% 6%)}
+  .screening .reel{bottom:10px;height:22px}
+  .screening::after{background:radial-gradient(ellipse 70% 40% at 50% 28%,rgba(243,210,122,.13),transparent 70%),linear-gradient(180deg,rgba(0,0,0,.18),transparent 22%,transparent 80%,rgba(0,0,0,.22))}
+}
+@media (prefers-reduced-motion:reduce){.screening .beam{animation:none}}
 </style>
 </head>
 <body>
@@ -646,10 +679,13 @@ body:has(#home.hidden) .flowtiles{display:block}
   </section>
   <div class="tiles" aria-hidden="true"></div>
 
-  <section class="sec night2" aria-labelledby="filmT">
+  <section class="sec night2 screening" aria-labelledby="filmT">
+    <div class="beam" aria-hidden="true"></div>
+    <div class="reel" aria-hidden="true"></div>
     <div class="wrap film">
       <div class="poster-wrap reveal"><span class="tape t1" aria-hidden="true"></span><span class="tape t2" aria-hidden="true"></span><div class="poster" id="poster"></div></div>
       <div>
+        <p class="showday hidden" id="showDay"></p>
         <h2 id="filmT">即將上映</h2>
         <div id="filmBody"></div>
         <ul class="dl" id="facts"></ul>
@@ -1016,6 +1052,7 @@ body:has(#home.hidden) .flowtiles{display:block}
     const tm = real(info['時間']) ? info['時間'] : '', place = real(info['地點']) ? info['地點'] : '';
     $('stubTime').textContent = tm ? `入場 ${tm}` : ''; $('stubTime').classList.toggle('hidden', !tm); $('evDate').querySelector('.cut').classList.toggle('hidden', !tm);
     $('showing').textContent = place ? `${evDay}${evWk ? `（${evWk}）` : ''}晚上　${place}` : ''; $('showing').classList.toggle('hidden', !place);
+    $('showDay').textContent = evDay ? `${evDay}${evWk ? `（${evWk}）` : ''}晚上・露天放映` : ''; $('showDay').classList.toggle('hidden', !evDay);
     startCountdown(info);
     $('evMeta').innerHTML = `<li>${icon('clock')}${real(info['時間']) ? `<span>${esc(info['時間'])}</span>` : '<span class="tbd">時間待公布</span>'}</li><li>${icon('map-pin')}${real(info['地點']) ? `<span>${esc(info['地點'])}</span>` : '<span class="tbd">地點待公布</span>'}</li>${cp('fee') ? `<li>${icon('ticket')}<span>${esc(cp('fee'))}</span></li>` : ''}`;
     const now = new Date(); let note = '', can = false;
