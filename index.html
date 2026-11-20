@@ -1085,7 +1085,7 @@ body:has(#home.hidden) .flowtiles{display:block}
     // 日期、時間、地點已經在首屏，這裡只放注意事項（有填才顯示）
     $('facts').innerHTML = catalog.venue_note ? `<li>${icon('info')}<b>注意事項</b><span>${esc(catalog.venue_note)}</span></li>` : '';
     $('facts').classList.toggle('hidden', !catalog.venue_note);
-    $('vlist').innerHTML = foods().map(v => `<div class="vcard"><span class="ill">${illo(vIcon(v))}</span><div><b>${esc(v.name)}</b><span>${esc(v.items.slice(0, 4).map(i => i.name).join('、'))}${v.items.length > 4 ? ' 等' : ''}${v.items.length ? `・$${Math.min(...v.items.map(i => i.price))} 起` : ''}</span></div></div>`).join('') || '<p class="muted">餐點待公布</p>';
+    $('vlist').innerHTML = foods().map(v => ({ v, its: v.items.filter(i => !i.addon_for) })).map(({ v, its }) => `<div class="vcard"><span class="ill">${illo(vIcon(v))}</span><div><b>${esc(v.name)}</b><span>${esc(its.slice(0, 4).map(i => i.name).join('、'))}${its.length > 4 ? ' 等' : ''}${its.length ? `・$${Math.min(...its.map(i => i.price))} 起` : ''}</span></div></div>`).join('') || '<p class="muted">餐點待公布</p>';
     $('vlist').insertAdjacentHTML('afterbegin', rentals().flatMap(v => v.items).map(i => `<div class="vcard rent"><span class="ill">${illo('mat')}</span><div><b>${esc(i.name.replace(/（.*）/, ''))}租借</b><span>報名時可以加租・$${esc(i.price)}／張</span></div></div>`).join(''));
     $('how').innerHTML = [1, 2, 3].map(i => [cp('s' + i + '_t'), cp('s' + i + '_d')])
       .map(([t, d], i) => `<li><span class="no num" aria-hidden="true">${i + 1}</span><div><h3><span class="sr">第 ${i + 1} 步：</span>${esc(t)}</h3><p>${esc(d)}</p></div></li>`).join('');
@@ -1153,9 +1153,22 @@ body:has(#home.hidden) .flowtiles{display:block}
   }
 
   // 改數量：act 是 plus／minus／remove；回傳新的份數（被擋下時回傳 null）
+  // 加購品（addon_for）要搭配同一組的主餐（combo_key），每份主餐可以加購 1 份；伺服器也會檢查
+  const mainQty = key => all().filter(x => x.combo_key === key).reduce((s, x) => s + (cart[x.id] || 0), 0);
+  function trimAddons(key){
+    let room = mainQty(key), cut = false;
+    all().filter(x => x.addon_for === key).forEach(a => {
+      const q = cart[a.id] || 0, nq = Math.min(q, room); room -= nq;
+      if (nq !== q) { cart[a.id] = nq; cut = true; const li = document.getElementById('mi_' + a.id); if (li) { li.classList.toggle('has', nq > 0); li.querySelector('.ctl').innerHTML = ctl(a); } }
+    });
+    if (cut) toast(`加購的份數不能超過「${key}」，已經幫你一起減少`, 'info');
+  }
   function changeQty(id, act){
     const it = all().find(x => x.id === id); if (!it) return null;
     let q = cart[it.id] || 0;
+    if (act === 'plus' && it.addon_for && q >= mainQty(it.addon_for)) {
+      toast(mainQty(it.addon_for) ? `每份「${it.addon_for}」可以加購 1 份` : `要先點「${it.addon_for}」，才能加購這個品項`, 'triangle-alert'); return null;
+    }
     if (act === 'plus') {
       if (it.remaining != null && q >= it.remaining) { toast(`「${it.name}」只剩 ${it.remaining} 份`, 'triangle-alert'); return null; }
       if (q >= 10) { toast('同一個品項最多 10 份', 'triangle-alert'); return null; }
@@ -1163,6 +1176,7 @@ body:has(#home.hidden) .flowtiles{display:block}
       q++;
     } else q = act === 'remove' ? 0 : Math.max(0, q - 1);
     cart[it.id] = q;
+    if (it.combo_key && act !== 'plus') trimAddons(it.combo_key);
     const li = document.getElementById('mi_' + it.id);
     if (li) { li.classList.toggle('has', q > 0); li.querySelector('.ctl').innerHTML = ctl(it); const out = li.querySelector('output'); if (out && !reduce) out.classList.add('bump'); }
     updateSummary(true); renderTabs(); refreshErrs();
@@ -1332,7 +1346,9 @@ body:has(#home.hidden) .flowtiles{display:block}
     $('cfBody').innerHTML = `<p class="cf-who">${esc($('f_name').value.trim())}・${guest ? '校外人士' : '學號 ' + esc($('f_sid').value.trim())}・${esc($('f_phone').value.trim())}</p>
       <div class="cf-rows">${l.length ? l.map(i => `<div class="rw"><span>${esc(i.name)} × ${i.qty}<br><small class="muted">${esc(i.vendor)}</small></span><span class="num">$${i.price * i.qty}</span></div>`).join('') : '<div class="rw"><span>不點餐，只報名活動</span><span></span></div>'}</div>
       <div class="cf-tot"><span>總金額</span><span class="num">${money(total())}</span></div>`;
-    const dl = catalog.test_mode ? new Date(Math.max(new Date(catalog.payment_deadline || 0), Date.now() + 3 * 864e5)) : catalog.payment_deadline;
+    // 付款期限＝送出後 N 小時（payment_hold_hours），最晚不超過 payment_deadline；和資料庫的算法一致
+    const dl = catalog.test_mode ? new Date(Math.max(new Date(catalog.payment_deadline || 0), Date.now() + 3 * 864e5))
+      : catalog.payment_hold_hours ? new Date(Math.min(new Date(catalog.payment_deadline || 8.64e15), Date.now() + catalog.payment_hold_hours * 36e5)) : catalog.payment_deadline;
     $('cfDl').innerHTML = total() > 0 && dl ? `${icon('clock')}<span>送出後請在 <b>${esc(fmtTime(dl))}</b> 前轉帳 <b class="num">${money(total())}</b>，逾期訂單會取消、名額釋出。</span>` : '';
     $('cfDl').classList.toggle('hidden', !(total() > 0 && dl));
     $('scrim').classList.add('on'); $('confirmSheet').classList.add('on');
