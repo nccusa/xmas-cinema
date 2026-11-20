@@ -202,7 +202,20 @@ input[type=checkbox]{width:17px;height:17px;accent-color:var(--green)}
 pre.mail{white-space:pre-wrap;background:var(--sunk);border:1px solid var(--rule);border-radius:10px;padding:12px;font:inherit;font-size:14px;max-height:360px;overflow:auto;margin:8px 0 0}
 .vars{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 14px}
 .vars button{border:1px solid var(--rule2);background:var(--sunk);border-radius:7px;padding:2px 8px;font-size:12.5px;cursor:pointer}
-.drop{border:2px dashed var(--rule2);border-radius:14px;padding:26px;text-align:center;background:var(--sunk);cursor:pointer;transition:border-color .12s,background .12s}
+.drop{display:flex;flex-direction:column;align-items:center;gap:4px;border:2px dashed var(--rule2);border-radius:14px;padding:26px 18px;text-align:center;background:var(--sunk);cursor:pointer;transition:border-color .12s,background .12s}
+.drop.slim{flex-direction:row;justify-content:center;gap:10px;padding:12px 16px}.drop.slim b{margin:0}.drop.slim .i{width:22px;height:22px}
+.imp{margin-top:16px;border-top:1px solid var(--rule);padding-top:16px}
+.imphead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}.imphead b{font-size:15.5px;word-break:break-all}.imphead .small{color:var(--dim)}
+.checks{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:6px}
+.checks li{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border-radius:10px;font-size:14px;line-height:1.5}
+.checks li .i{flex:none;margin-top:2px;width:18px;height:18px}.checks li span{color:var(--dim);display:block;font-size:13px}
+.checks .ok{background:var(--ok-bg)}.checks .ok .i,.checks .ok b{color:var(--ok)}
+.checks .warn{background:var(--caution-bg)}.checks .warn .i,.checks .warn b{color:var(--caution)}
+.checks .bad{background:var(--crit-bg)}.checks .bad .i,.checks .bad b{color:var(--crit)}
+.checks .neu{background:var(--sunk);border:1px solid var(--rule)}.checks .neu .i{color:var(--dim)}
+.imptbl td{vertical-align:top}.imptbl td:nth-child(5){min-width:200px}.imptbl td:nth-child(6){min-width:150px}.imptbl .why{font-size:12.5px;color:var(--dim);margin-top:3px}
+.impfoot{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid var(--rule)}.impfoot .grow{flex:1;min-width:200px;font-size:13px;color:var(--dim)}
+details.impmore{margin-top:10px}details.impmore summary{cursor:pointer;font-size:13.5px;color:var(--dim);padding:4px 0}
 .drop.over,.drop:hover{border-color:var(--green2);background:#F0F7F3}
 .drop .i{width:32px;height:32px;color:var(--green2)}
 .drop b{display:block;margin-top:8px}
@@ -763,28 +776,29 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
   }
   function parsePostCSV(text){
     text = text.replace(/^﻿/, '');
-    const lines = text.split(/\r?\n/); let period = ''; const rows = []; let started = false, last = null, skipped = 0;
+    const lines = text.split(/\r?\n/); let period = '', account = '', header = false; const rows = [], skippedList = []; let started = false, last = null, skipped = 0, outgoing = 0;
     for (const ln of lines) {
       if (!ln.trim()) continue;
       const c = parseLine(ln);
-      if (c[0] === '存簿帳號') { period = c[3] || ''; continue; }
-      if (/交易日期/.test(c[0])) { started = true; continue; }
+      if (c[0] === '存簿帳號') { period = c[3] || ''; account = (c[1] || '').replace(/\D/g, ''); continue; }
+      if (/交易日期/.test(c[0])) { started = true; header = true; continue; }
       if (!started) continue;
       const m = c[0].match(/^(\d{2,3})\/(\d{2})\/(\d{2}) (\d{2}:\d{2}:\d{2})$/); if (!m) continue;
       const summary = (c[1] || '').replace(/\s/g, ''), note = (c[6] || '').normalize('NFKC'), memo = (c[7] || '').normalize('NFKC').trim();
       if (summary === '續上一筆') { if (last) { if (/^\d{3}\D/.test(note) && !last.bank) last.bank = note; if (memo) last.memo = (last.memo + ' ' + memo).trim(); } continue; }
       last = null;
       const dep = parseInt((c[4] || '').replace(/[^0-9]/g, ''), 10) || 0;
-      if (dep <= 0) continue;
-      if (c[2]) { skipped++; continue; }
-      if (/利息|薪資|委發款項|票證/.test(summary)) { skipped++; continue; }
+      if (dep <= 0) { if (summary !== '手續費') outgoing++; continue; }
+      const at = `${parseInt(m[1], 10) + 1911}/${m[2]}/${m[3]} ${m[4].slice(0, 5)}`;
+      if (c[2]) { skipped++; skippedList.push({ at, amount: dep, why: '沖正（銀行撤銷的交易）' }); continue; }
+      if (/利息|薪資|委發款項|票證/.test(summary)) { skipped++; skippedList.push({ at, amount: dep, why: summary }); continue; }
       const tok = (note.split(/\s+/)[0] || '').replace(/[^0-9*]/g, '');
       const last5 = /\d{5}$/.test(tok) ? tok.slice(-5) : null;
       const iso = `${parseInt(m[1], 10) + 1911}-${m[2]}-${m[3]}T${m[4]}+08:00`;
       last = { txn_at: iso, amount: dep, last5, memo, bank: '', summary };
       rows.push(last);
     }
-    return { period, rows, skipped };
+    return { period, rows, skipped, skippedList, outgoing, account, header };
   }
   let parsed = null;
   async function renderRecon(){
@@ -799,7 +813,7 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
     page().innerHTML = `
       <div class="card"><h2>${icon('file-up')}匯入郵局交易明細</h2><p>從電腦版網路郵局匯出 CSV，拖進來或點一下選檔。檔案只在這台電腦解析，只上傳時間、金額、帳號後五碼和附言；同一段期間重複匯入沒關係，系統會略過已經匯入的交易。</p>
         <label class="drop" id="drop">${icon('file-spreadsheet')}<b>拖曳 CSV 到這裡，或點一下選擇檔案</b><span class="small muted" id="preview">支援郵局匯出的 UTF-8 或 Big5 格式</span><input type="file" id="csv" accept=".csv,text/csv" hidden></label>
-        <div class="row" style="margin-top:12px;justify-content:flex-end"><button class="btn" type="button" id="doImport" disabled>${icon('upload')}匯入並比對</button></div>
+        <div id="impPrev"></div>
       </div>
       ${batches.length ? `<div class="card"><h2>${icon('clock')}最近一次匯入：${esc(fmtTime(batches[0].created_at))}</h2><p>明細期間 ${esc(batches[0].file_period || '—')}，共 ${batches[0].rows_total} 筆轉入，新增 ${batches[0].rows_new} 筆（其他是之前匯入過的）。</p>
         <div class="lastbatch"><div><b style="color:var(--ok)">${batches[0].matched}</b><span>自動配對入帳</span></div><div><b style="color:var(--caution)">${batches[0].suggested}</b><span>建議配對，待確認</span></div><div><b style="color:var(--crit)">${batches[0].unmatched}</b><span>找不到對應訂單</span></div><div><b>${Math.max(0, batches[0].rows_total - batches[0].rows_new)}</b><span>重複，已略過</span></div></div></div>` : ''}
@@ -819,16 +833,91 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
     ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
     ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
     drop.addEventListener('drop', e => { if (e.dataTransfer.files[0]) readCSV(e.dataTransfer.files[0]); });
-    $('csv').onchange = e => { if (e.target.files[0]) readCSV(e.target.files[0]); };
-    $('doImport').onclick = e => busy(e.currentTarget, async () => { const res = await run(() => Api.rpc('admin_import_txns', { p_rows: parsed.rows, p_period: parsed.period })); toast(`新增 ${res.new} 筆：自動入帳 ${res.matched}、建議 ${res.suggested}、找不到 ${res.unmatched}`); parsed = null; await loadAll(); renderRecon(); });
+    $('csv').onchange = e => { if (e.target.files[0]) readCSV(e.target.files[0]); e.target.value = ''; };
     page().onclick = reconClick;
+    if (parsed) { drop.classList.add('slim'); drop.querySelector('b').textContent = '換一個檔案：拖曳到這裡或點一下'; $('preview').textContent = ''; renderImportPreview(); }
   }
+  const rocToIso = d => { const m = String(d || '').match(/(\d{2,3})\/(\d{1,2})\/(\d{1,2})/); return m ? `${+m[1] + 1911}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}` : ''; };
+  const money = n => '$' + Number(n || 0).toLocaleString('en-US');
+  const IMP_METHOD = { memo: '附言的學號／訂單編號相符', memo_name: '附言姓名＋金額相符', last5_amount: '帳號後五碼＋金額相符' };
+  const IMP_PREV = { matched: '當時已入帳', suggested: '還在待確認', unmatched: '當時找不到訂單', ignored: '已略過' };
   async function readCSV(f){
-    const buf = await f.arrayBuffer(); let text = new TextDecoder('utf-8').decode(buf);
-    if (!/交易日期/.test(text)) { try { text = new TextDecoder('big5').decode(buf); } catch (er) {} }
-    parsed = parsePostCSV(text);
-    $('preview').innerHTML = parsed.rows.length ? `<b style="color:var(--ok)">${esc(f.name)}</b>：期間 ${esc(parsed.period)}，找到 ${parsed.rows.length} 筆轉入，略過 ${parsed.skipped} 筆非付款項目` : `<b style="color:var(--crit)">${esc(f.name)} 裡找不到轉入紀錄，請確認是郵局匯出的交易明細 CSV</b>`;
-    $('doImport').disabled = !parsed.rows.length;
+    const box = $('impPrev'), drop = $('drop');
+    box.innerHTML = `<div class="imp"><div class="empty">${icon('loader-circle', 'spin')}正在讀取 ${esc(f.name)}…</div></div>`;
+    const buf = await f.arrayBuffer(); let text = new TextDecoder('utf-8').decode(buf), enc = 'UTF-8';
+    if (!/交易日期/.test(text)) { try { const t2 = new TextDecoder('big5').decode(buf); if (/交易日期/.test(t2)) { text = t2; enc = 'Big5'; } } catch (er) {} }
+    parsed = parsePostCSV(text); parsed.file = f.name; parsed.preview = null; parsed.previewErr = '';
+    drop.classList.add('slim'); drop.querySelector('b').textContent = '換一個檔案：拖曳到這裡或點一下';
+    $('preview').textContent = '';
+    if (parsed.header && parsed.rows.length) {
+      try { parsed.preview = await Api.rpc('admin_preview_txns', { p_rows: parsed.rows }); }
+      catch (er) { parsed.previewErr = er.message || String(er); }
+    }
+    parsed.enc = enc; parsed.size = f.size;
+    renderImportPreview();
+  }
+  function renderImportPreview(){
+    const P = parsed, box = $('impPrev'); if (!P) { box.innerHTML = ''; return; }
+    const byId = Object.fromEntries(regs.map(r => [r.id, r]));
+    const checks = [];
+    const ck = (tone, ic, title, detail = '') => checks.push(`<li class="${tone}">${icon(ic)}<div><b>${title}</b>${detail ? `<span>${detail}</span>` : ''}</div></li>`);
+    if (!P.header) {
+      ck('bad', 'circle-x', '這不是郵局的交易明細', '找不到「交易日期」欄位。請從電腦版網路郵局的「交易明細查詢」匯出 CSV，不要先用 Excel 開啟再存檔。');
+    } else {
+      ck('ok', 'circle-check', '郵局交易明細格式正確', `編碼 ${P.enc}・${(P.size / 1024).toFixed(1)} KB`);
+      const want = String(settings.account_no || '').replace(/\D/g, '');
+      if (P.account && want) {
+        if (P.account.slice(-5) === want.slice(-5)) ck('ok', 'circle-check', '是收款帳戶的明細', `帳號末五碼 ${esc(P.account.slice(-5))}，和「設定」裡的收款帳號相同`);
+        else ck('bad', 'triangle-alert', '帳號和收款帳號不同', `這份明細的帳號末五碼是 ${esc(P.account.slice(-5))}，「設定」裡的收款帳號末五碼是 ${esc(want.slice(-5))}。可能匯出成別的帳戶，請確認。`);
+      } else ck('warn', 'circle-alert', '無法確認是哪個帳戶', '檔案裡沒有存簿帳號，請自己確認是收款帳戶的明細。');
+      const [ps, pe] = (P.period || '').split('~'), today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Taipei' }), endIso = rocToIso(pe);
+      if (endIso && endIso < today) ck('warn', 'clock', `明細只查到 ${esc(endIso.slice(5).replace('-', '/'))}`, `查詢期間 ${esc(P.period)}。${esc(endIso.slice(5).replace('-', '/'))} 之後的轉帳不在這份檔案裡，要對到今天請重新匯出到今天。`);
+      else ck('ok', 'calendar', `查詢期間 ${esc(P.period || '—')}`, P.rows.length ? `轉入時間從 ${esc(fmtTime(P.rows.reduce((a, r) => r.txn_at < a ? r.txn_at : a, P.rows[0].txn_at)))} 到 ${esc(fmtTime(P.rows.reduce((a, r) => r.txn_at > a ? r.txn_at : a, '')))}` : '');
+      const sum = P.rows.reduce((a, r) => a + r.amount, 0);
+      if (P.rows.length) ck('ok', 'banknote', `找到 ${P.rows.length} 筆轉入，合計 ${money(sum)}`, [P.outgoing ? `另有 ${P.outgoing} 筆提款／轉出，不需要對帳` : '', P.skipped ? `略過 ${P.skipped} 筆不是付款的項目（明細在下面）` : ''].filter(Boolean).join('；'));
+      else ck('bad', 'circle-x', '這段期間沒有任何轉入', P.outgoing ? `只有 ${P.outgoing} 筆提款／轉出。` : '請確認查詢期間有包含同學轉帳的日期。');
+      const noL5 = P.rows.filter(r => !r.last5).length;
+      if (noL5) ck('warn', 'circle-alert', `${noL5} 筆沒有轉出帳號`, '通常是臨櫃或 ATM 現金存入，只能靠附言比對。');
+      if (P.previewErr) ck('warn', 'triangle-alert', '無法試算比對結果', `${esc(P.previewErr)}。仍然可以直接匯入。`);
+    }
+    const res = Array.isArray(P.preview) ? P.preview : [], st = Object.fromEntries(res.map(x => [x.i, x]));
+    const items = P.rows.map((r, k) => ({ r, x: st[k + 1] || { state: 'unknown' } }));
+    const cnt = s => items.filter(o => o.x.state === s);
+    const mt = cnt('matched'), sg = cnt('suggested'), un = cnt('unmatched'), dup = items.filter(o => ['duplicate', 'dup_in_file'].includes(o.x.state)), bad = cnt('invalid');
+    const fresh = items.filter(o => !['duplicate', 'dup_in_file', 'invalid'].includes(o.x.state));
+    if (res.length) {
+      if (!fresh.length) ck('neu', 'check-check', '這份明細的交易都匯入過了', '不需要再匯入。');
+      else if (!sg.length && !un.length) ck('ok', 'party-popper', `新的 ${fresh.length} 筆都能自動入帳`, '匯入後不需要人工處理。');
+      else ck('warn', 'list-checks', `匯入後有 ${sg.length + un.length} 筆要人工處理`, '下面列在最前面，匯入後會出現在「需要人工確認」。');
+    }
+    const order = { invalid: 0, unmatched: 1, suggested: 2, unknown: 3, matched: 4 };
+    const row = ({ r, x }) => {
+      const reg = byId[x.reg];
+      const badge = { matched: `<span class="badge b-ok">會自動入帳</span>`, suggested: `<span class="badge b-caution">需要確認</span>`, unmatched: `<span class="badge b-crit">找不到訂單</span>`, duplicate: `<span class="badge b-neu">已匯入過</span>`, dup_in_file: `<span class="badge b-neu">檔案內重複</span>`, invalid: `<span class="badge b-crit">資料不完整</span>`, unknown: `<span class="badge b-neu">未試算</span>` }[x.state] || '';
+      const why = x.state === 'matched' ? IMP_METHOD[x.method] || '' : x.state === 'duplicate' ? IMP_PREV[x.prev] || '' : x.state === 'dup_in_file' ? '同一份檔案裡出現兩次，只會匯入一次' : (x.note || '');
+      return `<tr><td class="small">${esc(fmtTime(r.txn_at))}</td><td class="r num"><b>${r.amount}</b></td><td class="num">${esc(r.last5 || '—')}</td><td>${esc(r.memo || '—')}${r.bank ? `<div class="why">${esc(r.bank)}</div>` : ''}</td><td>${badge}${why ? `<div class="why">${esc(why)}</div>` : ''}</td>
+        <td class="small">${reg ? `<b>${esc(reg.name)}</b> <span class="num">${esc(reg.order_no)}</span><div class="why">應付 <span class="num">${reg.total_amount - reg.paid_amount}</span>${reg.payer_last5 ? `・後五碼 <span class="num">${esc(reg.payer_last5)}</span>` : ''}</div>` : '<span class="muted">—</span>'}</td></tr>`;
+    };
+    const thead = '<thead><tr><th>入帳時間</th><th class="r">金額</th><th>後五碼</th><th>附言</th><th>預計結果</th><th>對應訂單</th></tr></thead>';
+    const list = fresh.concat(bad).sort((a, b) => order[a.x.state] - order[b.x.state]);
+    const canImport = P.header && P.rows.length && (!res.length || fresh.length);
+    box.innerHTML = `<div class="imp">
+      <div class="imphead">${icon('file-spreadsheet')}<b>${esc(P.file)}</b><span class="grow"></span><button class="btn quiet sm" type="button" id="impClear">${icon('circle-x')}取消</button></div>
+      <ul class="checks">${checks.join('')}</ul>
+      ${res.length ? `<div class="lastbatch" style="margin-bottom:12px"><div><b style="color:var(--ok)">${mt.length}</b><span>會自動入帳（${money(mt.reduce((a, o) => a + o.r.amount, 0))}）</span></div><div><b style="color:var(--caution)">${sg.length}</b><span>建議配對，要確認</span></div><div><b style="color:var(--crit)">${un.length}</b><span>找不到對應訂單</span></div><div><b>${dup.length}</b><span>已匯入過，會略過</span></div></div>` : ''}
+      ${list.length ? `<div class="tblwrap"><table class="tbl imptbl">${thead}<tbody>${list.map(row).join('')}</tbody></table></div>` : ''}
+      ${dup.length ? `<details class="impmore"${list.length ? '' : ' open'}><summary>已匯入過的 ${dup.length} 筆</summary><div class="tblwrap"><table class="tbl imptbl">${thead}<tbody>${dup.map(row).join('')}</tbody></table></div></details>` : ''}
+      ${P.skippedList.length ? `<details class="impmore"><summary>略過的 ${P.skippedList.length} 筆非付款項目</summary><div class="tblwrap"><table class="tbl"><thead><tr><th>時間</th><th class="r">金額</th><th>原因</th></tr></thead><tbody>${P.skippedList.map(k => `<tr><td class="small">${esc(k.at)}</td><td class="r num">${k.amount}</td><td class="small">${esc(k.why)}</td></tr>`).join('')}</tbody></table></div></details>` : ''}
+      ${res.length || canImport ? `<div class="impfoot"><span class="grow">${res.length ? '以上是試算，還沒有寫入任何資料。按「確認匯入」才會入帳；自動入帳的訂單會產生付款完成信，等你到「信件」核准。' : canImport ? '按「確認匯入」後，系統會比對並入帳。' : ''}</span>
+        ${canImport ? `<button class="btn" type="button" id="doImport">${icon('upload')}確認匯入${res.length ? ` ${fresh.length} 筆` : ''}</button>` : ''}</div>` : ''}
+    </div>`;
+    $('impClear').onclick = () => { parsed = null; renderRecon(); };
+    if ($('doImport')) $('doImport').onclick = e => busy(e.currentTarget, async () => {
+      const want = String(settings.account_no || '').replace(/\D/g, '');
+      if (P.account && want && P.account.slice(-5) !== want.slice(-5) && !(await ask({ title: '帳號和收款帳號不同', body: `這份明細的帳號末五碼是 ${P.account.slice(-5)}，不是收款帳號。確定要匯入嗎？`, ok: '仍要匯入' }))) return;
+      const r = await run(() => Api.rpc('admin_import_txns', { p_rows: P.rows, p_period: P.period }));
+      toast(`新增 ${r.new} 筆：自動入帳 ${r.matched}、建議 ${r.suggested}、找不到 ${r.unmatched}`); parsed = null; await loadAll(); renderRecon();
+    });
   }
   async function reconClick(e){
     const tr = e.target.closest('[data-t]'); if (!tr) return;
@@ -1107,7 +1196,7 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
       <div class="card"><h2>${icon('calendar')}報名與名額</h2>
         <div class="grid2">${f('registration_open_at', '開放報名時間（台北時間）', 'datetime-local')}${f('registration_close_at', '報名截止時間', 'datetime-local')}${f('payment_deadline', '付款期限（新報名的預設值）', 'datetime-local', '改這裡不會影響已經報名的人；個別延長請到「訂單」')}${f('capacity', '名額上限', 'number')}</div></div>
       <div class="card"><h2>${icon('wallet')}收款資訊</h2>
-        <div class="grid2">${f('bank_name', '收款銀行')}${f('bank_code', '銀行代碼')}${f('account_no', '收款帳號（郵局 14 碼）')}${f('account_name', '戶名')}</div>${f('qr_image_url', '收款 QR Code 圖片網址', 'text', '把郵局收款碼圖片放到網站上後，貼上圖片網址')}</div>
+        <div class="grid2">${f('bank_name', '收款銀行')}${f('bank_code', '銀行代碼')}${f('account_no', '收款帳號（郵局 14 碼）')}${f('account_name', '戶名')}</div>${f('qr_image_url', '收款 QR Code 圖片網址', 'text', '通常留空：報名頁會依收款帳號自動產生轉帳 QR Code。郵局 App 的收款碼 24 小時就過期，不要貼在這裡。')}</div>
       <div class="card"><h2>${icon('mail')}信件與其他</h2>
         <div class="grid2">${f('contact_info', '聯絡方式')}${f('site_url', '報名頁網址', 'text', '信件裡的查詢連結會用到')}${f('email_cap_24h', '每 24 小時寄信上限', 'number', '一般 Gmail 上限是 500，建議 450')}</div>${f('privacy_notice', '個人資料蒐集告知', 'textarea')}</div>
       <div class="savebar"><button class="btn" type="button" id="saveS">${icon('check')}儲存設定</button></div>`;
