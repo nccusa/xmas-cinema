@@ -153,6 +153,8 @@ body:has(#home.hidden) .fmark{color:var(--green)}
 .poster::before,.poster::after{content:"";position:absolute;top:0;bottom:0;width:18px;background:#05100C radial-gradient(circle 4px at 50% 50%,#2B3B35 95%,transparent) 0 0/18px 22px repeat-y;z-index:1}
 .poster::before{left:0}.poster::after{right:0}
 .poster img{position:absolute;inset:0 18px;width:calc(100% - 36px);height:100%;object-fit:cover}
+.poster.has{aspect-ratio:.72;padding:0}
+.film:has(.poster.has){grid-template-columns:minmax(0,4fr) minmax(0,7fr)}
 .poster .soon{position:relative;display:grid;justify-items:center;gap:6px;color:var(--cream);padding:0 12px}
 .poster .soon svg{position:absolute;left:-30px;right:-30px;top:-70px;width:calc(100% + 60px);height:calc(100% + 140px)}
 .poster .soon .tw{fill:var(--gold-l);filter:drop-shadow(0 0 5px rgba(243,210,122,.8))}
@@ -570,6 +572,9 @@ body:has(#home.hidden) .flowtiles{display:block}
   .marquee{padding:22px 22px 18px;width:100%;margin-bottom:20px;transform:none}
   .film.nofilm{grid-template-columns:1fr}
   .poster-wrap.empty{max-width:240px}
+  .poster.has{aspect-ratio:.72}
+  .poster-wrap:has(.poster.has){width:100%;max-width:280px;margin:0 auto}
+  .film:has(.poster.has){grid-template-columns:1fr}
   .poster-wrap.empty .poster{aspect-ratio:1/1}
   .showing,.presents{text-align:left;justify-content:flex-start}
   .countdown{justify-content:flex-start}
