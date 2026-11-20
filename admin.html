@@ -395,6 +395,7 @@ pre.mail{white-space:pre-wrap;background:var(--sunk);border:1px solid var(--rule
     const od = regs.filter(overdue).length;
     const todo = [];
     if (/展示|尚未/.test(settings.account_no)) todo.push(['crit', 'wallet', '收款帳號還是展示資料', '正式開放前要換成學生會的郵局帳號', 'settings']);
+    else if (!/學生會/.test(settings.account_name || '')) todo.push(['crit', 'wallet', '收款帳號是個人帳號（測試用）', '正式開放前要換成學生會的郵局帳號', 'settings']);
     if (!settings.site_url) todo.push(['crit', 'globe', '還沒設定報名頁網址', '信件裡的查詢連結會缺少，系統會擋下信件', 'settings']);
     if (d.txn_review) todo.push(['caution', 'landmark', `${d.txn_review} 筆款項需要人工確認`, '建議配對或找不到對應訂單', 'recon']);
     if (d.email_pending) todo.push(['caution', 'mail', `${d.email_pending} 封信等你核准`, '核准後才會寄出', 'mail']);
