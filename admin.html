@@ -317,6 +317,14 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
   .tri{gap:6px}.lastbatch{grid-template-columns:repeat(2,minmax(0,1fr))}
   .log li{grid-template-columns:1fr}.log li .small{grid-column:1}
 }
+.ago{margin-right:4px;align-self:center}
+.dphone{display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-weight:700;color:var(--green);text-decoration:none;font-size:15px}
+.dphone .i{width:16px;height:16px}
+.cands{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px}
+.linkbtn{background:none;border:0;padding:0;color:var(--green);text-decoration:underline;cursor:pointer;font:inherit;text-align:left}
+.prep h3{display:flex;align-items:center;gap:8px}
+.prep .ptotal{border-top:1px solid var(--line);font-weight:700}
+.moremenu hr{border:0;border-top:1px solid var(--line);margin:10px 0}
 </style>
 </head>
 <body>
@@ -367,6 +375,7 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
   if (window.registerSW) registerSW();
   const $ = id => document.getElementById(id);
   let regs = [], menu = { vendors: [], items: [] }, settings = null, dash = null, view = 'dash';
+  let lastLoad = 0, lastImport = null, pageDirty = false;  // 資料抓取時間、最後一次匯入郵局明細、這一頁是否有未儲存的修改
   const PAGES = [
     ['dash', '總覽', 'layout-dashboard', '報名、付款與現場進度一眼看完'],
     ['orders', '訂單', 'receipt-text', '查詢、修改餐點、人工入帳、取消'],
@@ -431,19 +440,30 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
     $('outBtn').innerHTML = icon('log-out') + '登出'; $('installBtn').innerHTML = icon('square-plus') + '安裝';
   }
   $('outBtn').onclick = async () => { await Api.logout(); showLogin(); };
-  $('nav').onclick = e => { const b = e.target.closest('[data-v]'); if (b) show(b.dataset.v); };
-  addEventListener('hashchange', () => { const v = location.hash.slice(1); if (v && v !== view && $('app').offsetParent !== null) show(v); });
+  // 「首頁文案」「設定」「菜單」「信件範本」改到一半換頁會不見，先確認
+  async function go(v){
+    if (v !== view && pageDirty && !(await ask({ title: '這一頁還有修改沒儲存', body: '離開後，剛剛改的內容會不見。', ok: '離開，不儲存', danger: true, cancel: '留在這一頁' }))) {
+      if (location.hash.slice(1) !== view) history.replaceState(null, '', '#' + view); return;
+    }
+    pageDirty = false; show(v);
+  }
+  $('nav').onclick = e => { const b = e.target.closest('[data-v]'); if (b) go(b.dataset.v); };
+  addEventListener('hashchange', () => { const v = location.hash.slice(1); if (v && v !== view && $('app').offsetParent !== null) go(v); });
+  $('page').addEventListener('input', e => { if (['copy', 'settings', 'menu', 'mail'].includes(view) && !e.target.closest('[data-q], #mAll, #oq, #newV')) pageDirty = true; });
+  $('page').addEventListener('change', e => { if (['copy', 'settings', 'menu', 'mail'].includes(view) && e.target.matches('input[type=file], input[type=checkbox][data-vf], input[type=checkbox][data-if], input[type=date], input[type=datetime-local], select')) pageDirty = true; });
+  addEventListener('beforeunload', e => { if (pageDirty) { e.preventDefault(); e.returnValue = ''; } });
   let deferred = null; addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; });
   $('installBtn').onclick = async () => { if (deferred) { deferred.prompt(); deferred = null; return; } await ask({ title: '安裝成 App', body: /iPhone|iPad/.test(navigator.userAgent) ? 'iPhone／iPad：用 Safari 打開，點「分享」→「加入主畫面」。' : '電腦版 Chrome／Edge：點網址列右邊的「安裝」圖示。\n手機 Chrome：右上角選單 →「安裝應用程式」。', ok: '知道了', cancel: '關閉' }); };
 
   async function loadAll(){
-    const [r, v, i, s] = await Promise.all([
+    const [r, v, i, s, ib] = await Promise.all([
       Api.select('registrations', 'select=*,order_items(*),pickups(*)&order=created_at.desc'),
       Api.select('vendors', 'select=*&order=sort,name'),
       Api.select('menu_items', 'select=*&order=sort,name'),
-      Api.select('settings', 'select=*&id=eq.1')
+      Api.select('settings', 'select=*&id=eq.1'),
+      Api.select('import_batches', 'select=created_at&order=created_at.desc&limit=1').catch(() => [])
     ]);
-    regs = r; menu = { vendors: v, items: i }; settings = s[0];
+    regs = r; menu = { vendors: v, items: i }; settings = s[0]; lastImport = ib[0] ? ib[0].created_at : null; lastLoad = Date.now();
     try { dash = await Api.rpc('admin_dashboard'); } catch (e) { dash = null; }
     paintChrome();
   }
@@ -457,7 +477,7 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
       ? `${icon('flask-conical')}<span><b>測試模式開啟中</b>：報名不受開放時間限制，付款頁可以模擬付款。目前有 ${tests} 筆測試資料。</span><button class="btn sm sec" type="button" data-go="test">測試工具</button>`
       : `${icon('triangle-alert')}<span>測試模式已關閉，但還有 <b>${tests}</b> 筆測試資料，正式開放前請清除。</span><button class="btn sm sec" type="button" data-go="test">去清除</button>`;
   }
-  document.addEventListener('click', e => { const g = e.target.closest('[data-go]'); if (g) { e.preventDefault(); show(g.dataset.go); } });
+  document.addEventListener('click', e => { const g = e.target.closest('[data-go]'); if (g) { e.preventDefault(); go(g.dataset.go); } });
 
   function show(v){
     if (!PAGES.find(p => p[0] === v)) v = 'dash';
@@ -470,16 +490,31 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
   const page = () => $('page');
   function acts(html){ $('pageActs').innerHTML = html; }
   async function refresh(){ await run(loadAll); show(view); }
+  const agoText = () => { const m = Math.floor((Date.now() - lastLoad) / 6e4); return m < 1 ? '資料剛更新' : `資料更新於 ${m} 分鐘前`; };
+  const agoHtml = () => `<span class="ago small muted" id="updAgo" title="總覽和訂單頁每分鐘自動更新（開著訂單明細或正在輸入時會暫停）">${agoText()}</span>`;
+  function paintAgo(){ const el = $('updAgo'); if (el) el.textContent = agoText(); }
+  setInterval(async () => {
+    paintAgo();
+    if (document.hidden || $('app').classList.contains('hidden') || !['dash', 'orders'].includes(view)) return;
+    if ($('drawer').classList.contains('on') || $('dialog').classList.contains('on')) return;
+    const a = document.activeElement; if (a && a.matches('input, textarea, select') && page().contains(a)) return;
+    if (Date.now() - lastLoad < 58e3) return;
+    try { await loadAll(); const y = scrollY; (view === 'dash' ? renderDash : renderOrders)(); scrollTo(0, y); } catch (e) {}
+  }, 15e3);
 
   // ---------- 總覽 ----------
   // 上半部：今天要處理的事；下半部：正式開放前的檢查清單。統計只算正式資料，測試資料另外標示。
   async function renderDash(){
-    acts(`<button class="btn sec" type="button" id="rf">${icon('refresh-cw')}重新整理</button>`); $('rf').onclick = e => busy(e.currentTarget, refresh);
+    acts(`${agoHtml()}<button class="btn sec" type="button" id="rf">${icon('refresh-cw')}重新整理</button>`); $('rf').onclick = e => busy(e.currentTarget, refresh);
     const d = dash || {}; const cap = settings.capacity || 1;
     const real = regs.filter(r => !r.is_test && r.status !== 'cancelled'), tests = regs.filter(r => r.is_test && r.status !== 'cancelled').length;
     const k = { total: real.length, pending: real.filter(r => r.status === 'pending_payment').length, revenue: real.reduce((s, r) => s + (r.paid_amount || 0), 0), paid: real.filter(r => r.status !== 'pending_payment').length, checked: real.filter(r => r.checked_in_at || r.status === 'picked_up').length, done: real.filter(r => siteState(r) === 'done').length, guests: real.filter(r => r.participant_type === 'guest').length };
     const od = regs.filter(overdue).length;
     const todo = [];
+    // 還有待付款的正式訂單，但超過 24 小時沒匯入郵局明細：逾期訂單要等期限後匯入過明細才會自動取消
+    const pendReal = regs.filter(r => !r.is_test && r.status === 'pending_payment').length;
+    const impH = lastImport ? (Date.now() - new Date(lastImport)) / 36e5 : null;
+    if (pendReal && (impH == null || impH >= 24)) todo.push([impH == null || impH >= 48 ? 'crit' : 'caution', 'file-up', impH == null ? '還沒有匯入過郵局明細' : `已經 ${Math.floor(impH)} 小時沒匯入郵局明細`, `有 ${pendReal} 筆待付款；逾期的訂單要等期限後匯入過明細，才會自動取消、釋出名額`, 'recon']);
     if (d.txn_review) todo.push(['caution', 'landmark', `${d.txn_review} 筆款項需要人工確認`, '建議配對或找不到對應訂單', 'recon']);
     if (d.email_pending) todo.push(['caution', 'mail', `${d.email_pending} 封信等你核准`, '核准後才會寄出', 'mail']);
     if (d.email_blocked) todo.push(['crit', 'mail-warning', `${d.email_blocked} 封信寄送失敗或被擋下`, '通常是範本變數沒代入或 Email 錯誤', 'mail']);
@@ -487,7 +522,16 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
     const partial = regs.filter(r => !r.is_test && siteState(r) === 'partial').length;
     if (partial) todo.push(['info', 'hand-platter', `${partial} 人已報到但餐點還沒領完`, '到訂單頁用「現場進度」篩選', 'orders']);
     const kpi = (ic, t, v, sub, bar) => `<div class="kpi"><div class="k">${icon(ic)}${t}</div><div class="v">${v}${sub ? `<small>${sub}</small>` : ''}</div>${bar != null ? `<div class="bar"><i style="width:${Math.min(100, bar)}%"></i></div>` : ''}</div>`;
-    const prepBy = {}; (d.prep || []).forEach(p => (prepBy[p.vendor] = prepBy[p.vendor] || []).push(p));
+    // 備餐統計：只算正式、沒取消的訂單；「已付款」才是要跟店家訂的份數
+    const prepBy = {};
+    regs.filter(r => !r.is_test && r.status !== 'cancelled').forEach(r => {
+      const paid = ['paid', 'picked_up'].includes(r.status), pv = new Set((r.pickups || []).map(x => x.vendor_name));
+      (r.order_items || []).forEach(o => {
+        const v = prepBy[o.vendor_name] = prepBy[o.vendor_name] || {}; const it = v[o.item_name] = v[o.item_name] || { qty: 0, paid: 0, picked: 0, amt: 0 };
+        it.qty += o.qty; if (paid) { it.paid += o.qty; it.amt += o.qty * o.unit_price; } if (r.status === 'picked_up' || pv.has(o.vendor_name)) it.picked += o.qty;
+      });
+    });
+    const prepTotal = v => Object.values(prepBy[v]).reduce((s, x) => s + x.amt, 0);
     page().innerHTML = `
       <div class="kpis">
         ${kpi('users', '有效報名', k.total, '／' + cap, k.total / cap * 100)}
@@ -504,9 +548,14 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
         </div>
         <div class="card"><h2>${icon('badge-check')}上線前檢查</h2><p>全部打勾再開放報名、收款。</p><ul class="check" id="launch"><li><span>${icon('loader-circle', 'spin')}</span><span>檢查中…</span><span></span></li></ul></div>
       </div>
-      <div class="card prep"><h2>${icon('store')}備餐統計</h2><p>報名截止後，以「已付款」份數通知店家。</p>
-        ${Object.keys(prepBy).length ? Object.entries(prepBy).map(([v, list]) => `<h3>${icon('store')}${esc(v)}</h3><div class="it hd"><span>品項</span><span class="num">全部</span><span class="num">已付款</span><span class="num">已取</span></div>${list.map(p => `<div class="it"><span>${esc(p.item)}</span><span class="num">${p.qty}</span><span class="num"><b>${p.qty_paid || 0}</b></span><span class="num">${p.qty_picked || 0}</span></div>`).join('')}`).join('') : `<div class="empty">${icon('utensils-crossed')}還沒有人點餐</div>`}
+      <div class="card prep"><h2>${icon('store')}備餐統計</h2><p>只算正式訂單。報名截止後，以「已付款」份數通知店家；「複製」只會複製到剪貼簿，要不要傳給店家由你決定。</p>
+        ${Object.keys(prepBy).length ? Object.entries(prepBy).map(([v, items]) => `<h3>${icon('store')}${esc(v)}<span class="grow"></span><button class="btn sm sec" type="button" data-copyv="${esc(v)}">${icon('copy')}複製這家的訂單內容</button></h3><div class="it hd"><span>品項</span><span class="num">全部</span><span class="num">已付款</span><span class="num">已取</span></div>${Object.entries(items).map(([n, p]) => `<div class="it"><span>${esc(n)}</span><span class="num">${p.qty}</span><span class="num"><b>${p.paid}</b></span><span class="num">${p.picked}</span></div>`).join('')}<div class="it ptotal"><span>已付款合計</span><span></span><span class="num"><b>${money(prepTotal(v))}</b></span><span></span></div>`).join('') : `<div class="empty">${icon('utensils-crossed')}還沒有人點餐</div>`}
       </div>`;
+    page().querySelectorAll('[data-copyv]').forEach(b => b.onclick = async () => {
+      const v = b.dataset.copyv, items = Object.entries(prepBy[v]).filter(([, p]) => p.paid > 0);
+      const txt = `【${settings.event_name || '聖誕露天電影院'}】${v} 預購（已付款）\n` + (items.length ? items.map(([n, p]) => `${n} × ${p.paid}`).join('\n') : '（目前沒有已付款的品項）') + `\n共 ${items.reduce((s, [, p]) => s + p.paid, 0)} 份，已付款合計 ${money(prepTotal(v))}\n（統計時間 ${fmtTime(new Date().toISOString())}，以已付款訂單計算）`;
+      try { await navigator.clipboard.writeText(txt); toast('已複製到剪貼簿'); } catch (e) { await ask({ title: '請手動複製', body: txt, ok: '好' }); }
+    });
     // 上線前檢查（另外查信件範本、是否寄出過信）
     let tpls = [], sent = [];
     try { [tpls, sent] = await Promise.all([Api.select('email_templates', 'select=key,label,enabled,approved_at'), Api.select('email_queue', 'select=id&status=eq.sent&limit=1')]); } catch (e) {}
@@ -560,9 +609,12 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
     if (osite !== 'all' && (r.status === 'cancelled' || siteState(r) !== osite)) return false;
     return true;
   }
+  let q = '';
   function renderOrders(){
-    acts(`<button class="btn sec" type="button" id="rf">${icon('refresh-cw')}重新整理</button>`); $('rf').onclick = e => busy(e.currentTarget, refresh);
-    const q = oq.toLowerCase();
+    q = oq.toLowerCase();
+    acts(`${agoHtml()}<button class="btn sec" type="button" id="csvBtn">${icon('download')}匯出 CSV</button><button class="btn sec" type="button" id="printBtn">${icon('printer')}列印報到名單</button><button class="btn sec" type="button" id="rf">${icon('refresh-cw')}重新整理</button>`); $('rf').onclick = e => busy(e.currentTarget, refresh);
+    $('csvBtn').onclick = () => exportCsv(regs.filter(r => (!q || [r.name, r.student_id || '', r.phone, r.order_no, r.email].some(x => String(x).toLowerCase().includes(q))) && orderFilter(r)));
+    $('printBtn').onclick = printRoster;
     const base = regs.filter(r => !q || [r.name, r.student_id || '', r.phone, r.order_no, r.email].some(x => String(x).toLowerCase().includes(q)));
     const n = (k, v) => { const o = [opay, osite]; if (k === 'pay') opay = v; else osite = v; const c = base.filter(orderFilter).length; [opay, osite] = o; return c; };
     const list = base.filter(orderFilter);
@@ -582,9 +634,9 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
         <div class="grow"><b>已選 ${picked.length} 筆</b><span class="bsum">${[['pending', '待付款'], ['overdue', '逾期'], ['paid', '已入帳'], ['balance', '有差額'], ['cancelled', '已取消']].filter(([k]) => sum(k)).map(([k, t]) => `${t} ${sum(k)}`).join('・')}</span></div>
         ${picked.some(r => r.status === 'pending_payment') ? `<button class="btn sm sec" type="button" data-bulk="deadline">${icon('calendar')}設定付款期限</button>` : ''}
         ${picked.some(r => r.status !== 'cancelled') ? `<button class="btn sm sec" type="button" data-bulk="cancel">${icon('circle-x')}取消報名</button>` : ''}
-        <details class="moremenu"><summary class="btn sm sec">${icon('ellipsis')}更多</summary><div class="mm"><p>永久刪除只會刪測試資料，或已取消且沒收過款的訂單（目前選取中 ${deletable.length} 筆可刪）。</p><button class="btn sm danger" type="button" data-bulk="delete" ${deletable.length ? '' : 'disabled'}>${icon('trash-2')}永久刪除 ${deletable.length} 筆</button></div></details>
+        <details class="moremenu"><summary class="btn sm sec">${icon('ellipsis')}更多</summary><div class="mm">${picked.some(r => !r.is_test) ? `<p>幹部或同學測試留下的正式訂單，可以標成測試資料：不再計入總覽，之後用「測試工具 → 清除全部測試資料」連同款項一起刪除。</p><button class="btn sm sec" type="button" data-bulk="mark_test">${icon('flask-conical')}標記為測試資料</button><hr>` : ''}<p>永久刪除只會刪測試資料，或已取消且沒收過款的訂單（目前選取中 ${deletable.length} 筆可刪）。</p><button class="btn sm danger" type="button" data-bulk="delete" ${deletable.length ? '' : 'disabled'}>${icon('trash-2')}永久刪除 ${deletable.length} 筆</button></div></details>
         <button class="btn sm sec" type="button" data-bulk="clear">取消選取</button></div>` : ''}
-      ${list.length ? `<div class="tblwrap otable"><table class="tbl"><thead><tr><th class="selc"><input type="checkbox" id="selAll" aria-label="全選" ${allOn ? 'checked' : ''}></th><th>訂單</th><th>姓名</th><th>學號／身分</th><th>手機</th><th class="r">應付</th><th>付款</th><th>現場</th><th>報名時間</th></tr></thead><tbody>
+      ${list.length ? `<div class="tblwrap otable"><table class="tbl"><thead><tr><th class="selc"><input type="checkbox" id="selAll" aria-label="全選" ${allOn ? 'checked' : ''}></th><th>訂單</th><th>姓名</th><th>學號／身分</th><th>手機</th><th class="r">金額</th><th>付款</th><th>現場</th><th>報名時間</th></tr></thead><tbody>
         ${list.map(r => `<tr class="click${osel.has(r.id) ? ' picked' : ''}" data-id="${r.id}" tabindex="0">
           <td class="selc"><input type="checkbox" data-sel="${r.id}" aria-label="選取 ${esc(r.order_no)}" ${osel.has(r.id) ? 'checked' : ''}></td>
           <td class="num">${esc(r.order_no)}</td>
@@ -599,7 +651,7 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
       <div class="ocards" role="list">${list.map(r => `<div class="ocard${osel.has(r.id) ? ' picked' : ''}" role="listitem" data-id="${r.id}" tabindex="0">
           <label class="selc" aria-label="選取 ${esc(r.order_no)}"><input type="checkbox" data-sel="${r.id}" ${osel.has(r.id) ? 'checked' : ''}></label>
           <div class="oc1"><b>${esc(r.name)}</b>${r.is_test ? ` <span class="mini test">測試</span>` : ''}<small><span class="num">${esc(r.order_no)}</span>・${r.participant_type === 'guest' ? '校外人士' : '政大學生'}</small></div>
-          <div class="oc2">${payBadge(r)}<small class="num">應付 ${money(r.total_amount)}</small></div>
+          <div class="oc2">${payBadge(r)}<small class="num">${r.status === 'cancelled' ? '金額' : r.paid_amount >= r.total_amount ? '已付' : '應付'} ${money(r.total_amount)}</small></div>
           <div class="oc3 sitecell">${siteText(r)}</div>
           <span class="go">${icon('chevron-right')}</span></div>`).join('')}</div>` : `<div class="card empty">${icon('inbox')}${regs.length ? '沒有符合條件的訂單' : '還沒有人報名。可以到「測試工具」產生一批測試報名。'}</div>`}`;
     $('oq').oninput = e => { oq = e.target.value; clearTimeout(renderOrders._t); renderOrders._t = setTimeout(() => { renderOrders(); const el = $('oq'); el.focus(); el.setSelectionRange(el.value.length, el.value.length); }, 220); };
@@ -629,6 +681,41 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
       toast('已設定，請到「信件」核准延長通知'); refresh();
     };
   }
+  // 匯出目前篩選的訂單（含個資，提醒妥善保管）
+  const PAYTXT = r => r.status === 'cancelled' ? '已取消' : r.total_amount === 0 ? '免費' : r.paid_amount >= r.total_amount ? '已付款' : r.paid_amount > 0 ? `差額（已付 ${r.paid_amount}／${r.total_amount}）` : overdue(r) ? '逾期未付' : '待付款';
+  const itemsTxt = r => (r.order_items || []).map(o => `${o.item_name}×${o.qty}`).join('、');
+  async function exportCsv(list){
+    if (!list.length) return toast('目前沒有訂單可以匯出', 'err');
+    if (!(await ask({ title: `匯出 ${list.length} 筆訂單`, body: '檔案裡有姓名、學號、手機、Email，請存在學生會的電腦或雲端，不要轉傳；活動結束後 30 天內刪除。', ok: '匯出' }))) return;
+    const cell = v => { const t = String(v == null ? '' : v); return /[",\n]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t; };
+    const head = ['訂單編號', '姓名', '身分', '學號', '手機', 'Email', '付款狀態', '金額', '已付', '付款期限', '餐點', '報到', '測試資料', '內部備註'];
+    const rows = list.map(r => [r.order_no, r.name, r.participant_type === 'guest' ? '校外人士' : '政大學生', r.student_id || '', r.phone, r.email, PAYTXT(r), r.total_amount, r.paid_amount, fmtTime(r.payment_deadline), itemsTxt(r), r.checked_in_at ? fmtTime(r.checked_in_at) : '', r.is_test ? '是' : '', (r.internal_note || '').replace(/\s+/g, ' ')]);
+    const csv = '\ufeff' + [head, ...rows].map(x => x.map(cell).join(',')).join('\r\n');
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    a.download = `露天電影院名單_${new Date().toLocaleString('sv-SE', { timeZone: 'Asia/Taipei' }).slice(0, 16).replace(/[-: ]/g, '')}.csv`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 5e3);
+  }
+  // 列印報到名單：活動當天掃描頁連不上時的備援。只列正式、沒取消的報名，政大學生依學號、校外人士依姓名排序
+  function printRoster(){
+    const list = regs.filter(r => !r.is_test && r.status !== 'cancelled')
+      .sort((a, b) => (a.participant_type === 'guest') - (b.participant_type === 'guest') || String(a.student_id || a.name).localeCompare(String(b.student_id || b.name), 'zh-Hant'));
+    if (!list.length) return toast('目前沒有正式報名可以列印', 'err');
+    const w = open('', '_blank'); if (!w) return toast('瀏覽器擋住了新視窗，請允許彈出視窗後再試', 'err');
+    const now = fmtTime(new Date().toISOString());
+    w.document.write(`<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><title>報到名單 ${esc(now)}</title><style>
+      body{font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;font-size:12px;margin:16px;color:#111}
+      h1{font-size:18px;margin:0 0 4px}.warn{border:1.5px solid #b3121a;color:#b3121a;padding:6px 10px;margin:8px 0 12px;font-weight:700}
+      table{width:100%;border-collapse:collapse}th,td{border:1px solid #999;padding:4px 6px;text-align:left;vertical-align:top}th{background:#eee}
+      td.c{text-align:center;width:28px}.num{font-variant-numeric:tabular-nums;white-space:nowrap}tr{break-inside:avoid}
+      @media print{.noprint{display:none}}</style></head><body>
+      <button class="noprint" onclick="print()" style="font-size:14px;padding:6px 14px;margin-bottom:8px">列印</button>
+      <h1>${esc(settings.event_name || '聖誕露天電影院')}　報到名單</h1>
+      <div>列印時間 ${esc(now)}・共 ${list.length} 人（政大學生依學號、校外人士依姓名排序）。這份名單只是印出當下的狀態，之後的報名或付款不會出現。</div>
+      <div class="warn">本名單含個人資料，只供活動當天報到使用，請勿拍照、轉傳；活動結束後請由負責幹部收回並以碎紙機銷毀。</div>
+      <table><thead><tr><th>報到</th><th>取餐</th><th>學號／身分</th><th>姓名</th><th>訂單</th><th>手機</th><th>付款</th><th>餐點</th></tr></thead><tbody>
+      ${list.map(r => `<tr><td class="c">□</td><td class="c">${(r.order_items || []).length ? '□' : '—'}</td><td class="num">${r.participant_type === 'guest' ? '校外人士' : esc(r.student_id)}</td><td>${esc(r.name)}</td><td class="num">${esc(r.order_no)}</td><td class="num">${esc(r.phone)}</td><td>${esc(PAYTXT(r))}</td><td>${esc(itemsTxt(r)) || '—'}</td></tr>`).join('')}
+      </tbody></table></body></html>`);
+    w.document.close();
+  }
   async function bulk(act, picked){
     if (act === 'clear') { osel.clear(); return renderOrders(); }
     const ids = picked.map(r => r.id), n = ids.length;
@@ -645,6 +732,13 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
       if (!(await ask({ title: `取消 ${live.length} 筆報名？`, body: `名額和限量餐點會釋出，還沒寄出的信也會一起取消。${paidLive.length ? `其中 ${paidLive.length} 筆已經付款，取消後記得另外處理退款。` : ''}${n > live.length ? `另外 ${n - live.length} 筆本來就已取消，會略過。` : ''}`, ok: `取消 ${live.length} 筆`, danger: true, cancel: '先不要' }))) return;
       res = await run(() => Api.rpc('admin_bulk_registrations', { p_ids: live.map(r => r.id), p_action: 'cancel' }));
       if (res) toast(`已取消 ${res.done} 筆`);
+    } else if (act === 'mark_test') {
+      const tgt = picked.filter(r => !r.is_test), paidN = tgt.filter(r => r.paid_amount > 0).length;
+      if (!tgt.length) return toast('選取的都已經是測試資料', 'err');
+      const typed = await ask({ title: `把 ${tgt.length} 筆訂單標記為測試資料？`, body: `${tgt.map(r => r.order_no + ' ' + r.name).join('、')}\n\n標記後不計入總覽，也可以用「清除全部測試資料」連同款項紀錄一起刪除。${paidN ? `其中 ${paidN} 筆已經入帳：標錯的話，真的帳務紀錄可能被刪掉。` : ''}只在確定是測試時使用。`, input: { label: '請輸入「確認標記」', placeholder: '確認標記' }, ok: '標記為測試資料', danger: true, cancel: '先不要' });
+      if (!typed) return; if (typed.trim() !== '確認標記') return toast('沒有輸入「確認標記」，已取消操作', 'err');
+      res = await run(() => Api.rpc('admin_bulk_registrations', { p_ids: tgt.map(r => r.id), p_action: 'mark_test', p_value: '確認標記' }));
+      if (res) toast(`已標記 ${res.done} 筆為測試資料${res.txns_marked ? `（含 ${res.txns_marked} 筆入帳款項）` : ''}`);
     } else if (act === 'delete') {
       if (!deletable.length) return toast('只能永久刪除「已取消且沒收過款」或「測試」的訂單。正式訂單請先取消；已收款的訂單要保留帳務紀錄。', 'err');
       const typed = await ask({ title: `永久刪除 ${deletable.length} 筆訂單？`, body: `訂單、餐點、報到取餐紀錄和信件都會刪除，不能復原，訂單編號也不會重新使用。${n > deletable.length ? `另外 ${n - deletable.length} 筆是正式訂單且還沒取消（或已收過款），不會刪除。` : ''}`, input: { label: `確認請輸入「刪除」`, placeholder: '刪除' }, ok: '永久刪除', danger: true, cancel: '先不要' });
@@ -674,13 +768,13 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
     const cell = (k, v, sub) => `<div><span>${k}</span><b>${v}</b>${sub ? `<small>${sub}</small>` : ''}</div>`;
     openDrawer(`
       <div class="dhead">
-        <div class="row"><div class="grow"><h2 id="dTitle">${esc(r.name)}</h2><div class="sub"><span class="num">${esc(r.order_no)}</span>・${r.participant_type === 'guest' ? '校外人士' : '政大學生 <span class="num">' + esc(r.student_id) + '</span>'}${r.is_test ? `・<span class="mini test">${icon('flask-conical')}測試資料</span>` : ''}</div></div>
+        <div class="row"><div class="grow"><h2 id="dTitle">${esc(r.name)}</h2><div class="sub"><span class="num">${esc(r.order_no)}</span>・${r.participant_type === 'guest' ? '校外人士' : '政大學生 <span class="num">' + esc(r.student_id) + '</span>'}${r.is_test ? `・<span class="mini test">${icon('flask-conical')}測試資料</span>` : ''}</div><a class="dphone num" href="tel:${esc(r.phone)}">${icon('phone')}${esc(r.phone)}</a></div>
         <button class="btn quiet sm" type="button" id="dClose" aria-label="關閉">${icon('x')}</button></div>
         <div class="tri">${cell('付款', { pending: '待付款', overdue: '逾期未付', paid: '已入帳', balance: '有差額', cancelled: '已取消' }[ps], r.paid_at ? fmtTime(r.paid_at).slice(5) : '')}${cell('報到', r.checked_in_at ? '已報到' : '還沒', r.checked_in_at ? fmtTime(r.checked_in_at).slice(5) : '')}${cell('取餐', vs.length ? `${pickedOf(r)}／${vs.length} 家` : '沒有點餐', '')}</div>
         ${alert ? `<div class="dalert ${alert[0]}">${esc(alert[1])}</div>` : ''}
       </div>
       <div class="dbody">
-        <div class="tri money3">${cell('應付', money(r.total_amount))}${cell('已收', money(r.paid_amount))}${cell('差額', money(owe), owe > 0 && r.status !== 'pending_payment' ? '需補' : owe < 0 ? '需退' : '')}</div>
+        <div class="tri money3">${cell('金額', money(r.total_amount))}${cell('已收', money(r.paid_amount))}${cell('差額', money(owe), owe > 0 && r.status !== 'pending_payment' ? '需補' : owe < 0 ? '需退' : '')}</div>
         ${r.paid_method ? `<p class="small muted" style="margin:6px 0 0">付款方式：${esc(METHOD[r.paid_method] || r.paid_method)}</p>` : ''}
         ${r.status === 'pending_payment' || owe > 0 ? `<details class="card fold"><summary>${icon('wallet')}人工入帳${icon('chevron-down')}</summary><div class="row" style="margin-top:10px"><input class="in num" id="payAmt" type="number" style="width:110px" value="${Math.max(owe, 0)}" aria-label="入帳金額"><input class="in grow" id="payNote" placeholder="原因（必填），例如：現金補繳"><button class="btn" type="button" id="markPaid">${icon('check')}入帳</button></div></details>` : ''}
         <div class="dtabs" role="tablist"><button type="button" role="tab" data-dt="items" aria-selected="${tab !== 'log'}">已訂餐點</button><button type="button" role="tab" data-dt="log" aria-selected="${tab === 'log'}">處理紀錄</button></div>
@@ -822,7 +916,7 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
         ${txns.map(t => { const s = byId[t.suggested_registration_id]; return `<tr data-t="${t.id}"><td class="small">${esc(fmtTime(t.txn_at))}${t.is_test ? ' <span class="mini test">測試</span>' : ''}</td><td class="r num"><b>${t.amount}</b></td><td class="num">${esc(t.account_last5 || '—')}</td><td>${esc(t.memo || '—')}</td>
           <td><span class="badge ${t.status === 'suggested' ? 'b-caution' : 'b-crit'}">${t.status === 'suggested' ? '建議配對' : '找不到'}</span><div class="small muted" style="margin-top:4px">${esc(t.match_note || '')}</div></td>
           <td class="small">${s ? `<b>${esc(s.name)}</b> <span class="num">${esc(s.order_no)}</span><br>${esc(s.student_id || '校外')}・應付 <span class="num">${s.total_amount - s.paid_amount}</span>・後五碼 <span class="num">${esc(s.payer_last5)}</span>` : '<span class="muted">—</span>'}</td>
-          <td><div class="row">${s && s.status === 'pending_payment' ? `<button class="btn sm" type="button" data-ok="${s.id}">${icon('check')}確認配對</button>` : ''}<input class="in" style="width:120px;min-height:32px" placeholder="訂單編號／學號" data-in aria-label="指定訂單"><button class="btn sm sec" type="button" data-assign>指定</button><button class="btn sm quiet" type="button" data-ignore>略過</button></div></td></tr>`; }).join('')}
+          <td>${!s ? (() => { const c = regs.filter(r => r.status === 'pending_payment' && !!r.is_test === !!t.is_test && r.total_amount - r.paid_amount === t.amount); return c.length ? `<div class="cands"><span class="small muted">金額相同、還沒付款：</span>${c.slice(0, 6).map(r => `<button class="btn sm sec" type="button" data-ok="${r.id}" title="入帳到這筆訂單">${esc(r.order_no)} ${esc(r.name)}</button>`).join('')}${c.length > 6 ? `<span class="small muted">還有 ${c.length - 6} 筆，請輸入編號</span>` : ''}</div>` : '<div class="small muted" style="margin-bottom:6px">沒有金額相同的待付款訂單</div>'; })() : ''}<div class="row">${s && s.status === 'pending_payment' ? `<button class="btn sm" type="button" data-ok="${s.id}">${icon('check')}確認配對</button>` : ''}<input class="in" style="width:120px;min-height:32px" placeholder="訂單編號／學號" data-in aria-label="指定訂單"><button class="btn sm sec" type="button" data-assign>指定</button><button class="btn sm quiet" type="button" data-ignore>略過</button></div></td></tr>`; }).join('')}
         </tbody></table></div>` : batches.length ? `<div class="empty">${icon('circle-check')}目前匯入的款項都處理完了。之後有新的轉帳，要再匯入最新明細。</div>` : `<div class="empty">${icon('file-up')}<b>還沒有匯入過郵局明細</b>，所以還沒有對帳。上面匯入後，需要人工確認的款項會列在這裡。</div>`}
       </div>
       <div class="card"><h2>${icon('clock')}最近匯入</h2>
@@ -924,7 +1018,11 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
     const b = e.target.closest('button'); if (!b) return;
     const tid = tr.dataset.t;
     try {
-      if (b.dataset.ok) await run(() => Api.rpc('admin_resolve_txn', { p_txn: tid, p_reg: b.dataset.ok }), '已入帳');
+      if (b.dataset.ok) {
+        const r = regs.find(x => x.id === b.dataset.ok);
+        if (b.closest('.cands') && r && !(await ask({ title: '指定入帳', body: `把這筆款項入帳到 ${r.order_no} ${r.name}（應付 ${r.total_amount - r.paid_amount} 元、後五碼 ${r.payer_last5}）？`, ok: '入帳' }))) return;
+        await run(() => Api.rpc('admin_resolve_txn', { p_txn: tid, p_reg: b.dataset.ok }), '已入帳');
+      }
       else if (b.hasAttribute('data-assign')) {
         const key = tr.querySelector('[data-in]').value.trim().toUpperCase(); const r = regs.find(x => x.order_no === key || x.student_id === key);
         if (!r) return toast('找不到這筆訂單', 'err');
@@ -952,6 +1050,7 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
   const MAIL_ACTIONS = { pending_approval: ['cancel', 'approve'], failed: ['cancel', 'retry'], blocked: ['cancel', 'rerender'], cancelled: ['rerender'] };
   const VARS = ['姓名','學號','附言代碼','身分','訂單編號','餐點明細','總金額','已付金額','付款期限','收款銀行','收款帳號','戶名','查詢連結','活動名稱','活動資訊','聯絡方式'];
   async function renderMail(){
+    pageDirty = false;
     page().innerHTML = `<div class="card empty">${icon('loader-circle', 'spin')}載入中…</div>`;
     const [tpls, queue] = await Promise.all([
       Api.select('email_templates', 'select=*&order=key'),
@@ -969,8 +1068,8 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
         <div class="seg" role="group" aria-label="信件狀態" style="margin:8px 0 14px">${tabs.map(([k, v]) => `<button type="button" data-mt="${k}" aria-pressed="${mailTab === k}">${v}<span class="c">${counts[k] || 0}</span></button>`).join('')}</div>
         <p class="small muted" style="margin:-4px 0 12px">${esc(MAIL_TAB_HELP[mailTab] || '')}</p>
         ${list.length && MAIL_ACTIONS[mailTab] ? `<div class="row" style="margin-bottom:10px"><label class="row small"><input type="checkbox" id="mAll">全選</label><span class="small muted" id="mSel"></span><span class="grow"></span>${MAIL_ACTIONS[mailTab].map(a => `<button class="btn ${a === 'cancel' ? 'sec' : ''} sm" type="button" data-ma="${a}">${a === 'approve' ? icon('send') + '核准寄出' : a === 'retry' ? icon('send') + '重新寄送' : a === 'rerender' ? icon('refresh-cw') + '重新產生' : '作廢'}</button>`).join('')}</div>` : ''}
-        ${list.length ? `<div class="tblwrap"><table class="tbl"><thead><tr>${MAIL_ACTIONS[mailTab] ? '<th></th>' : ''}<th>類型</th><th>收件人</th><th>主旨</th><th>時間</th></tr></thead><tbody>
-        ${list.map(q => `<tr>${MAIL_ACTIONS[mailTab] ? `<td><input type="checkbox" data-q="${q.id}" aria-label="選取"></td>` : ''}<td class="small">${esc(lbl[q.template_key] || q.template_key)}${isTest(q.registration_id) ? ' <span class="mini test">測試</span>' : ''}</td><td>${esc(q.to_email)}</td><td>${q.error && ['blocked', 'failed'].includes(q.status) ? `<div class="small" style="color:var(--crit);margin-bottom:4px">${icon('triangle-alert')}${esc(q.error)}</div>` : ''}<details><summary>${esc(q.subject)}</summary><pre class="mail">${esc(q.body)}</pre></details></td><td class="small muted">${esc(fmtTime(q.sent_at || q.created_at))}</td></tr>`).join('')}
+        ${list.length ? `<div class="tblwrap"><table class="tbl"><thead><tr>${MAIL_ACTIONS[mailTab] ? '<th></th>' : ''}<th>類型</th><th>訂單</th><th class="r">金額</th><th>收件人</th><th>主旨</th><th>時間</th></tr></thead><tbody>
+        ${list.map(q => `<tr>${MAIL_ACTIONS[mailTab] ? `<td><input type="checkbox" data-q="${q.id}" aria-label="選取"></td>` : ''}<td class="small">${esc(lbl[q.template_key] || q.template_key)}${isTest(q.registration_id) ? ' <span class="mini test">測試</span>' : ''}</td>${(() => { const r = regs.find(x => x.id === q.registration_id); return r ? `<td><button class="linkbtn" type="button" data-oo="${r.id}" title="打開這筆訂單"><span class="num">${esc(r.order_no)}</span> ${esc(r.name)}</button></td><td class="r num small">已收 ${money(r.paid_amount)}<br><span class="muted">應付 ${money(r.total_amount)}</span></td>` : '<td class="muted">—</td><td></td>'; })()}<td>${esc(q.to_email)}</td><td>${q.error && ['blocked', 'failed'].includes(q.status) ? `<div class="small" style="color:var(--crit);margin-bottom:4px">${icon('triangle-alert')}${esc(q.error)}</div>` : ''}<details><summary>${esc(q.subject)}</summary><pre class="mail">${esc(q.body)}</pre></details></td><td class="small muted">${esc(fmtTime(q.sent_at || q.created_at))}</td></tr>`).join('')}
         </tbody></table></div>` : `<div class="empty">${icon('mail-check')}這個分類沒有信件</div>`}
       </div>
       <div class="card ${mailView === 'tpl' ? '' : 'hidden'}"><h2>${icon('pencil')}信件範本</h2><p>修改後要按「核准並啟用」才會使用新的內容；核准前，這個範本要寄的信會先保留在「被擋下」，核准後自動重新產生。變數一定要用下面的按鈕插入，自己打的名稱系統認不得。</p>
@@ -985,6 +1084,7 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
     let lastTa = null;
     page().querySelectorAll('textarea[data-f]').forEach(ta => ta.onfocus = () => lastTa = ta);
     page().onclick = async e => {
+      const oo = e.target.closest('[data-oo]'); if (oo) return openOrder(oo.dataset.oo);
       const mv = e.target.closest('[data-mv]'); if (mv) { mailView = mv.dataset.mv; return renderMail(); }
       const mt = e.target.closest('[data-mt]'); if (mt) { mailTab = mt.dataset.mt; return renderMail(); }
       const vv = e.target.closest('[data-var]'); if (vv && lastTa) { const s = lastTa.selectionStart, v = '{{' + vv.dataset.var + '}}'; lastTa.value = lastTa.value.slice(0, s) + v + lastTa.value.slice(lastTa.selectionEnd); lastTa.focus(); lastTa.selectionStart = lastTa.selectionEnd = s + v.length; return; }
@@ -1034,10 +1134,15 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
       <div class="card"><h2>${icon('circle-plus')}新增店家</h2><div class="row"><input class="in grow" id="newV" placeholder="店家名稱"><button class="btn" type="button" id="addV">新增店家</button></div></div>`;
     page().onclick = async e => {
       const b = e.target.closest('button'); if (!b) return;
-      if (b.dataset.ed) { menuEdit.add(b.dataset.ed); return renderMenu(); }
-      if (b.dataset.edv) { menuEdit.add('v_' + b.dataset.edv); return renderMenu(); }
-      if (b.dataset.add) { menuEdit.add('new_' + b.dataset.add); renderMenu(); const el = page().querySelector('.editrow [data-if="name"]'); if (el) el.focus(); return; }
-      if (b.dataset.cx) { menuEdit.delete(b.dataset.cx); return renderMenu(); }
+      // 一次只開一列編輯；另一列有沒儲存的修改時先確認，避免整頁重畫時被洗掉
+      const openOne = async key => {
+        if (menuEdit.size && !menuEdit.has(key) && pageDirty && !(await ask({ title: '另一列還沒儲存', body: '先前打開的店家或品項有修改還沒按「儲存」，換編輯這一列會放棄那些修改。', ok: '放棄修改', danger: true, cancel: '回去儲存' }))) return false;
+        menuEdit.clear(); menuEdit.add(key); pageDirty = false; return true;
+      };
+      if (b.dataset.ed) { if (await openOne(b.dataset.ed)) renderMenu(); return; }
+      if (b.dataset.edv) { if (await openOne('v_' + b.dataset.edv)) renderMenu(); return; }
+      if (b.dataset.add) { if (!(await openOne('new_' + b.dataset.add))) return; renderMenu(); const el = page().querySelector('.editrow [data-if="name"]'); if (el) el.focus(); return; }
+      if (b.dataset.cx) { menuEdit.delete(b.dataset.cx); pageDirty = false; return renderMenu(); }
       if (b.id === 'addV') { const n = $('newV').value.trim(); if (!n) return; await run(() => Api.insert('vendors', { name: n, sort: menu.vendors.length + 1 }), '已新增店家'); await loadAll(); return renderMenu(); }
       if (b.hasAttribute('data-sv')) { const box = b.closest('[data-vendor]'); const g = f => box.querySelector(`[data-vf="${f}"]`); await run(() => Api.patch('vendors', 'id=eq.' + box.dataset.vendor, { name: g('name').value.trim(), description: g('description').value.trim(), image_url: box.querySelector('.vphoto [data-photo]').dataset.photo || null, sort: parseInt(g('sort').value, 10) || 0, active: g('active').checked }), '店家已儲存'); menuEdit.delete('v_' + box.dataset.vendor); await loadAll(); return renderMenu(); }
       if (b.hasAttribute('data-si')) {
@@ -1046,7 +1151,7 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
         if (!row.name || isNaN(row.price) || row.price < 0) return toast('請填寫品名和正確的價格', 'err');
         if (tr.dataset.item) await run(() => Api.patch('menu_items', 'id=eq.' + tr.dataset.item, row), '品項已儲存');
         else await run(() => Api.insert('menu_items', { ...row, vendor_id: tr.dataset.vendor }), '已新增品項');
-        menuEdit.delete(tr.dataset.item || 'new_' + tr.dataset.vendor); await loadAll(); return renderMenu();
+        menuEdit.delete(tr.dataset.item || 'new_' + tr.dataset.vendor); pageDirty = false; await loadAll(); return renderMenu();
       }
     };
   }
@@ -1133,6 +1238,7 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
     ['常見問題與結尾', [['faq_h', '常見問題標題'], ['end_h', '結尾標題（空白＝自動顯示「日期 見」）']]],
   ];
   function renderCopy(){
+    pageDirty = false;
     const sc = settings.site_copy || {};
     const val = k => (k in sc && (sc[k] !== '' || ['fee', 'end_h'].includes(k)) ? sc[k] : COPY_DEFAULT[k]);
     const faqs = Array.isArray(sc.faq) && sc.faq.length ? sc.faq : COPY_DEFAULT.faq;
@@ -1179,6 +1285,7 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
     return `日期：${d}　時間：${time.trim() || '待公布'}　地點：${place.trim() || '待公布'}`;
   }
   function renderSettings(){
+    pageDirty = false;
     const s = settings, evParts = parseEventInfo(s.event_info);
     const f = (k, label, type = 'text', hint = '') => `<label class="field"><span>${label}</span>${type === 'textarea' ? `<textarea data-s="${k}">${esc(s[k] || '')}</textarea>` : `<input data-s="${k}" type="${type}" value="${esc(type === 'datetime-local' ? toLocalInput(s[k]) : (s[k] ?? ''))}"${type === 'number' ? ' class="num"' : ''}>`}${hint ? `<small>${hint}</small>` : ''}</label>`;
     page().innerHTML = `
@@ -1187,7 +1294,7 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
         ${f('event_name', '活動名稱')}
         <div class="grid3">
           <label class="field"><span>活動日期</span><input type="date" id="evD" value="${esc(evParts.date)}"></label>
-          <label class="field"><span>開始時間</span><input id="evT" value="${esc(evParts.time)}" placeholder="還沒定就留空，例如 18:30"></label>
+          <label class="field"><span>時間</span><input id="evT" value="${esc(evParts.time)}" placeholder="例如 16:30-20:15；還沒定就留空"></label>
           <label class="field"><span>地點</span><input id="evP" value="${esc(evParts.place)}" placeholder="還沒定就留空"></label>
         </div>
         <p class="small muted" style="margin:-4px 0 12px">留空的欄位，報名頁會顯示「待公布」。</p>
@@ -1215,7 +1322,7 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
     const list = await run(() => Api.rpc('admin_list_staff'));
     page().innerHTML = `<div class="card"><h2>${icon('users')}可以登入的人</h2><p>管理員可以用整個後台；現場人員只能用掃描頁（查詢、報到、交付），看不到完整名單，也不能改價格或訂單。</p>
       <div class="tblwrap"><table class="tbl"><thead><tr><th>Email</th><th>名稱</th><th>角色</th><th></th></tr></thead><tbody>
-      ${list.map(s => `<tr><td>${esc(s.email)}</td><td>${esc(s.display_name || '')}</td><td><span class="badge ${s.role === 'admin' ? 'b-info' : 'b-neu'}">${s.role === 'admin' ? '管理員' : '現場人員'}</span></td><td class="r"><button class="btn sm quiet" type="button" data-rm="${s.user_id}">移除權限</button></td></tr>`).join('')}
+      ${list.map(s => `<tr><td>${esc(s.email)}</td><td>${esc(s.display_name || '')}</td><td><span class="badge ${s.role === 'admin' ? 'b-info' : 'b-neu'}">${s.role === 'admin' ? '管理員' : '現場人員'}</span></td><td class="r">${s.user_id === (Api.session.user || {}).id ? '<span class="small muted">（你自己）</span>' : `<button class="btn sm quiet" type="button" data-rm="${s.user_id}">移除權限</button>`}</td></tr>`).join('')}
       </tbody></table></div></div>
       <div class="card"><h2>${icon('circle-plus')}加入工作人員</h2><p>先到 Supabase 後台 Authentication → Users → Add user 建立帳號（勾 Auto Confirm），再回到這裡用同一個 Email 授權。</p>
       <div class="row"><input class="in grow" id="sEmail" placeholder="Email" type="email"><input class="in" id="sName" placeholder="名稱，例如：活動部小明"><select class="in" id="sRole" style="width:auto"><option value="staff">現場人員</option><option value="admin">管理員</option></select><button class="btn" type="button" id="sAdd">授權</button></div>
