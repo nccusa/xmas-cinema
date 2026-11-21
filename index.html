@@ -124,7 +124,7 @@ body:has(#home.hidden) .fmark{color:var(--green)}
   -webkit-mask:radial-gradient(circle 9px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 9px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat;
           mask:radial-gradient(circle 9px at 0 50%,#0000 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 9px at 100% 50%,#0000 98%,#000) right/51% 100% no-repeat}
 .stub::before{content:"";position:absolute;inset:5px 14px;border:1.5px dashed rgba(24,32,38,.25);border-radius:7px;pointer-events:none}
-.stub b{font-family:var(--num);font-weight:800;font-size:clamp(30px,3.6vw,42px);line-height:1;letter-spacing:-.01em;color:var(--red)}
+.stub b{font-family:var(--num);font-weight:800;font-size:clamp(30px,3.6vw,42px);line-height:1;letter-spacing:-.01em;color:var(--ink)}
 .stub .wk{font-weight:700;font-size:16px}
 .stub .cut{width:0;align-self:stretch;border-left:1.5px dashed rgba(24,32,38,.3);margin:2px 2px}
 .stub .lbl{font-size:14px;font-weight:700;line-height:1.3;text-align:left}.stub .lbl small{font-weight:400;color:var(--muted);font-size:12px}
@@ -491,7 +491,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:70;opa
 .sec h2.wavy::after{content:"";display:block;width:120px;height:12px;margin-top:6px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 12'%3E%3Cpath d='M2 8 C 20 2, 34 11, 52 6 S 86 3, 100 7 S 114 9, 118 5' fill='none' stroke='%23B18B35' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat}
 .night2 h2::after{filter:brightness(1.35)}
 /* 戲院招牌 */
-.marquee{position:relative;padding:30px 36px 24px;margin-bottom:24px;background:linear-gradient(180deg,#6E1015,#4E0B0F);border-radius:6px;box-shadow:0 0 0 6px #2A0709,0 0 0 8px rgba(232,196,104,.55),0 26px 50px -20px rgba(0,0,0,.75);transform:rotate(-1deg)}
+.marquee{position:relative;padding:30px 36px 24px;margin-bottom:24px;background:linear-gradient(180deg,#6E1015,#4E0B0F);border-radius:6px;box-shadow:0 0 0 6px #2A0709,0 0 0 8px rgba(232,196,104,.55),0 26px 50px -20px rgba(0,0,0,.75)}
 .marquee .bulbs{position:absolute;inset:0;pointer-events:none}
 .bulb{position:absolute;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;background:#FFE7A3;opacity:.35;box-shadow:0 0 0 1.5px #3A0A0C}
 .bulb.on,.lit .bulb{opacity:1;box-shadow:0 0 0 1.5px #3A0A0C,0 0 8px 2px rgba(255,214,120,.85)}
@@ -508,14 +508,14 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:70;opa
 .presents{display:flex;align-items:center;gap:8px;justify-content:flex-end;margin:0 0 10px;font-size:13.5px;color:#F2D9A8;letter-spacing:.08em}
 .presents .sa{width:24px;height:24px;color:var(--gold-l)}
 .showing{margin:12px 0 0;font-weight:700;letter-spacing:.08em;color:var(--gold-l);font-size:15px;text-align:right}
-.stub{transform:rotate(1.5deg);margin-top:4px}
+.stub{margin-top:4px}
 .tape{position:absolute;width:70px;height:22px;background:repeating-linear-gradient(90deg,rgba(232,196,104,.75) 0 8px,rgba(232,196,104,.55) 8px 16px);opacity:.85;box-shadow:0 1px 2px rgba(0,0,0,.15);pointer-events:none}
 .tape.ts{right:-18px;top:-10px;transform:rotate(28deg);width:54px;height:18px}
 .stub{overflow:visible}
-.countdown{margin:14px 0 0;font-size:14px;color:#D9DED6;display:flex;gap:6px;align-items:baseline;justify-content:flex-end;flex-wrap:wrap}
+.countdown{margin:10px 0 0;font-size:13px;color:#B9C2B8;display:flex;gap:6px;align-items:baseline;justify-content:flex-end;flex-wrap:wrap}
 .countdown:empty{display:none}
 .countdown .fl{display:inline-flex;gap:2px}
-.countdown .d{display:inline-block;min-width:.72em;text-align:center;font-family:var(--num);font-weight:800;font-size:22px;color:var(--night);background:var(--cream);border-radius:4px;padding:0 3px;box-shadow:inset 0 -1px 0 rgba(0,0,0,.25),0 1px 0 rgba(0,0,0,.4);transform-origin:50% 50%}
+.countdown .d{display:inline-block;min-width:.72em;text-align:center;font-family:var(--num);font-weight:700;font-size:15px;color:var(--ink);background:var(--cream);border-radius:3px;padding:0 2px;box-shadow:inset 0 -1px 0 rgba(0,0,0,.25),0 1px 0 rgba(0,0,0,.4);transform-origin:50% 50%}
 .countdown .d.flip{animation:flip .45s var(--ease)}
 @keyframes flip{0%{transform:rotateX(0)}50%{transform:rotateX(90deg)}100%{transform:rotateX(0)}}
 .stars{position:absolute;inset:0}
@@ -550,9 +550,12 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:70;opa
 /* 報名方式：節目單 */
 .program{list-style:none;padding:0;margin:8px 0 0;max-width:760px;border-top:2px solid var(--ink)}
 .program li{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:baseline;padding:18px 0;border-bottom:1px dashed #BDB59E}
-.program .no{font-family:var(--serif);font-weight:900;font-size:30px;color:var(--red);line-height:1;min-width:.7em;text-align:center}
+.program .no{font-family:var(--serif);font-weight:900;font-size:30px;color:var(--gold);line-height:1;min-width:.7em;text-align:center}
 .program h3{font-size:18px;margin:0 0 4px}
 .lede{font-size:17px;margin:0 0 16px;max-width:460px}
+.hero-meta{margin:16px 0 22px;display:flex;flex-wrap:wrap;gap:4px 6px;justify-content:flex-end;align-items:center;font-size:15px;color:#E9E4D6}
+.hero-meta .sep{color:var(--gold-l)}
+.gdot{width:6px;height:6px;border-radius:50%;background:var(--gold);flex:none}
 .foodfacts{list-style:none;padding:0;margin:0;display:grid;gap:10px}
 .foodfacts li{display:flex;gap:10px;align-items:center;color:var(--muted);font-size:15px}
 .foodfacts .i{color:var(--green);width:20px;height:20px}
@@ -596,7 +599,7 @@ body:has(#home.hidden) .flowtiles{display:block}
   .facts-inline{justify-items:start;margin:14px 0 22px}.facts-inline li{flex-direction:row}
   .presents{justify-content:flex-start}
   .cta{justify-content:flex-start}
-  .hero-film{justify-content:flex-start}.cta-sub{text-align:left}
+  .hero-meta{justify-content:flex-start}.cta-sub{text-align:left}
   .film,.food-intro{grid-template-columns:1fr;gap:32px}
   .poster{aspect-ratio:4/3;transform:rotate(-1.5deg);max-width:520px}
   .poster .q{font-size:88px}
@@ -659,8 +662,8 @@ body:has(#home.hidden) .flowtiles{display:block}
 @media (prefers-reduced-motion:reduce){.screening .beam{animation:none}}
 
 /* 加購租借品（野餐墊） */
-#addons .addon{margin:16px 0 8px;border:2px dashed rgba(201,154,46,.55);background:linear-gradient(180deg,rgba(243,210,122,.10),transparent 70%)}
-.vcard.rent{border:2px dashed rgba(201,154,46,.55);box-shadow:none}
+#addons .addon{margin:16px 0 8px}
+.rtag{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:99px;font-size:12px;font-weight:700;font-family:var(--font);background:#F4ECD8;color:#6E5418;vertical-align:3px;letter-spacing:0}
 
 #step1 .subh{font-size:22px;margin:30px 0 4px;padding-top:22px;border-top:1px solid var(--line,rgba(0,0,0,.12))}
 </style>
@@ -691,13 +694,12 @@ body:has(#home.hidden) .flowtiles{display:block}
           <h1 id="evTitle"><span class="l1">聖誕</span><span class="l2">露天電影院</span></h1>
           <p class="showing" id="showing"></p>
         </div>
-        <p class="hero-film hidden" id="heroFilm"></p>
-        <div class="stub" id="evDate"><b class="num">12/9</b><span class="wk">週三</span><span class="cut hidden" aria-hidden="true"></span><span class="lbl hidden" id="stubTime"></span><span class="tape ts" aria-hidden="true"></span></div>
-        <p class="countdown" id="countdown"></p>
-        <ul class="facts-inline" id="evMeta" aria-busy="true"><li><span data-icon="clock"></span><span class="skl" aria-hidden="true"></span></li><li><span data-icon="map-pin"></span><span class="skl" aria-hidden="true"></span></li><li><span data-icon="ticket"></span><span>免費入場，餐點另外付</span></li></ul>
+        <div class="stub" id="evDate"><b class="num">12/9</b><span class="wk">週三</span><span class="cut hidden" aria-hidden="true"></span><span class="lbl hidden" id="stubTime"></span></div>
+        <p class="hero-meta" id="evMeta" aria-busy="true"><span class="skl" aria-hidden="true"></span></p>
         <div class="cta"><button class="btn hero-cta" type="button" id="startBtn" disabled>免費報名</button></div>
         <p class="cta-sub">可加購餐點、租野餐墊</p>
         <div class="cta-note" id="openNote">載入中…</div>
+        <p class="countdown" id="countdown"></p>
       </div>
     </div>
   </section>
@@ -707,7 +709,7 @@ body:has(#home.hidden) .flowtiles{display:block}
     <div class="beam" aria-hidden="true"></div>
     <div class="reel" aria-hidden="true"></div>
     <div class="wrap film">
-      <div class="poster-wrap reveal"><span class="tape t1" aria-hidden="true"></span><span class="tape t2" aria-hidden="true"></span><div class="poster" id="poster"></div></div>
+      <div class="poster-wrap reveal"><span class="tape t1" aria-hidden="true"></span><div class="poster" id="poster"></div></div>
       <div>
         <p class="showday hidden" id="showDay"></p>
         <h2 id="filmT">即將上映</h2>
@@ -723,9 +725,9 @@ body:has(#home.hidden) .flowtiles{display:block}
         <h2 id="foodT">熱飲和三明治，報名時先訂</h2>
         <p class="lede">活動場地不能現場收錢，想吃東西的話，報名時一起點、一起轉帳。</p>
         <ul class="foodfacts">
-          <li><span data-icon="wallet"></span><span>兩家都是店家原價，沒有加價</span></li>
-          <li><span data-icon="hand-platter"></span><span>當天報到後，到取餐區領取</span></li>
-          <li><span data-icon="ticket"></span><span>不想吃東西，只報名也可以</span></li>
+          <li><span class="gdot" aria-hidden="true"></span><span>兩家都是店家原價，沒有加價</span></li>
+          <li><span class="gdot" aria-hidden="true"></span><span>當天報到後，到取餐區領取</span></li>
+          <li><span class="gdot" aria-hidden="true"></span><span>不想吃東西，只報名也可以</span></li>
         </ul>
       </div>
       <div class="reveal vcards" id="vlist"><div class="skel"></div><div class="skel"></div></div>
@@ -887,7 +889,7 @@ body:has(#home.hidden) .flowtiles{display:block}
   function illo(kind){
     const G = C.green, R = C.red, Y = C.gold, W = '#FFFDF8';
     if (kind === 'cup-soda') return `<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="${G}"/><g stroke="${Y}" stroke-width="2.6" fill="none" stroke-linecap="round"><path class="steam" d="M24 12c-3 4 3 6 0 10"/><path class="steam" d="M32 10c-3 4 3 6 0 10"/><path class="steam" d="M40 12c-3 4 3 6 0 10"/></g><path d="M16 26h32l-4 26a4 4 0 0 1-4 3H24a4 4 0 0 1-4-3z" fill="${W}"/><rect x="16" y="33" width="32" height="7" fill="${R}"/><path d="M47 31h3a6 6 0 0 1 0 12h-4" stroke="${W}" stroke-width="3.4" fill="none"/></svg>`;
-    if (kind === 'sandwich') return `<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="${R}"/><path d="M10 44 L32 14 L54 44Z" fill="#F4E3BE"/><path d="M12 44 L32 18 L52 44" fill="none" stroke="${Y}" stroke-width="3"/><path d="M10 44h44v4H10z" fill="${C.green2}"/><path d="M10 48h44v3a3 3 0 0 1-3 3H13a3 3 0 0 1-3-3z" fill="#F4E3BE"/><circle cx="26" cy="36" r="3" fill="${R}"/><circle cx="37" cy="33" r="3" fill="${R}"/></svg>`;
+    if (kind === 'sandwich') return `<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="${G}"/><path d="M10 44 L32 14 L54 44Z" fill="#F4E3BE"/><path d="M12 44 L32 18 L52 44" fill="none" stroke="${Y}" stroke-width="3"/><path d="M10 44h44v4H10z" fill="${C.green2}"/><path d="M10 48h44v3a3 3 0 0 1-3 3H13a3 3 0 0 1-3-3z" fill="#F4E3BE"/><circle cx="26" cy="36" r="3" fill="${R}"/><circle cx="37" cy="33" r="3" fill="${R}"/></svg>`;
     if (kind === 'mat') return `<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="${G}"/><g transform="rotate(-12 32 34)"><rect x="12" y="20" width="40" height="28" rx="3" fill="${W}"/><path d="M12 27h40M12 34h40M12 41h40M22 20v28M32 20v28M42 20v28" stroke="${R}" stroke-width="3.6" opacity=".85"/><path d="M12 48h40" stroke="${Y}" stroke-width="3"/></g><circle cx="49" cy="15" r="3" fill="${Y}"/></svg>`;
     return `<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="${G}"/><path d="M14 28h36v22H14z" fill="${W}"/><path d="M10 28l6-12h32l6 12z" fill="${R}"/><rect x="28" y="36" width="8" height="14" fill="${Y}"/></svg>`;
   }
@@ -1081,16 +1083,15 @@ body:has(#home.hidden) .flowtiles{display:block}
     if (real(info['日期'])) { const m = info['日期'].match(/(?:\d{4}\/)?(\d{1,2})\/(\d{1,2})/), w = info['日期'].match(/（(.)）/); if (m) { evDay = `${+m[1]}/${+m[2]}`; evWk = w ? w[1] : ''; $('evDate').querySelector('b').textContent = evDay; $('evDate').querySelector('.wk').textContent = evWk ? '週' + evWk : ''; $('hbarDate').textContent = `${evDay}${evWk ? `（${evWk}）` : ''}`; $('seeYou').textContent = cp('end_h') || `${evDay} 見`; } }
     // 時間、地點確定了才顯示，不用口號填空位
     const tm = real(info['時間']) ? info['時間'] : '', place = real(info['地點']) ? info['地點'] : '';
-    $('stubTime').textContent = tm || ''; $('stubTime').classList.toggle('hidden', !tm); $('evDate').querySelector('.cut').classList.toggle('hidden', !tm);
-    $('showing').textContent = place ? `${evDay}${evWk ? `（${evWk}）` : ''}晚上　${place}` : ''; $('showing').classList.toggle('hidden', !place);
-    $('showDay').textContent = evDay ? `${evDay}${evWk ? `（${evWk}）` : ''}晚上・露天放映` : ''; $('showDay').classList.toggle('hidden', !evDay);
+    $('stubTime').textContent = tm || '時間待公布'; $('stubTime').classList.remove('hidden'); $('evDate').querySelector('.cut').classList.remove('hidden');
+    $('showing').textContent = catalog.film_title ? `放映《${catalog.film_title}》` : ''; $('showing').classList.toggle('hidden', !catalog.film_title);
+    $('showDay').textContent = evDay ? `${evDay}${evWk ? `（${evWk}）` : ''}・露天放映` : ''; $('showDay').classList.toggle('hidden', !evDay);
     startCountdown(info);
     // 地點附 Google 地圖連結（用「國立政治大學＋地點」搜尋）；載入失敗時不要顯示「待公布」，改說明載入失敗
     const mapUrl = pl => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('國立政治大學 ' + pl);
     $('evMeta').removeAttribute('aria-busy');
-    $('evMeta').innerHTML = catalog.offline ? `<li>${icon('wifi-off')}<span class="tbd">活動資訊載入失敗，請重新整理</span></li>`
-      : `<li>${icon('clock')}${real(info['時間']) ? `<span>${esc(info['時間'])}</span>` : '<span class="tbd">時間待公布</span>'}</li><li>${icon('map-pin')}${real(info['地點']) ? `<a class="maplink" href="${mapUrl(info['地點'])}" target="_blank" rel="noopener">${esc(info['地點'])}<span class="sr">（在 Google 地圖開啟）</span>${icon('external-link')}</a>` : '<span class="tbd">地點待公布</span>'}</li>${cp('fee') ? `<li>${icon('ticket')}<span>${esc(cp('fee'))}</span></li>` : ''}`;
-    $('heroFilm').innerHTML = catalog.film_title ? `${icon('film')}<span>放映《${esc(catalog.film_title)}》</span>` : ''; $('heroFilm').classList.toggle('hidden', !catalog.film_title);
+    $('evMeta').innerHTML = catalog.offline ? `<span class="tbd">活動資訊載入失敗，請重新整理</span>`
+      : `${real(info['地點']) ? `<a class="maplink" href="${mapUrl(info['地點'])}" target="_blank" rel="noopener">${esc(info['地點'])}<span class="sr">（在 Google 地圖開啟）</span>${icon('external-link')}</a>` : '<span class="tbd">地點待公布</span>'}<span class="sep" aria-hidden="true">・</span><span>${esc(cp('fee') || '免費入場')}</span>`;
     const now = new Date(); let note = '', can = false;
     if (!catalog.is_open && now < new Date(catalog.open_at)) note = `${fmtTime(catalog.open_at)} 開放報名`;
     else if (!catalog.is_open) note = '報名已截止。已經報名的人可以用 Email 裡的連結查詢訂單。';
@@ -1104,13 +1105,13 @@ body:has(#home.hidden) .flowtiles{display:block}
     $('filmBody').innerHTML = catalog.film_title ? `<p class="title">${esc(catalog.film_title)}</p>${catalog.film_note ? `<p>${esc(catalog.film_note)}</p>` : ''}` : `<p class="muted">${esc(cp('film_empty'))}</p>`;
     $('filmT').textContent = cp('film_h'); $('foodT').textContent = cp('food_h'); $('howT').textContent = cp('how_h'); $('faqT').textContent = cp('faq_h');
     document.querySelector('.food-intro .lede').textContent = cp('food_lede');
-    document.querySelector('.foodfacts').innerHTML = String(cp('food_points')).split('\n').map(x => x.trim()).filter(Boolean).map((x, i) => `<li>${icon(['wallet', 'hand-platter', 'ticket', 'circle-check'][i] || 'circle-check')}<span>${esc(x)}</span></li>`).join('');
+    document.querySelector('.foodfacts').innerHTML = String(cp('food_points')).split('\n').map(x => x.trim()).filter(Boolean).map(x => `<li><span class="gdot" aria-hidden="true"></span><span>${esc(x)}</span></li>`).join('');
     $('menuLead').textContent = cp('menu_lead');
     // 日期、時間、地點已經在首屏，這裡只放注意事項（有填才顯示）
     $('facts').innerHTML = catalog.venue_note ? `<li>${icon('info')}<b>注意事項</b><span>${esc(catalog.venue_note)}</span></li>` : '';
     $('facts').classList.toggle('hidden', !catalog.venue_note);
     $('vlist').innerHTML = foods().map(v => ({ v, its: v.items.filter(i => !i.addon_for) })).map(({ v, its }) => `<div class="vcard"><span class="ill">${illo(vIcon(v))}</span><div><b>${esc(v.name)}</b><span>${esc(its.slice(0, 4).map(i => i.name).join('、'))}${its.length > 4 ? ' 等' : ''}${its.length ? `・$${Math.min(...its.map(i => i.price))} 起` : ''}</span></div></div>`).join('') || '<p class="muted">餐點待公布</p>';
-    $('vlist').insertAdjacentHTML('afterbegin', rentals().flatMap(v => v.items).map(i => `<div class="vcard rent"><span class="ill">${illo('mat')}</span><div><b>${esc(i.name.replace(/（.*）/, ''))}租借</b><span>報名時可以加租・$${esc(i.price)}／張</span></div></div>`).join(''));
+    $('vlist').insertAdjacentHTML('afterbegin', rentals().flatMap(v => v.items).map(i => `<div class="vcard rent"><span class="ill">${illo('mat')}</span><div><b>${esc(i.name.replace(/（.*）/, ''))}<span class="rtag">租借</span></b><span>報名時可以加租・$${esc(i.price)}／張</span></div></div>`).join(''));
     $('how').innerHTML = [1, 2, 3].map(i => [cp('s' + i + '_t'), cp('s' + i + '_d')])
       .map(([t, d], i) => `<li><span class="no num" aria-hidden="true">${i + 1}</span><div><h3><span class="sr">第 ${i + 1} 步：</span>${esc(t)}</h3><p>${esc(d)}</p></div></li>`).join('');
     $('footContact').textContent = catalog.contact_info && !/nccu_sa/i.test(catalog.contact_info) ? '聯絡我們：' + catalog.contact_info : '';
@@ -1134,7 +1135,7 @@ body:has(#home.hidden) .flowtiles{display:block}
     $('pickupNote').innerHTML = `${icon('hand-platter')}<div><b>取餐方式</b><span>${esc(catalog.pickup_note || '活動當天報到後，到取餐區出示學生證（校外人士出示 QR Code）取餐。取餐時間和地點確定後會公布在這裡。')}</span></div>`;
     $('addons').innerHTML = rentals().map(v => `
       <section class="vendor addon" aria-labelledby="ad_${esc(v.id)}">
-        <div class="vhead"><span class="ill">${illo('mat')}</span><div><h3 id="ad_${esc(v.id)}" style="font-size:20px;margin:0">要不要加租${esc(v.items.length === 1 ? v.items[0].name.replace(/（.*）/, '') : '租借品')}？</h3>${v.description ? `<p class="vdesc">${esc(v.description)}</p>` : ''}</div></div>
+        <div class="vhead"><span class="ill">${illo('mat')}</span><div><h3 id="ad_${esc(v.id)}" style="font-size:20px;margin:0">要不要加租${esc(v.items.length === 1 ? v.items[0].name.replace(/（.*）/, '') : '租借品')}？<span class="rtag">租借</span></h3>${v.description ? `<p class="vdesc">${esc(v.description)}</p>` : ''}</div></div>
         <ul class="items">${v.items.map(row).join('')}</ul>
       </section>`).join('');
     $('addons').onclick = e => $('menu').onclick(e);
