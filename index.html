@@ -1684,7 +1684,7 @@ body:has(#home.hidden) .flowtiles{display:block}
     renderMenu(); draftReady = true; updateSummary(false);
     $('clearDraft').onclick = () => { clearDraft(); renderMenu(); updateSummary(false); toast('已清除這台裝置暫存的資料', 'check'); if (step === 2) renderReview(); };
     if (location.hash === '#order' && d) { go(d.step === 2 ? 2 : 1); toast('已恢復你剛剛填寫的內容', 'rotate-ccw'); }
-    else { if (location.hash === '#order') history.replaceState(null, '', location.pathname); renderResume(d); }
+    else { if (location.hash === '#order') history.replaceState(null, '', location.pathname + location.search); renderResume(d); }
   }
   init();
 })();
