@@ -1,6 +1,17 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+<script>
+// 訂單連結的 ?t=… 是查詢訂單用的憑證，不能被 Google Analytics 記錄：在 Google 代碼載入前改成 #t=…（# 後面的內容不會被送出）
+(function(){try{var u=new URL(location.href),t=u.searchParams.get('t');if(!t)return;var ce=u.searchParams.get('ce');u.searchParams.delete('t');u.searchParams.delete('ce');history.replaceState(null,'',u.pathname+u.search+'#t='+encodeURIComponent(t)+(ce?'&ce='+encodeURIComponent(ce):''));}catch(e){}})();
+</script>
+<!-- Google 代碼（GTM-TK3BBB8L） -->
+<script async src="https://www.googletagmanager.com/gtm.js?id=GTM-TK3BBB8L"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>聖誕露天電影院｜免費報名・餐點預訂｜政大學生會</title>
@@ -1424,7 +1435,7 @@ body:has(#home.hidden) .flowtiles{display:block}
       privacy_agreed: $('f_agree').checked, items: list().map(i => (i.option ? { id: i.base, qty: i.qty, option: i.option } : { id: i.base, qty: i.qty })) };
     try {
       const r = await Api.rpc('public_create_registration', { p });
-      history.replaceState(null, '', location.pathname + '?t=' + r.lookup_token);
+      history.replaceState(null, '', location.pathname + '#t=' + r.lookup_token);
       clearTimeout(draftTimer); store.del(DRAFT_KEY); store.set(ORDER_KEY, { token: r.lookup_token, order_no: r.order_no, status: r.status, at: Date.now() });
       renderPayment($('step3'), r, true); go(3);
     } catch (e) {
@@ -1593,7 +1604,7 @@ body:has(#home.hidden) .flowtiles{display:block}
     try {
       const r = await Api.rpc('public_get_registration', { p_token: token });
       if (!r) return showState(`<div class="state-page">${glyph()}<h2>找不到這筆訂單</h2><p class="muted">訂單可能已經取消。如果你已經付款，請不要重複付款，私訊學生會協助確認。</p><p><button class="btn line" type="button" onclick="document.getElementById('lookupLink').click()">${icon('search')}用學號和手機查詢</button></p>${home()}</div>`);
-      const prev = store.get(ORDER_KEY), fresh = (prev && prev.token === token && prev.status === 'pending_payment' && r.status === 'paid') || !!forceFresh || new URLSearchParams(location.search).get('ce') === '1';
+      const prev = store.get(ORDER_KEY), fresh = (prev && prev.token === token && prev.status === 'pending_payment' && r.status === 'paid') || !!forceFresh || urlParam('ce') === '1';
       store.set(ORDER_KEY, { token, order_no: r.order_no, status: r.status, at: Date.now() });
       const box = document.createElement('div'); box.style.cssText = 'max-width:620px;margin:16px auto 96px';
       $('lookupBody').innerHTML = ''; $('lookupBody').appendChild(box); renderPayment(box, r, fresh);
@@ -1626,18 +1637,20 @@ body:has(#home.hidden) .flowtiles{display:block}
         const r = await Api.rpc('public_find_registration', { p_code: code, p_phone: ph });
         if (!r) { $('fdErr').innerHTML = icon('circle-alert') + '找不到符合的訂單。請確認學號（或訂單編號）和手機號碼是報名時填的；已取消的訂單查不到。'; return; }
         store.set(ORDER_KEY, { token: r.lookup_token, order_no: r.order_no, status: r.status, at: Date.now() });
-        history.pushState(null, '', location.pathname + '?t=' + r.lookup_token);
+        history.pushState(null, '', location.pathname + '#t=' + r.lookup_token);
         const box = document.createElement('div'); box.style.cssText = 'max-width:620px;margin:16px auto 96px';
         $('lookupBody').innerHTML = ''; $('lookupBody').appendChild(box); renderPayment(box, r, false); scrollTo({ top: 0 });
       } catch (er) { $('fdErr').innerHTML = icon('circle-alert') + esc(er.message); }
       finally { if (bt.isConnected) { bt.disabled = false; bt.innerHTML = icon('search') + '查詢'; } }
     };
-    $('lkForm').onsubmit = ev => { ev.preventDefault(); const v = $('lkIn').value.trim(), m = v.match(/[?&]t=([0-9a-f]{48})/) || v.match(/^([0-9a-f]{48})$/); if (m) { history.pushState(null, '', location.pathname + '?t=' + m[1]); showLookup(m[1]); } else toast('連結格式不正確，請貼上完整的查詢連結', 'circle-alert'); };
+    $('lkForm').onsubmit = ev => { ev.preventDefault(); const v = $('lkIn').value.trim(), m = v.match(/[?&#]t=([0-9a-f]{48})/) || v.match(/^([0-9a-f]{48})$/); if (m) { history.pushState(null, '', location.pathname + '#t=' + m[1]); showLookup(m[1]); } else toast('連結格式不正確，請貼上完整的查詢連結', 'circle-alert'); };
   }
 
+  // 訂單憑證放在 # 後面（#t=…），舊連結的 ?t=… 也讀得到
+  function urlParam(k){ return new URLSearchParams(location.hash.slice(1)).get(k) || new URLSearchParams(location.search).get(k); }
   // ---------- 啟動 ----------
   async function init(){
-    const token = new URLSearchParams(location.search).get('t');
+    const token = urlParam('t');
     try { catalog = await Api.rpc('public_get_catalog'); }
     catch (e) {
       // 載入失敗：首頁的固定內容照樣顯示，只有報名按鈕改成錯誤狀態
