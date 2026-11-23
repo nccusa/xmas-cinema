@@ -275,6 +275,9 @@ html[data-dir=back]::view-transition-new(flowstep){animation:vt-in-l .32s var(--
 .mi .tag{display:inline-block;font-size:12.5px;font-weight:700;margin-left:6px;padding:1px 8px;border-radius:99px;vertical-align:2px}
 .tag.red{background:#FBE3E3;color:var(--redtext)}.tag.green{background:#DDF0E8;color:var(--green)}.tag.gold{background:#F4ECD8;color:#6E5418}
 .mi .ds{color:var(--muted);font-size:14px;margin-top:2px}
+.mi .opt{display:flex;width:max-content;align-items:center;gap:8px;margin-top:8px;font-size:14px;color:var(--muted)}
+.mi .opt select{font:inherit;font-size:16px;min-height:40px;padding:4px 30px 4px 12px;border:1px solid var(--line);border-radius:var(--r);background:#fff;color:var(--ink)}
+.mi .optsum{font-size:13.5px;color:var(--green);font-weight:700;margin-top:4px}.mi .optsum:empty{display:none}
 .hero-film{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin:14px 0 0;font-size:17px;font-weight:700;color:#F3EBDD}
 .hero-film .i{color:var(--gold-l);flex:none}
 .skl{display:inline-block;width:9em;height:.95em;border-radius:6px;background:rgba(255,255,255,.14)}
@@ -311,6 +314,7 @@ html[data-dir=back]::view-transition-new(flowstep){animation:vt-in-l .32s var(--
 .sum-list{margin:0;padding:0;list-style:none;max-height:40vh;overflow:auto}
 .sum-list li{display:flex;justify-content:space-between;gap:12px;padding:7px 0;font-size:15px;animation:enter .25s var(--ease)}
 .sum-list .empty{color:var(--muted);animation:none}
+.sum-list li>span:first-child{min-width:0}.sum-list li>.num{flex:none}
 .sum-total{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--line);margin-top:10px;padding-top:14px}
 .sum-total .num{font-size:30px;font-weight:800}
 .sum-total .num.bump,.mbar b.bump{animation:bump .3s var(--ease)}
@@ -1038,7 +1042,7 @@ body:has(#home.hidden) .flowtiles{display:block}
   }
   function loadDraft(){ const d = store.get(DRAFT_KEY); if (!d || Date.now() - (d.at || 0) > DRAFT_TTL) { store.del(DRAFT_KEY); return null; } return d; }
   function applyDraft(d){
-    const items = all();
+    const items = lines();
     Object.entries(d.cart || {}).forEach(([id, q]) => { const it = items.find(i => i.id === id); if (it && q > 0 && it.remaining !== 0) cart[id] = Math.min(q, it.remaining == null ? 10 : it.remaining); });
     FKEYS.forEach(k => { if (d.f && d.f[k]) $('f_' + k).value = d.f[k]; });
     const r = document.querySelector(`input[name=ptype][value="${d.ptype === 'guest' ? 'guest' : 'nccu'}"]`); if (r) r.checked = true;
@@ -1067,7 +1071,12 @@ body:has(#home.hidden) .flowtiles{display:block}
   function toast(m, ic){ const t = $('toast'); t.innerHTML = icon(ic || 'info') + `<span>${esc(m)}</span>`; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), 2600); }
   function say(m){ $('live').textContent = ''; setTimeout(() => $('live').textContent = m, 30); }
   const all = () => catalog.vendors.flatMap(v => v.items.map(i => ({ ...i, vendor: v.name })));
-  const list = () => all().filter(i => cart[i.id] > 0).map(i => ({ ...i, qty: cart[i.id] }));
+  // 有選項（例如熱／冰）的品項，購物車用「品項id::選項」記，品名變成「品名（選項）」
+  const lines = () => all().flatMap(i => i.options && i.options.length ? i.options.map(o => ({ ...i, id: i.id + '::' + o, base: i.id, option: o, name: i.name + '（' + o + '）' })) : [{ ...i, base: i.id }]);
+  const baseQty = id => Object.entries(cart).reduce((s, [k, q]) => s + (k === id || k.startsWith(id + '::') ? (q || 0) : 0), 0);
+  const optSel = {};
+  const curLine = i => i.options && i.options.length ? lines().find(l => l.id === i.id + '::' + (optSel[i.id] || i.options[0])) : { ...i, base: i.id };
+  const list = () => lines().filter(i => cart[i.id] > 0).map(i => ({ ...i, qty: cart[i.id] }));
   const total = () => list().reduce((s, i) => s + i.price * i.qty, 0);
   const count = () => list().reduce((s, i) => s + i.qty, 0);
   const tbd = '<span class="tbd">待公布</span>';
@@ -1139,6 +1148,7 @@ body:has(#home.hidden) .flowtiles{display:block}
         <ul class="items">${v.items.map(row).join('')}</ul>
       </section>`).join('');
     $('addons').onclick = e => $('menu').onclick(e);
+    $('menu').onchange = e => { const sl = e.target.closest('[data-opt]'); if (!sl) return; optSel[sl.dataset.opt] = sl.value; refreshRow(sl.dataset.opt); };
     // 有租借品時，這一步叫「加購與點餐」，野餐墊在前、餐點在後
     const hasRent = rentals().length > 0;
     $('s1t').textContent = hasRent ? '加購與點餐' : '想吃點什麼？';
@@ -1149,7 +1159,7 @@ body:has(#home.hidden) .flowtiles{display:block}
     $('menu').onclick = e => {
       const b = e.target.closest('[data-act]'); if (!b) return;
       const q = changeQty(b.dataset.id, b.dataset.act); if (q == null) return;
-      const li = document.getElementById('mi_' + b.dataset.id);
+      const li = document.getElementById('mi_' + (b.dataset.base || b.dataset.id));
       if (b.dataset.act === 'plus') flyToBag(li.querySelector('[data-act="plus"]') || b);
       const nb = li.querySelector(`[data-act="${q ? b.dataset.act : 'plus'}"]`); if (nb) nb.focus();
     };
@@ -1161,14 +1171,26 @@ body:has(#home.hidden) .flowtiles{display:block}
   function renderTabs(){
     const cur = ($('vtabs').querySelector('[aria-current="true"]') || {}).dataset;
     const nv = foods().length; $('vtabs').classList.toggle('even', nv >= 2 && nv <= 3); $('vtabs').style.setProperty('--n', nv);
-    $('vtabs').innerHTML = foods().map((v, i) => { const n = v.items.reduce((s, it) => s + (cart[it.id] || 0), 0); return `<button type="button" data-jump="v${i}" aria-current="${cur ? cur.jump === 'v' + i : i === 0}">${icon(vIcon(v))}${esc(v.name)}${n ? `<span class="n">${n}</span>` : ''}</button>`; }).join('');
+    $('vtabs').innerHTML = foods().map((v, i) => { const n = v.items.reduce((s, it) => s + baseQty(it.id), 0); return `<button type="button" data-jump="v${i}" aria-current="${cur ? cur.jump === 'v' + i : i === 0}">${icon(vIcon(v))}${esc(v.name)}${n ? `<span class="n">${n}</span>` : ''}</button>`; }).join('');
   }
   function row(i){
-    const out = i.remaining === 0, q = cart[i.id] || 0;
+    const out = i.remaining === 0, q = baseQty(i.id);
     return `<li class="mi${out ? ' out' : ''}${q ? ' has' : ''}${i.image_url ? ' wimg' : ''}" id="mi_${esc(i.id)}">
       ${i.image_url ? `<img class="th" src="${esc(i.image_url)}" alt="" loading="lazy" decoding="async">` : ''}
-      <div class="info"><span class="nm">${esc(i.name)}</span>${i.tag ? `<span class="tag ${noteClass(i.tag)}">${esc(i.tag)}</span>` : ''}${i.remaining != null && !out && i.remaining <= 20 ? `<span class="tag red">剩 ${i.remaining} 份</span>` : ''}${descHtml(i)}</div>
+      <div class="info"><span class="nm">${esc(i.name)}</span>${i.tag ? `<span class="tag ${noteClass(i.tag)}">${esc(i.tag)}</span>` : ''}${i.remaining != null && !out && i.remaining <= 20 ? `<span class="tag red">剩 ${i.remaining} 份</span>` : ''}${descHtml(i)}${optHtml(i)}</div>
       <div class="side"><div class="pr">$${esc(i.price)}</div><div class="ctl">${ctl(i)}</div></div></li>`;
+  }
+  // 選項下拉選單（例如熱／冰）＋已選的各選項份數
+  function optHtml(i){
+    if (!i.options || !i.options.length || i.remaining === 0) return '';
+    const sel = optSel[i.id] || i.options[0];
+    return `<label class="opt"><span>選擇</span><select data-opt="${esc(i.id)}" aria-label="${esc(i.name)} 選擇${esc(i.options.join('或'))}">${i.options.map(o => `<option${o === sel ? ' selected' : ''}>${esc(o)}</option>`).join('')}</select></label><div class="optsum">${optSum(i)}</div>`;
+  }
+  function optSum(i){ const t = (i.options || []).map(o => [o, cart[i.id + '::' + o] || 0]).filter(([, q]) => q > 0); return t.length ? '已選：' + t.map(([o, q]) => `${esc(o)} × ${q}`).join('、') : ''; }
+  function refreshRow(id){
+    const it = all().find(x => x.id === id), li = document.getElementById('mi_' + id); if (!it || !li) return;
+    li.classList.toggle('has', baseQty(id) > 0); li.querySelector('.ctl').innerHTML = ctl(it);
+    const os = li.querySelector('.optsum'); if (os) os.innerHTML = optSum(it);
   }
   // 品項說明：第一句（到第一個「。」）當一行重點，其餘收進「查看介紹」
   function descHtml(i){
@@ -1177,16 +1199,16 @@ body:has(#home.hidden) .flowtiles{display:block}
     if (d.length <= 40 || k < 0 || k >= d.length - 1) return `<div class="ds">${esc(d)}</div>`;
     return `<div class="ds">${esc(d.slice(0, k))}</div><details class="more"><summary>查看介紹</summary><p>${esc(d.slice(k + 1).trim())}</p></details>`;
   }
-  function ctl(i){
-    const q = cart[i.id] || 0;
-    if (i.remaining === 0) return '<span class="soldout">已售完</span>';
-    if (!q) return `<button type="button" class="add" data-act="plus" data-id="${esc(i.id)}">${icon('plus')}加入<span class="sr"> ${esc(i.name)}</span></button>`;
-    return `<span class="qty" role="group" aria-label="${esc(i.name)} 數量"><button type="button" data-act="minus" data-id="${esc(i.id)}" aria-label="減少 ${esc(i.name)}">${icon(q === 1 ? 'trash-2' : 'minus')}</button><output>${q}</output><button type="button" data-act="plus" data-id="${esc(i.id)}" aria-label="增加 ${esc(i.name)}">${icon('plus')}</button></span>`;
+  function ctl(item){
+    if (item.remaining === 0) return '<span class="soldout">已售完</span>';
+    const i = curLine(item), q = cart[i.id] || 0, d = `data-id="${esc(i.id)}" data-base="${esc(i.base)}"`;
+    if (!q) return `<button type="button" class="add" data-act="plus" ${d}>${icon('plus')}加入<span class="sr"> ${esc(i.name)}</span></button>`;
+    return `<span class="qty" role="group" aria-label="${esc(i.name)} 數量"><button type="button" data-act="minus" ${d} aria-label="減少 ${esc(i.name)}">${icon(q === 1 ? 'trash-2' : 'minus')}</button><output>${q}</output><button type="button" data-act="plus" ${d} aria-label="增加 ${esc(i.name)}">${icon('plus')}</button></span>`;
   }
 
   // 改數量：act 是 plus／minus／remove；回傳新的份數（被擋下時回傳 null）
   // 加購品（addon_for）要搭配同一組的主餐（combo_key），每份主餐可以加購 1 份；伺服器也會檢查
-  const mainQty = key => all().filter(x => x.combo_key === key).reduce((s, x) => s + (cart[x.id] || 0), 0);
+  const mainQty = key => all().filter(x => x.combo_key === key).reduce((s, x) => s + baseQty(x.id), 0);
   function trimAddons(key){
     let room = mainQty(key), cut = false;
     all().filter(x => x.addon_for === key).forEach(a => {
@@ -1196,21 +1218,23 @@ body:has(#home.hidden) .flowtiles{display:block}
     if (cut) toast(`加購的份數不能超過「${key}」，已經幫你一起減少`, 'info');
   }
   function changeQty(id, act){
-    const it = all().find(x => x.id === id); if (!it) return null;
+    const it = lines().find(x => x.id === id); if (!it) return null;
     let q = cart[it.id] || 0;
     if (act === 'plus' && it.addon_for && q >= mainQty(it.addon_for)) {
       toast(mainQty(it.addon_for) ? `每份「${it.addon_for}」可以加購 1 份` : `要先點「${it.addon_for}」，才能加購這個品項`, 'triangle-alert'); return null;
     }
     if (act === 'plus') {
-      if (it.remaining != null && q >= it.remaining) { toast(`「${it.name}」只剩 ${it.remaining} 份`, 'triangle-alert'); return null; }
+      if (it.remaining != null && baseQty(it.base) >= it.remaining) { toast(`「${it.name}」只剩 ${it.remaining} 份`, 'triangle-alert'); return null; }
       if (q >= 10) { toast('同一個品項最多 10 份', 'triangle-alert'); return null; }
       if (count() >= 20) { toast('一筆訂單最多 20 份', 'triangle-alert'); return null; }
       q++;
     } else q = act === 'remove' ? 0 : Math.max(0, q - 1);
     cart[it.id] = q;
     if (it.combo_key && act !== 'plus') trimAddons(it.combo_key);
-    const li = document.getElementById('mi_' + it.id);
-    if (li) { li.classList.toggle('has', q > 0); li.querySelector('.ctl').innerHTML = ctl(it); const out = li.querySelector('output'); if (out && !reduce) out.classList.add('bump'); }
+    if (it.option && optSel[it.base] !== it.option && act === 'plus') optSel[it.base] = it.option;
+    refreshRow(it.base);
+    const li = document.getElementById('mi_' + it.base);
+    if (li) { const sl = li.querySelector('[data-opt]'); if (sl && it.option && act === 'plus') sl.value = it.option; const out = li.querySelector('output'); if (out && !reduce) out.classList.add('bump'); }
     updateSummary(true); renderTabs(); refreshErrs();
     say(q ? `${it.name} ${q} 份，總金額 ${total()} 元` : `已移除 ${it.name}，總金額 ${total()} 元`);
     return q;
@@ -1228,7 +1252,7 @@ body:has(#home.hidden) .flowtiles{display:block}
     if (count() && b.dataset.armed !== '1') { b.dataset.armed = '1'; b.innerHTML = icon('triangle-alert') + '確定清空餐點嗎？再按一次'; setTimeout(() => { b.dataset.armed = ''; syncOnlyReg(); }, 5000); return; }
     b.dataset.armed = '';
     Object.keys(cart).forEach(id => { cart[id] = 0; });
-    document.querySelectorAll('#menu .mi').forEach(li => { const it = all().find(x => 'mi_' + x.id === li.id); if (it) { li.classList.remove('has'); li.querySelector('.ctl').innerHTML = ctl(it); } });
+    document.querySelectorAll('#menu .mi').forEach(li => { const it = all().find(x => 'mi_' + x.id === li.id); if (it) refreshRow(it.id); });
     updateSummary(); renderTabs(); refreshErrs();
     history.pushState({ s: 2 }, '', '#order'); go(2);
   };
@@ -1397,7 +1421,7 @@ body:has(#home.hidden) .flowtiles{display:block}
     sending = true; [$('sumNext'), $('mNext')].forEach(b => { b.disabled = true; b.innerHTML = icon('loader-circle', 'spin') + '送出中…'; });
     const p = { participant_type: ptype(), name: $('f_name').value.trim(), student_id: ptype() === 'guest' ? null : $('f_sid').value.trim(),
       phone: $('f_phone').value.replace(/[\s-]/g, ''), email: $('f_email').value.trim(), payer_last5: total() === 0 ? '00000' : $('f_last5').value.trim(),
-      privacy_agreed: $('f_agree').checked, items: list().map(i => ({ id: i.id, qty: i.qty })) };
+      privacy_agreed: $('f_agree').checked, items: list().map(i => (i.option ? { id: i.base, qty: i.qty, option: i.option } : { id: i.base, qty: i.qty })) };
     try {
       const r = await Api.rpc('public_create_registration', { p });
       history.replaceState(null, '', location.pathname + '?t=' + r.lookup_token);
@@ -1480,7 +1504,7 @@ body:has(#home.hidden) .flowtiles{display:block}
     try {
       await Api.rpc('public_cancel_registration', { p_token: r.lookup_token });
       store.del(ORDER_KEY);
-      store.set(DRAFT_KEY, { at: Date.now(), cart: Object.fromEntries((r.items || []).map(i => { const m = all().find(x => x.name === i.name && x.vendor === i.vendor); return m ? [m.id, i.qty] : null; }).filter(Boolean)), f: { name: r.name || '', sid: r.student_id || '', phone: '', email: '', last5: '' }, ptype: r.participant_type, step: 1 });
+      store.set(DRAFT_KEY, { at: Date.now(), cart: Object.fromEntries((r.items || []).map(i => { const m = lines().find(x => x.name === i.name && x.vendor === i.vendor); return m ? [m.id, i.qty] : null; }).filter(Boolean)), f: { name: r.name || '', sid: r.student_id || '', phone: '', email: '', last5: '' }, ptype: r.participant_type, step: 1 });
       el.innerHTML = `<div class="state-page" style="margin:24px auto">${glyph()}<h2>已取消訂單 ${esc(r.order_no)}</h2><p class="muted">名額已經釋出。剛剛選的餐點已經幫你帶回去，可以修改後重新報名。</p><button type="button" class="btn" id="againBtn">${icon('arrow-right')}重新報名</button></div>`;
       $('againBtn').onclick = () => { location.href = location.pathname + '#order'; location.reload(); };
       history.replaceState(null, '', location.pathname);
@@ -1499,7 +1523,7 @@ body:has(#home.hidden) .flowtiles{display:block}
       <div class="status-line"><span class="pill done">${icon('circle-check')}${done ? '已完成報到與取餐' : r.total_amount === 0 ? '報名完成' : '付款已確認'}</span>${r.is_test ? `<span class="pill test">${icon('flask-conical')}測試訂單</span>` : ''}<span>訂單 <span class="num">${esc(r.order_no)}</span></span></div>
       <h2 tabindex="-1" id="payT" style="margin:0">${done ? '取餐完成，電影好看！' : r.total_amount === 0 ? `報名完成，${esc(evDay)} 見` : `付款確認了，${esc(evDay)} 見`}</h2>
       ${!done ? (guest ? `<div class="ticket${celebrate ? ' print' : ''}"><svg class="band" viewBox="0 0 432 36" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${tileBand(12, 36)}</svg>
-        <div class="tin"><div class="tinfo">${saMark('tmark', '國立政治大學學生會')}<span class="stamp" aria-hidden="true">${r.total_amount === 0 ? '已報名' : '已付款'}</span>${sparks}<div class="who">${esc(r.name)}</div><div class="meta"><span>校外人士</span><span>${itemCount(r)}</span></div><p class="muted" style="margin:12px 0 0">活動當天到報到櫃檯出示這個 QR Code，報到後到取餐區取餐。</p></div>
+        <div class="tin"><div class="tinfo">${saMark('tmark', '國立政治大學學生會')}<span class="stamp" aria-hidden="true">${r.total_amount === 0 ? '已報名' : '已付款'}</span>${sparks}<div class="who">${esc(r.name)}</div><div class="meta"><span>校外人士</span><span>${itemCount(r)}</span></div><p class="muted" style="margin:12px 0 0">活動當天到報到櫃檯出示這個 QR Code，報到後到取餐區（飲料到餐車）取餐。</p></div>
         <div class="qr" aria-label="報到用 QR Code">${qr}</div></div></div>
       ${r.qr_token ? `<div class="saveqr"><button type="button" class="btn" id="saveQr">${icon('download')}把 QR Code 存到手機</button>${linkBtn}</div>
       <p class="muted" style="font-size:14px;margin:0">這是你的報到憑證，建議現在就存進相簿。之後也可以點報名確認信（或付款完成信）裡的連結，或在報名網站用「查詢訂單」找回來。</p>` : ''}`

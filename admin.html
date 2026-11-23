@@ -832,13 +832,15 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
     };
     // 修改餐點：先看到修改後的金額和差額，再儲存
     if ($('editItems')) $('editItems').onclick = () => {
-      const qty = {}; (r.order_items || []).forEach(oi => { if (oi.menu_item_id) qty[oi.menu_item_id] = oi.qty; });
+      const qty = {}; (r.order_items || []).forEach(oi => { if (oi.menu_item_id) { const k = oi.menu_item_id + (oi.option ? '::' + oi.option : ''); qty[k] = (qty[k] || 0) + oi.qty; } });
+      // 有選項（熱／冰）的品項拆成每個選項一列；key 是「品項id::選項」
+      const rows = () => menu.items.flatMap(i => i.options && i.options.length ? i.options.map(o => ({ ...i, key: i.id + '::' + o, label: i.name + '（' + o + '）' })) : [{ ...i, key: i.id, label: i.name }]);
       let showAll = false;
       const draw = () => {
-        const items = menu.items.filter(i => showAll || qty[i.id] > 0);
-        const newTotal = Object.entries(qty).reduce((s, [k, q]) => { const it = menu.items.find(i => i.id === k); return s + (it ? it.price * q : 0); }, 0), diff = newTotal - r.paid_amount;
+        const items = rows().filter(i => showAll || qty[i.key] > 0);
+        const newTotal = Object.entries(qty).reduce((s, [k, q]) => { const it = menu.items.find(i => i.id === k.split('::')[0]); return s + (it ? it.price * q : 0); }, 0), diff = newTotal - r.paid_amount;
         $('itemEditor').innerHTML = `<div class="card editbox"><h2>${icon('pencil')}修改餐點</h2>
-          ${menu.vendors.map(v => { const its = items.filter(i => i.vendor_id === v.id); return its.length ? `<h3 class="small" style="margin:10px 0 2px;color:var(--ink2)">${esc(v.name)}</h3>` + its.map(i => `<div class="ied"><span>${esc(i.name)} <span class="small muted num">$${i.price}${i.active ? '' : '・已下架'}</span></span><span class="stepper"><button type="button" data-m="${i.id}" aria-label="減少 ${esc(i.name)}">${icon('minus')}</button><output>${qty[i.id] || 0}</output><button type="button" data-p="${i.id}" aria-label="增加 ${esc(i.name)}">${icon('plus')}</button></span></div>`).join('') : ''; }).join('') || '<p class="muted">目前沒有餐點。</p>'}
+          ${menu.vendors.map(v => { const its = items.filter(i => i.vendor_id === v.id); return its.length ? `<h3 class="small" style="margin:10px 0 2px;color:var(--ink2)">${esc(v.name)}</h3>` + its.map(i => `<div class="ied"><span>${esc(i.label)} <span class="small muted num">$${i.price}${i.active ? '' : '・已下架'}</span></span><span class="stepper"><button type="button" data-m="${esc(i.key)}" aria-label="減少 ${esc(i.label)}">${icon('minus')}</button><output>${qty[i.key] || 0}</output><button type="button" data-p="${esc(i.key)}" aria-label="增加 ${esc(i.label)}">${icon('plus')}</button></span></div>`).join('') : ''; }).join('') || '<p class="muted">目前沒有餐點。</p>'}
           <button class="btn quiet sm" type="button" id="showAll" style="margin-top:8px">${showAll ? '只顯示已點的品項' : `${icon('plus')}加其他品項`}</button>
           <div class="newsum"><div>修改後應付 <b class="num">${money(newTotal)}</b>（原本 ${money(r.total_amount)}）</div><div class="${diff > 0 ? 'crit' : diff < 0 ? 'crit' : 'ok'}">${diff > 0 ? `已收 ${money(r.paid_amount)}，要再補 <b>${diff}</b> 元` : diff < 0 ? `已收 ${money(r.paid_amount)}，要退 <b>${-diff}</b> 元` : '和已收金額一樣，不用補退'}</div></div>
           <label class="field" style="margin-top:12px"><span>修改原因（必填）</span><input id="dReason" placeholder="例如：IG 私訊要求把冰紅茶換成熱拿鐵"></label>
@@ -853,7 +855,7 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
         if (b.id === 'showAll') { showAll = !showAll; draw(); $('dReason').value = reasonKeep; return; }
         if (b.id === 'cancelEdit') { $('itemEditor').classList.add('hidden'); $('editItems').classList.remove('hidden'); return; }
         if (b.id === 'saveItems') { const reason = $('dReason').value.trim(); if (!reason) { $('dReason').focus(); return toast('請填寫修改原因', 'err'); }
-          busy(b, async () => { const items = Object.entries(qty).filter(([, q]) => q > 0).map(([k, q]) => ({ id: k, qty: q })); const res = await run(() => Api.rpc('admin_update_order', { p_reg: id, p_items: items, p_reason: reason })); after(res.balance > 0 ? `已修改，需補 ${res.balance} 元` : res.balance < 0 ? `已修改，需退 ${-res.balance} 元` : '餐點已修改'); }); }
+          busy(b, async () => { const items = Object.entries(qty).filter(([, q]) => q > 0).map(([k, q]) => { const [id, option] = k.split('::'); return option ? { id, qty: q, option } : { id, qty: q }; }); const res = await run(() => Api.rpc('admin_update_order', { p_reg: id, p_items: items, p_reason: reason })); after(res.balance > 0 ? `已修改，需補 ${res.balance} 元` : res.balance < 0 ? `已修改，需退 ${-res.balance} 元` : '餐點已修改'); }); }
       };
     };
     if ($('markPaid')) $('markPaid').onclick = e => { const amt = parseInt($('payAmt').value, 10), note = $('payNote').value.trim(); if (!amt || !note) return toast('請填金額和原因', 'err'); busy(e.currentTarget, async () => { await run(() => Api.rpc('admin_mark_paid', { p_reg: id, p_amount: amt, p_note: note })); after('已入帳'); }); };
@@ -1163,8 +1165,8 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
       if (b.hasAttribute('data-sv')) { const box = b.closest('[data-vendor]'); const g = f => box.querySelector(`[data-vf="${f}"]`); await run(() => Api.patch('vendors', 'id=eq.' + box.dataset.vendor, { name: g('name').value.trim(), description: g('description').value.trim(), image_url: box.querySelector('.vphoto [data-photo]').dataset.photo || null, sort: parseInt(g('sort').value, 10) || 0, active: g('active').checked }), '店家已儲存'); menuEdit.delete('v_' + box.dataset.vendor); await loadAll(); return renderMenu(); }
       if (b.hasAttribute('data-si')) {
         const tr = b.closest('tr'); const g = f => tr.querySelector(`[data-if="${f}"]`);
-        const row = { image_url: tr.querySelector('[data-photo]') ? (tr.querySelector('[data-photo]').dataset.photo || null) : undefined, name: g('name').value.trim(), description: g('description').value.trim(), price: parseInt(g('price').value, 10), stock_limit: g('stock').value === '' ? null : parseInt(g('stock').value, 10), tag: g('tag').value.trim() || null, sort: parseInt(g('sort').value, 10) || 0, active: g('active').checked };
-        if (!row.name || isNaN(row.price) || row.price < 0) return toast('請填寫品名和正確的價格', 'err');
+        const row = { image_url: tr.querySelector('[data-photo]') ? (tr.querySelector('[data-photo]').dataset.photo || null) : undefined, name: g('name').value.trim(), description: g('description').value.trim(), price: parseInt(g('price').value, 10), stock_limit: g('stock').value === '' ? null : parseInt(g('stock').value, 10), tag: g('tag').value.trim() || null, options: (o => o.length ? o : null)(g('options').value.split(/[,，、／\/]/).map(x => x.trim()).filter(Boolean)), sort: parseInt(g('sort').value, 10) || 0, active: g('active').checked };
+        if (!row.name || isNaN(row.price) || row.price < 0) return toast('請填寫品名和正確的價格', 'err'); if (row.options && (row.options.length < 2 || row.options.length > 6 || new Set(row.options).size !== row.options.length)) return toast('「讓客人選」要填 2～6 個不重複的選項，例如：熱，冰；只有一種就留空、寫在說明', 'err');
         if (tr.dataset.item) await run(() => Api.patch('menu_items', 'id=eq.' + tr.dataset.item, row), '品項已儲存');
         else await run(() => Api.insert('menu_items', { ...row, vendor_id: tr.dataset.vendor }), '已新增品項');
         menuEdit.delete(tr.dataset.item || 'new_' + tr.dataset.vendor); pageDirty = false; await loadAll(); return renderMenu();
@@ -1204,7 +1206,7 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
   function itemView(i){
     const n = sold(i.id);
     return `<tr class="mitem" data-item="${i.id}" data-vendor="${i.vendor_id}"><td>${i.image_url ? `<img class="mthumb" src="${esc(i.image_url)}" alt="">` : `<span class="mthumb">${icon('camera')}</span>`}</td>
-      <td class="nm"><b>${esc(i.name)}</b>${i.tag ? ` <span class="mini">${esc(i.tag)}</span>` : ''}${i.description ? `<small>${esc(i.description)}</small>` : ''}</td>
+      <td class="nm"><b>${esc(i.name)}</b>${i.tag ? ` <span class="mini">${esc(i.tag)}</span>` : ''}${i.options && i.options.length ? ` <span class="mini">選：${esc(i.options.join('／'))}</span>` : ''}${i.description ? `<small>${esc(i.description)}</small>` : ''}</td>
       <td class="num r">$${i.price}</td><td class="num r">${n}${i.stock_limit != null ? `<span class="small muted">／${i.stock_limit}</span>` : ''}</td>
       <td>${i.active ? '<span class="badge b-ok">上架中</span>' : '<span class="badge b-neu">已下架</span>'}</td>
       <td class="r"><button class="btn quiet sm" type="button" data-ed="${i.id}">${icon('pencil')}編輯</button></td></tr>`;
@@ -1217,6 +1219,7 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
       <label class="field"><span>價格</span><input class="in num" data-if="price" type="number" min="0" value="${esc(i.price)}"></label>
       <label class="field"><span>限量（空白＝不限）</span><input class="in num" data-if="stock" type="number" min="0" value="${i.stock_limit == null ? '' : i.stock_limit}" placeholder="不限"></label>
       <label class="field"><span>標籤</span><input class="in" data-if="tag" value="${esc(i.tag || '')}" placeholder="例如：熱門"></label>
+      <label class="field"><span>讓客人選（用逗號分隔，空白＝不用選）</span><input class="in" data-if="options" value="${esc((i.options || []).join('，'))}" placeholder="例如：熱，冰"></label>
       <label class="field"><span>排序</span><input class="in num" data-if="sort" type="number" value="${i.sort}"></label>
       <label class="row small" style="align-self:end;min-height:40px"><input type="checkbox" data-if="active" ${i.active ? 'checked' : ''}>上架</label>
       <div class="row" style="grid-column:1 / -1"><button class="btn sm" type="button" data-si>${icon('check')}${i.id ? '儲存' : '新增品項'}</button><button class="btn quiet sm" type="button" data-cx="${i.id || 'new_' + i.vendor_id}">取消</button>${i.id ? `<span class="small muted">已售 ${sold(i.id)} 份</span>` : ''}</div>
