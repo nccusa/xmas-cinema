@@ -1081,8 +1081,9 @@ body:has(#home.hidden) .flowtiles{display:block}
     const c = $('resumeClear'); if (c) c.onclick = () => { clearDraft(); renderMenu(); updateSummary(false); el.classList.add('hidden'); toast('已清除，可以重新填寫', 'check'); };
   }
   const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && innerWidth < 1100);
-  // GA 事件（經 GTM）：只送步驟、金額、份數這類統計，不送姓名、學號、手機、Email、訂單編號或查詢代碼
-  function track(ev, p){ try { (window.dataLayer = window.dataLayer || []).push(Object.assign({ event: ev }, p || {})); } catch (e) {} }
+  // GA 事件：用 Google 代碼的 gtag('event')（這個容器是 GA 的 Google 代碼升級來的，會直接送到 GA4，不用另外在 GTM 設觸發條件）
+  // 只送步驟、金額、份數這類統計，不送姓名、學號、手機、Email、訂單編號或查詢代碼
+  function track(ev, p){ try { if (typeof window.gtag === 'function') window.gtag('event', ev, p || {}); } catch (e) {} }
   function toast(m, ic){ const t = $('toast'); t.innerHTML = icon(ic || 'info') + `<span>${esc(m)}</span>`; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), 2600); }
   function say(m){ $('live').textContent = ''; setTimeout(() => $('live').textContent = m, 30); }
   const all = () => catalog.vendors.flatMap(v => v.items.map(i => ({ ...i, vendor: v.name })));
