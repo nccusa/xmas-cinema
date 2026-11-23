@@ -325,6 +325,7 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
 .prep h3{display:flex;align-items:center;gap:8px}
 .prep .ptotal{border-top:1px solid var(--line);font-weight:700}
 .moremenu hr{border:0;border-top:1px solid var(--line);margin:10px 0}
+body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="admin"]) .bulkbar,body[data-role]:not([data-role="admin"]) #extendAll,body[data-role]:not([data-role="admin"]) #tape button{display:none!important}
 </style>
 </head>
 <body>
@@ -375,7 +376,15 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
   if (window.registerSW) registerSW();
   const $ = id => document.getElementById(id);
   let regs = [], menu = { vendors: [], items: [] }, settings = null, dash = null, view = 'dash';
-  let lastLoad = 0, lastImport = null, pageDirty = false;  // 資料抓取時間、最後一次匯入郵局明細、這一頁是否有未儲存的修改
+  let lastLoad = 0, lastImport = null, pageDirty = false;
+  let myRole = 'admin';
+  const ROLE_NAME = { admin: '管理員', accountant: '會計', viewer: '唯讀', ops: '活動執行', staff: '現場人員' };
+  const ROLE_DESC = { admin: '整個後台，包含菜單、文案、設定、收款帳號、工作人員', accountant: '總覽、訂單（只能看）、對帳與人工入帳、核准寄信、匯出名單', viewer: '只能看總覽和訂單，不能改、不能匯出', ops: '總覽、訂單（只能看）、匯出與列印報到名單、掃描頁', staff: '只能用掃描頁（查詢、報到、交付）' };
+  const PERMS = { admin: null, accountant: ['view', 'recon', 'mail', 'export'], viewer: ['view'], ops: ['view', 'export', 'scan'], staff: ['scan'] };
+  const ROLE_PAGES = { accountant: ['dash', 'orders', 'recon', 'mail'], viewer: ['dash', 'orders'], ops: ['dash', 'orders'] };
+  const can = p => myRole === 'admin' || (PERMS[myRole] || []).includes(p);
+  const isAdmin = () => myRole === 'admin';
+  const pageOk = k => isAdmin() || (ROLE_PAGES[myRole] || []).includes(k);  // 資料抓取時間、最後一次匯入郵局明細、這一頁是否有未儲存的修改
   const PAGES = [
     ['dash', '總覽', 'layout-dashboard', '報名、付款與現場進度一眼看完'],
     ['orders', '訂單', 'receipt-text', '查詢、修改餐點、人工入帳、取消'],
@@ -424,10 +433,10 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
   async function boot(){
     Api.loadSession();
     if (!Api.session) return showLogin();
-    try { const ok = await Api.rpc('is_admin'); if (!ok) throw new Error('這個帳號不是管理員'); }
+    try { const role = await Api.rpc('my_role'); if (!['admin', 'accountant', 'viewer', 'ops'].includes(role)) throw new Error(role === 'staff' ? '現場人員帳號只能用掃描頁（scan.html），不能登入後台' : '這個帳號沒有後台權限，請管理員到「工作人員」授權'); myRole = role; document.body.dataset.role = role; }
     catch (e) { await Api.logout(); return showLogin(e.message); }
     $('loginView').classList.add('hidden'); $('app').classList.remove('hidden');
-    $('whoEmail').textContent = (Api.session.user && Api.session.user.email) || '';
+    $('whoEmail').textContent = ((Api.session.user && Api.session.user.email) || '') + (isAdmin() ? '' : `（${ROLE_NAME[myRole]}）`);
     buildNav(); await loadAll(); show(location.hash.slice(1) || 'dash');
   }
   function showLogin(m){ $('app').classList.add('hidden'); $('loginView').classList.remove('hidden'); $('lErr').textContent = m || ''; }
@@ -436,7 +445,7 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
     await busy($('lBtn'), async () => { try { await Api.login($('lEmail').value.trim(), $('lPass').value); $('lPass').value = ''; await boot(); } catch (err) { $('lErr').textContent = /Invalid login/i.test(err.message) ? 'Email 或密碼不正確' : '登入失敗：' + err.message; } });
   };
   function buildNav(){
-    $('nav').innerHTML = PAGES.map(([k, n, ic], i) => `${i === 7 ? '<hr>' : ''}<button type="button" data-v="${k}">${icon(ic)}<span>${n}</span><span class="cnt hidden" id="cnt_${k}"></span></button>`).join('');
+    $('nav').innerHTML = PAGES.filter(([k]) => pageOk(k)).map(([k, n, ic]) => `${k === 'staff' ? '<hr>' : ''}<button type="button" data-v="${k}">${icon(ic)}<span>${n}</span><span class="cnt hidden" id="cnt_${k}"></span></button>`).join('');
     $('outBtn').innerHTML = icon('log-out') + '登出'; $('installBtn').innerHTML = icon('square-plus') + '安裝';
   }
   $('outBtn').onclick = async () => { await Api.logout(); showLogin(); };
@@ -480,7 +489,7 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
   document.addEventListener('click', e => { const g = e.target.closest('[data-go]'); if (g) { e.preventDefault(); go(g.dataset.go); } });
 
   function show(v){
-    if (!PAGES.find(p => p[0] === v)) v = 'dash';
+    if (!PAGES.find(p => p[0] === v) || !pageOk(v)) v = 'dash';
     view = v; if (location.hash.slice(1) !== v) history.replaceState(null, '', '#' + v);
     document.querySelectorAll('#nav [data-v]').forEach(b => { if (b.dataset.v === v) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
     const p = PAGES.find(x => x[0] === v); $('pageTitle').textContent = p[1]; $('pageSub').textContent = p[3]; $('pageActs').innerHTML = '';
@@ -521,6 +530,7 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
     if (od) todo.push(['crit', 'clock', `${od} 筆逾期未付款`, '先匯入最新明細，確認沒付再設定新期限', 'orders']);
     const partial = regs.filter(r => !r.is_test && siteState(r) === 'partial').length;
     if (partial) todo.push(['info', 'hand-platter', `${partial} 人已報到但餐點還沒領完`, '到訂單頁用「現場進度」篩選', 'orders']);
+    for (let i = todo.length - 1; i >= 0; i--) if (!pageOk(todo[i][4])) todo.splice(i, 1);
     const kpi = (ic, t, v, sub, bar) => `<div class="kpi"><div class="k">${icon(ic)}${t}</div><div class="v">${v}${sub ? `<small>${sub}</small>` : ''}</div>${bar != null ? `<div class="bar"><i style="width:${Math.min(100, bar)}%"></i></div>` : ''}</div>`;
     // 備餐統計：只算正式、沒取消的訂單；「已付款」才是要跟店家訂的份數
     const prepBy = {};
@@ -546,7 +556,7 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
         <div class="card"><h2>${icon('list-checks')}需要你處理</h2><p>點一下直接過去處理。</p>
           ${todo.length ? `<div class="todo">${todo.map(([t, ic, b, s, go]) => `<button type="button" data-go="${go}"><span class="ic ${t}">${icon(ic)}</span><span><b>${esc(b)}</b><small>${esc(s)}</small></span>${icon('chevron-right')}</button>`).join('')}</div>` : `<div class="empty">${icon('circle-check')}目前沒有待處理的事</div>`}
         </div>
-        <div class="card"><h2>${icon('badge-check')}上線前檢查</h2><p>全部打勾再開放報名、收款。</p><ul class="check" id="launch"><li><span>${icon('loader-circle', 'spin')}</span><span>檢查中…</span><span></span></li></ul></div>
+        ${isAdmin() ? '' : '<!--'}<div class="card"><h2>${icon('badge-check')}上線前檢查</h2><p>全部打勾再開放報名、收款。</p><ul class="check" id="launch"><li><span>${icon('loader-circle', 'spin')}</span><span>檢查中…</span><span></span></li></ul></div>${isAdmin() ? '' : '-->'}
       </div>
       <div class="card prep"><h2>${icon('store')}備餐統計</h2><p>只算正式訂單。報名截止後，以「已付款」份數通知店家；「複製」只會複製到剪貼簿，要不要傳給店家由你決定。</p>
         ${Object.keys(prepBy).length ? Object.entries(prepBy).map(([v, items]) => `<h3>${icon('store')}${esc(v)}<span class="grow"></span><button class="btn sm sec" type="button" data-copyv="${esc(v)}">${icon('copy')}複製這家的訂單內容</button></h3><div class="it hd"><span>品項</span><span class="num">全部</span><span class="num">已付款</span><span class="num">已取</span></div>${Object.entries(items).map(([n, p]) => `<div class="it"><span>${esc(n)}</span><span class="num">${p.qty}</span><span class="num"><b>${p.paid}</b></span><span class="num">${p.picked}</span></div>`).join('')}<div class="it ptotal"><span>已付款合計</span><span></span><span class="num"><b>${money(prepTotal(v))}</b></span><span></span></div>`).join('') : `<div class="empty">${icon('utensils-crossed')}還沒有人點餐</div>`}
@@ -573,7 +583,7 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
       [!settings.test_mode, '測試模式已關閉', '', 'test'],
       [!regs.some(r => r.is_test), '測試資料已清除', '', 'test'],
     ];
-    const el = $('launch'); if (!el) return;
+    const el = $('launch'); if (!el || !isAdmin()) return;
     el.innerHTML = checks.map(([ok, t, sub, go]) => `<li class="${ok ? 'ok' : 'no'}">${icon(ok ? 'circle-check' : 'circle-x')}<span><b>${esc(t)}</b>${!ok && sub ? `<small>${esc(sub)}</small>` : ''}</span>${ok ? '<span></span>' : `<button class="btn quiet sm" type="button" data-go="${go}">去處理</button>`}</li>`).join('');
   }
 
@@ -613,8 +623,9 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
   function renderOrders(){
     q = oq.toLowerCase();
     acts(`${agoHtml()}<button class="btn sec" type="button" id="csvBtn">${icon('download')}匯出 CSV</button><button class="btn sec" type="button" id="printBtn">${icon('printer')}列印報到名單</button><button class="btn sec" type="button" id="rf">${icon('refresh-cw')}重新整理</button>`); $('rf').onclick = e => busy(e.currentTarget, refresh);
-    $('csvBtn').onclick = () => exportCsv(regs.filter(r => (!q || [r.name, r.student_id || '', r.phone, r.order_no, r.email].some(x => String(x).toLowerCase().includes(q))) && orderFilter(r)));
-    $('printBtn').onclick = printRoster;
+    if (!can('export')) { $('csvBtn').remove(); $('printBtn').remove(); }
+    if ($('csvBtn')) $('csvBtn').onclick = () => exportCsv(regs.filter(r => (!q || [r.name, r.student_id || '', r.phone, r.order_no, r.email].some(x => String(x).toLowerCase().includes(q))) && orderFilter(r)));
+    if ($('printBtn')) $('printBtn').onclick = printRoster;
     const base = regs.filter(r => !q || [r.name, r.student_id || '', r.phone, r.order_no, r.email].some(x => String(x).toLowerCase().includes(q)));
     const n = (k, v) => { const o = [opay, osite]; if (k === 'pay') opay = v; else osite = v; const c = base.filter(orderFilter).length; [opay, osite] = o; return c; };
     const list = base.filter(orderFilter);
@@ -804,6 +815,11 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
           <p class="small muted" style="margin:10px 0 0">報名 ${esc(fmtTime(r.created_at))}・最後更新 ${esc(fmtTime(r.updated_at))}</p></details>
       </div>`);
     $('dClose').onclick = closeDrawer; setTimeout(() => $('dClose').focus(), 60);
+    if (!isAdmin()) {
+      ['editItems', 'saveNote', 'saveInfo', 'undoPick', 'cancelReg'].forEach(k => { const el = $(k); if (el) el.style.display = 'none'; });
+      $('drawer').querySelectorAll('#dNote, #dName, #dPhone, #dEmail, #dLast5, #dDl').forEach(el => { el.readOnly = true; el.disabled = el.type === 'datetime-local'; });
+      if (!can('recon') && $('markPaid')) $('markPaid').closest('details').style.display = 'none';
+    }
     const after = async (msg, t) => { await loadAll(); toast(msg); if (view === 'orders') renderOrders(); openOrder(id, t); };
     $('drawer').querySelector('.dtabs').onclick = e => { const b = e.target.closest('[data-dt]'); if (!b) return; $('drawer').querySelectorAll('[data-dt]').forEach(x => x.setAttribute('aria-selected', x === b)); $('dtItems').classList.toggle('hidden', b.dataset.dt !== 'items'); $('dtLog').classList.toggle('hidden', b.dataset.dt !== 'log'); };
     loadLog(r);
@@ -896,7 +912,7 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
   }
   let parsed = null;
   async function renderRecon(){
-    acts(settings.test_mode ? `<button class="btn sec" type="button" id="simBtn">${icon('flask-conical')}模擬一份明細</button>` : '');
+    acts(settings.test_mode && isAdmin() ? `<button class="btn sec" type="button" id="simBtn">${icon('flask-conical')}模擬一份明細</button>` : '');
     if ($('simBtn')) $('simBtn').onclick = e => busy(e.currentTarget, simulate);
     page().innerHTML = `<div class="card empty">${icon('loader-circle', 'spin')}載入中…</div>`;
     const [txns, batches] = await Promise.all([
@@ -1050,7 +1066,7 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
   const MAIL_ACTIONS = { pending_approval: ['cancel', 'approve'], failed: ['cancel', 'retry'], blocked: ['cancel', 'rerender'], cancelled: ['rerender'] };
   const VARS = ['姓名','學號','附言代碼','身分','訂單編號','餐點明細','總金額','已付金額','付款期限','收款銀行','收款帳號','戶名','查詢連結','活動名稱','活動資訊','聯絡方式'];
   async function renderMail(){
-    pageDirty = false;
+    pageDirty = false; if (!isAdmin()) mailView = 'queue';
     page().innerHTML = `<div class="card empty">${icon('loader-circle', 'spin')}載入中…</div>`;
     const [tpls, queue] = await Promise.all([
       Api.select('email_templates', 'select=*&order=key'),
@@ -1063,7 +1079,7 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
     const isTest = id => { const r = regs.find(x => x.id === id); return r && r.is_test; };
     page().innerHTML = `
       <div class="note info">${icon('info')}<span>系統每 5 分鐘從 nccusa.info@gmail.com 寄出「等待寄出」的信。報名成功信會自動寄；付款完成、延長期限信要你核准才寄。寄信失敗會通知到 Discord 監控頻道。</span></div>
-      <div class="seg" role="tablist" aria-label="信件" style="margin-bottom:14px"><button type="button" data-mv="queue" aria-pressed="${mailView === 'queue'}">${icon('inbox')}寄送佇列<span class="c">${(counts.pending_approval || 0) + (counts.failed || 0) + (counts.blocked || 0)}</span></button><button type="button" data-mv="tpl" aria-pressed="${mailView === 'tpl'}">${icon('pencil')}信件範本<span class="c">${tpls.filter(t => !(t.approved_at && t.enabled)).length}</span></button></div>
+      <div class="seg" role="tablist" aria-label="信件" style="margin-bottom:14px"><button type="button" data-mv="queue" aria-pressed="${mailView === 'queue'}">${icon('inbox')}寄送佇列<span class="c">${(counts.pending_approval || 0) + (counts.failed || 0) + (counts.blocked || 0)}</span></button>${isAdmin() ? '' : '<!--'}<button type="button" data-mv="tpl" aria-pressed="${mailView === 'tpl'}">${icon('pencil')}信件範本<span class="c">${tpls.filter(t => !(t.approved_at && t.enabled)).length}</span></button>${isAdmin() ? '' : '-->'}</div>
       <div class="card ${mailView === 'queue' ? '' : 'hidden'}"><h2>${icon('inbox')}信件佇列</h2>
         <div class="seg" role="group" aria-label="信件狀態" style="margin:8px 0 14px">${tabs.map(([k, v]) => `<button type="button" data-mt="${k}" aria-pressed="${mailTab === k}">${v}<span class="c">${counts[k] || 0}</span></button>`).join('')}</div>
         <p class="small muted" style="margin:-4px 0 12px">${esc(MAIL_TAB_HELP[mailTab] || '')}</p>
@@ -1320,13 +1336,13 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
   // ---------- 工作人員 ----------
   async function renderStaff(){
     const list = await run(() => Api.rpc('admin_list_staff'));
-    page().innerHTML = `<div class="card"><h2>${icon('users')}可以登入的人</h2><p>管理員可以用整個後台；現場人員只能用掃描頁（查詢、報到、交付），看不到完整名單，也不能改價格或訂單。</p>
+    page().innerHTML = `<div class="card"><h2>${icon('users')}可以登入的人</h2><p>每個角色能做的事：</p><ul class="small" style="margin:0 0 12px;padding-left:18px">${Object.entries(ROLE_DESC).map(([k, d]) => `<li><b>${ROLE_NAME[k]}</b>：${esc(d)}</li>`).join('')}</ul><p class="small muted">除了現場人員，其他角色都看得到報名者的個資，只開給需要的人。</p>
       <div class="tblwrap"><table class="tbl"><thead><tr><th>Email</th><th>名稱</th><th>角色</th><th></th></tr></thead><tbody>
-      ${list.map(s => `<tr><td>${esc(s.email)}</td><td>${esc(s.display_name || '')}</td><td><span class="badge ${s.role === 'admin' ? 'b-info' : 'b-neu'}">${s.role === 'admin' ? '管理員' : '現場人員'}</span></td><td class="r">${s.user_id === (Api.session.user || {}).id ? '<span class="small muted">（你自己）</span>' : `<button class="btn sm quiet" type="button" data-rm="${s.user_id}">移除權限</button>`}</td></tr>`).join('')}
+      ${list.map(s => `<tr><td>${esc(s.email)}</td><td>${esc(s.display_name || '')}</td><td><span class="badge ${s.role === 'admin' ? 'b-info' : 'b-neu'}">${ROLE_NAME[s.role] || s.role}</span></td><td class="r">${s.user_id === (Api.session.user || {}).id ? '<span class="small muted">（你自己）</span>' : `<button class="btn sm quiet" type="button" data-rm="${s.user_id}">移除權限</button>`}</td></tr>`).join('')}
       </tbody></table></div></div>
-      <div class="card"><h2>${icon('circle-plus')}加入工作人員</h2><p>先到 Supabase 後台 Authentication → Users → Add user 建立帳號（勾 Auto Confirm），再回到這裡用同一個 Email 授權。</p>
-      <div class="row"><input class="in grow" id="sEmail" placeholder="Email" type="email"><input class="in" id="sName" placeholder="名稱，例如：活動部小明"><select class="in" id="sRole" style="width:auto"><option value="staff">現場人員</option><option value="admin">管理員</option></select><button class="btn" type="button" id="sAdd">授權</button></div>
-      <p class="small muted" style="margin:12px 0 0">現場人員的掃描頁網址：<span class="num">${esc(location.origin + location.pathname.replace(/admin\.html$/, ''))}scan.html</span>，建議請他們打開後「加到主畫面」。</p></div>`;
+      <div class="card"><h2>${icon('circle-plus')}加入工作人員</h2><p>步驟：① Supabase 後台 → Authentication → Users → Add user → Create new user，填 Email 和密碼、勾 Auto Confirm User；② 回到這裡輸入同一個 Email、選角色、按「授權」；③ 已經授權過的人，再授權一次就是改角色。</p>
+      <div class="row"><input class="in grow" id="sEmail" placeholder="Email" type="email"><input class="in" id="sName" placeholder="名稱，例如：活動部小明"><select class="in" id="sRole" style="width:auto">${['staff', 'ops', 'viewer', 'accountant', 'admin'].map(k => `<option value="${k}">${ROLE_NAME[k]}</option>`).join('')}</select><button class="btn" type="button" id="sAdd">授權</button></div>
+      <p class="small muted" style="margin:12px 0 0">現場人員、活動執行用的掃描頁網址：<span class="num">${esc(location.origin + location.pathname.replace(/admin\.html$/, ''))}scan.html</span>，建議請他們打開後「加到主畫面」。</p></div>`;
     page().onclick = async e => {
       const b = e.target.closest('button'); if (!b) return;
       if (b.id === 'sAdd') { await run(() => Api.rpc('admin_grant_role', { p_email: $('sEmail').value.trim(), p_role: $('sRole').value, p_name: $('sName').value.trim() }), '已授權'); return renderStaff(); }

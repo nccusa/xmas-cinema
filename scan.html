@@ -352,7 +352,7 @@ button{font:inherit;color:inherit}
   async function boot(){
     Api.loadSession();
     if (!Api.session) return showLogin();
-    try { const role = await Api.rpc('my_role'); if (!role) throw new Error('這個帳號沒有工作人員權限'); }
+    try { const role = await Api.rpc('my_role'); if (!['admin', 'staff', 'ops'].includes(role)) throw new Error(role ? '這個帳號的角色不能用掃描頁，請管理員改成「現場人員」或「活動執行」' : '這個帳號沒有工作人員權限'); }
     catch (e) { if (/權限|登入|JWT/.test(e.message)) { await Api.logout(); return showLogin(e.message); } return showLogin('目前連不上伺服器，請確認網路後重試'); }
     $('loginView').classList.add('hidden');
     try { station = JSON.parse(localStorage.getItem('xc_station')); } catch (e) {}
