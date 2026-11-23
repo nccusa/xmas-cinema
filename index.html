@@ -1081,6 +1081,8 @@ body:has(#home.hidden) .flowtiles{display:block}
     const c = $('resumeClear'); if (c) c.onclick = () => { clearDraft(); renderMenu(); updateSummary(false); el.classList.add('hidden'); toast('已清除，可以重新填寫', 'check'); };
   }
   const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && innerWidth < 1100);
+  // GA 事件（經 GTM）：只送步驟、金額、份數這類統計，不送姓名、學號、手機、Email、訂單編號或查詢代碼
+  function track(ev, p){ try { (window.dataLayer = window.dataLayer || []).push(Object.assign({ event: ev }, p || {})); } catch (e) {} }
   function toast(m, ic){ const t = $('toast'); t.innerHTML = icon(ic || 'info') + `<span>${esc(m)}</span>`; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), 2600); }
   function say(m){ $('live').textContent = ''; setTimeout(() => $('live').textContent = m, 30); }
   const all = () => catalog.vendors.flatMap(v => v.items.map(i => ({ ...i, vendor: v.name })));
@@ -1318,9 +1320,9 @@ body:has(#home.hidden) .flowtiles{display:block}
     }, dir);
     setTimeout(() => { const h = s === 1 ? $('s1t') : s === 2 ? $('s2t') : $('payT'); if (h) h.focus({ preventScroll: true }); }, 60);
   }
-  const start = () => { history.pushState({ s: 1 }, '', '#order'); go(1); };
+  const start = e => { track('xc_start_registration', { xc_from: ({ startBtn: 'hero', startBtn2: 'closing', hbarBtn: 'sticky_bar' })[e && e.currentTarget && e.currentTarget.id] || 'other' }); history.pushState({ s: 1 }, '', '#order'); go(1); };
   $('startBtn').onclick = start; $('startBtn2').onclick = start; $('hbarBtn').onclick = start;
-  const next = () => { if (step === 1) { history.pushState({ s: 2 }, '', '#order'); go(2); } else if (step === 2) submit(); };
+  const next = () => { if (step === 1) { track('xc_begin_details', { xc_items: count(), xc_value: total() }); history.pushState({ s: 2 }, '', '#order'); go(2); } else if (step === 2) submit(); };
   $('sumNext').onclick = next; $('mNext').onclick = next;
   $('backBtn').onclick = () => history.back();
   addEventListener('popstate', () => {
@@ -1439,9 +1441,11 @@ body:has(#home.hidden) .flowtiles{display:block}
       const r = await Api.rpc('public_create_registration', { p });
       history.replaceState(null, '', location.pathname + '#t=' + r.lookup_token);
       clearTimeout(draftTimer); store.del(DRAFT_KEY); store.set(ORDER_KEY, { token: r.lookup_token, order_no: r.order_no, status: r.status, at: Date.now() });
+      track('xc_registration_submitted', { xc_paid: r.total_amount > 0 ? 'paid' : 'free', xc_type: p.participant_type, xc_items: p.items.reduce((s, i) => s + i.qty, 0), xc_value: r.total_amount || 0, value: r.total_amount || 0, currency: 'TWD' });
       renderPayment($('step3'), r, true); go(3);
     } catch (e) {
       const net = /Failed to fetch|NetworkError|連線/.test(e.message);
+      track('xc_registration_error', { xc_reason: net ? '網路連線失敗' : String(e.message || '').slice(0, 100) });
       $('errlist').innerHTML = `<li>${esc(net ? '網路連線失敗，資料都還在，請確認網路後再按一次「確認送出」。不確定是否已經送出時，再送一次會提示「已經報名過了」，不會重複建立訂單。' : e.message)}</li>`;
       $('errsum').classList.remove('hidden'); $('errsum').focus();
     } finally { sending = false; [$('sumNext'), $('mNext')].forEach(b => b.disabled = false); updateSummary(false); }
@@ -1502,9 +1506,9 @@ body:has(#home.hidden) .flowtiles{display:block}
       </div>`;
     el.onclick = async e => {
       const t = e.target.closest('[role="tab"]');
-      if (t) { el.querySelectorAll('[role="tab"]').forEach(b => b.setAttribute('aria-selected', b === t)); el.querySelectorAll('[role="tabpanel"]').forEach(p => p.classList.toggle('hidden', p.id !== t.getAttribute('aria-controls'))); return; }
+      if (t) { track('xc_payment_tab', { xc_tab: t.id === 'tb_qr' ? 'qr' : 'copy' }); el.querySelectorAll('[role="tab"]').forEach(b => b.setAttribute('aria-selected', b === t)); el.querySelectorAll('[role="tabpanel"]').forEach(p => p.classList.toggle('hidden', p.id !== t.getAttribute('aria-controls'))); return; }
       const c = e.target.closest('[data-copy]');
-      if (c) { const ok = await copyText(c.dataset.copy); const old = c.innerHTML; c.classList.toggle('done', ok); c.innerHTML = ok ? icon('check') + '已複製' : '請長按複製'; say(ok ? '已複製' : '請長按手動複製'); setTimeout(() => { c.innerHTML = old; c.classList.remove('done'); }, 1800); }
+      if (c) { track('xc_copy', { xc_what: c.id === 'copyTicketLink' ? '查詢連結' : ((c.querySelector('.sr') || {}).textContent || '其他').trim() }); const ok = await copyText(c.dataset.copy); const old = c.innerHTML; c.classList.toggle('done', ok); c.innerHTML = ok ? icon('check') + '已複製' : '請長按複製'; say(ok ? '已複製' : '請長按手動複製'); setTimeout(() => { c.innerHTML = old; c.classList.remove('done'); }, 1800); }
       const sc = e.target.closest('#selfCancel');
       if (sc) return selfCancel(el, r, sc);
       const tp = e.target.closest('#testPay');
@@ -1516,6 +1520,7 @@ body:has(#home.hidden) .flowtiles{display:block}
     sc.disabled = true; sc.innerHTML = icon('loader-circle', 'spin') + '取消中…';
     try {
       await Api.rpc('public_cancel_registration', { p_token: r.lookup_token });
+      track('xc_order_cancel', { xc_value: r.total_amount || 0 });
       store.del(ORDER_KEY);
       store.set(DRAFT_KEY, { at: Date.now(), cart: Object.fromEntries((r.items || []).map(i => { const m = lines().find(x => x.name === i.name && x.vendor === i.vendor); return m ? [m.id, i.qty] : null; }).filter(Boolean)), f: { name: r.name || '', sid: r.student_id || '', phone: '', email: '', last5: '' }, ptype: r.participant_type, step: 1 });
       el.innerHTML = `<div class="state-page" style="margin:24px auto">${glyph()}<h2>已取消訂單 ${esc(r.order_no)}</h2><p class="muted">名額已經釋出。剛剛選的餐點已經幫你帶回去，可以修改後重新報名。</p><button type="button" class="btn" id="againBtn">${icon('arrow-right')}重新報名</button></div>`;
@@ -1606,6 +1611,7 @@ body:has(#home.hidden) .flowtiles{display:block}
     try {
       const r = await Api.rpc('public_get_registration', { p_token: token });
       if (!r) return showState(`<div class="state-page">${glyph()}<h2>找不到這筆訂單</h2><p class="muted">訂單可能已經取消。如果你已經付款，請不要重複付款，私訊學生會協助確認。</p><p><button class="btn line" type="button" onclick="document.getElementById('lookupLink').click()">${icon('search')}用學號和手機查詢</button></p>${home()}</div>`);
+      track('xc_order_view', { xc_status: r.status });
       const prev = store.get(ORDER_KEY), fresh = (prev && prev.token === token && prev.status === 'pending_payment' && r.status === 'paid') || !!forceFresh || urlParam('ce') === '1';
       store.set(ORDER_KEY, { token, order_no: r.order_no, status: r.status, at: Date.now() });
       const box = document.createElement('div'); box.style.cssText = 'max-width:620px;margin:16px auto 96px';
@@ -1637,12 +1643,13 @@ body:has(#home.hidden) .flowtiles{display:block}
       const bt = $('fdGo'); bt.disabled = true; bt.innerHTML = icon('loader-circle', 'spin') + '查詢中…';
       try {
         const r = await Api.rpc('public_find_registration', { p_code: code, p_phone: ph });
+        track('xc_order_lookup', { xc_result: r ? 'found' : 'not_found' });
         if (!r) { $('fdErr').innerHTML = icon('circle-alert') + '找不到符合的訂單。請確認學號（或訂單編號）和手機號碼是報名時填的；已取消的訂單查不到。'; return; }
         store.set(ORDER_KEY, { token: r.lookup_token, order_no: r.order_no, status: r.status, at: Date.now() });
         history.pushState(null, '', location.pathname + '#t=' + r.lookup_token);
         const box = document.createElement('div'); box.style.cssText = 'max-width:620px;margin:16px auto 96px';
         $('lookupBody').innerHTML = ''; $('lookupBody').appendChild(box); renderPayment(box, r, false); scrollTo({ top: 0 });
-      } catch (er) { $('fdErr').innerHTML = icon('circle-alert') + esc(er.message); }
+      } catch (er) { track('xc_order_lookup', { xc_result: 'error' }); $('fdErr').innerHTML = icon('circle-alert') + esc(er.message); }
       finally { if (bt.isConnected) { bt.disabled = false; bt.innerHTML = icon('search') + '查詢'; } }
     };
     $('lkForm').onsubmit = ev => { ev.preventDefault(); const v = $('lkIn').value.trim(), m = v.match(/[?&#]t=([0-9a-f]{48})/) || v.match(/^([0-9a-f]{48})$/); if (m) { history.pushState(null, '', location.pathname + '#t=' + m[1]); showLookup(m[1]); } else toast('連結格式不正確，請貼上完整的查詢連結', 'circle-alert'); };
@@ -1650,6 +1657,12 @@ body:has(#home.hidden) .flowtiles{display:block}
 
   // 訂單憑證放在 # 後面（#t=…），舊連結的 ?t=… 也讀得到
   function urlParam(k){ return new URLSearchParams(location.hash.slice(1)).get(k) || new URLSearchParams(location.search).get(k); }
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[href]'); if (!a) return;
+    const where = a.closest('footer') ? 'footer' : a.closest('#lookup') ? 'order_page' : a.closest('#flow') ? 'registration' : 'home';
+    if (a.classList.contains('maplink')) track('xc_map_click', { xc_where: where });
+    else if (/instagram\.com/.test(a.href)) track('xc_ig_click', { xc_where: where });
+  }, true);
   // ---------- 啟動 ----------
   async function init(){
     const token = urlParam('t');
