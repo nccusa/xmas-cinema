@@ -569,6 +569,11 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:70;opa
 .program .no{font-family:var(--serif);font-weight:900;font-size:30px;color:var(--gold);line-height:1;min-width:.7em;text-align:center}
 .program h3{font-size:18px;margin:0 0 4px}
 .lede{font-size:17px;margin:0 0 16px;max-width:460px}
+.sponsor{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:inherit;font-size:12.5px;font-weight:700;letter-spacing:.1em}
+.sponsor .sp-logo{display:inline-flex;background:#fff;border-radius:6px;padding:4px 8px;box-shadow:0 0 0 1px rgba(0,0,0,.08);transition:transform .15s}
+.sponsor img{display:block;height:34px;width:auto}
+.sponsor:hover .sp-logo{transform:translateY(-1px)}
+.sponsor:focus-visible{outline:2px solid var(--gold-l);outline-offset:4px;border-radius:8px}
 .hero-meta{margin:16px 0 22px;display:flex;flex-wrap:wrap;gap:4px 6px;justify-content:flex-end;align-items:center;font-size:15px;color:#E9E4D6}
 .hero-meta .sep{color:var(--gold-l)}
 .gdot{width:6px;height:6px;border-radius:50%;background:var(--gold);flex:none}
@@ -859,6 +864,7 @@ body:has(#home.hidden) .flowtiles{display:block}
 
 <footer class="foot"><div class="tiles" aria-hidden="true"></div><div class="wrap fin">
   <div class="fbrand"><span data-sa="fmark" aria-label="國立政治大學學生會"></span><div><b>聖誕露天電影院</b><span>主辦：國立政治大學學生會</span></div></div>
+  <a class="sponsor" id="sponsorFoot" data-sponsor="goeugo" data-where="footer" href="https://www.goeugo.com/?utm_source=nccusa&amp;utm_medium=sponsor&amp;utm_campaign=xmas_cinema_2026" target="_blank" rel="noopener sponsored"><span class="sp-k">冠名贊助</span><span class="sp-logo"><picture><source srcset="images/sponsor/goeugo.webp" type="image/webp"><img src="images/sponsor/goeugo.png" alt="歐來歐去 GOEUGO" width="310" height="132" decoding="async"></picture></span></a>
   <div class="flinks"><a href="https://www.instagram.com/nccu_sa/" target="_blank" rel="noopener" id="footIg"><span data-icon="camera"></span>IG @nccu_sa</a><span id="footContact"></span></div>
   <p class="fsmall">本網站使用 Google Analytics 統計瀏覽人數與使用情形，不會蒐集你填寫的報名資料。</p>
 </div></footer>
@@ -1658,6 +1664,20 @@ body:has(#home.hidden) .flowtiles{display:block}
 
   // 訂單憑證放在 # 後面（#t=…），舊連結的 ?t=… 也讀得到
   function urlParam(k){ return new URLSearchParams(location.hash.slice(1)).get(k) || new URLSearchParams(location.search).get(k); }
+  // 贊助商 logo：曝光＝一半以上在畫面上、停留滿 1 秒（每次開頁每個位置算一次）；點擊另外記
+  document.querySelectorAll('[data-sponsor]').forEach(el => {
+    const p = { xc_sponsor: el.dataset.sponsor, xc_where: el.dataset.where };
+    let tm = null, seen = false;
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(es => es.forEach(en => {
+        if (seen) return;
+        if (en.isIntersecting && en.intersectionRatio >= .5 && !document.hidden) tm = tm || setTimeout(() => { seen = true; track('xc_sponsor_view', p); io.disconnect(); }, 1000);
+        else { clearTimeout(tm); tm = null; }
+      }), { threshold: [0, .5, 1] });
+      io.observe(el);
+    }
+    el.addEventListener('click', () => track('xc_sponsor_click', p));
+  });
   document.addEventListener('click', e => {
     const a = e.target.closest('a[href]'); if (!a) return;
     const where = a.closest('footer') ? 'footer' : a.closest('#lookup') ? 'order_page' : a.closest('#flow') ? 'registration' : 'home';
