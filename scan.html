@@ -538,6 +538,12 @@ button{font:inherit;color:inherit}
     }
     if (r.status === 'cancelled') { setPanel('bad', `<div class="state">${icon('ban')}這筆報名已取消</div>${head(r)}${note(r)}`); nextGo(); feedback('bad'); log('bad', r.name + ' 已取消'); return; }
     const m = station.mode;
+    // 後台改餐後還沒補款：可以報到，但先不要交付
+    const owe = (r.total_amount || 0) - (r.paid_amount || 0);
+    if (owe > 0 && r.status === 'paid' && m !== 'checkin') {
+      setPanel('warn', `<div class="state">${icon('circle-dollar-sign')}還差 ${money(owe)}</div>${head(r)}<div class="hint alert">${icon('ban')}<span>這筆訂單改過餐點，應付 <b class="num">${money(r.total_amount)}</b>，已收 <b class="num">${money(r.paid_amount)}</b>。請他先補款或找管理員，補完再交付。</span></div>${itemsHtml(r.items)}${note(r)}`);
+      nextGo(); feedback('warn'); log('warn', r.name + ' 還差 ' + owe + ' 元'); return;
+    }
     if (m === 'checkin') {
       if (r.checked_in_at) { setPanel('warn', `<div class="state">${icon('triangle-alert')}已經報到過了</div>${head(r)}<div class="hint">${icon('clock')}<span>${esc(fmtTime(r.checked_in_at))} 已報到。同一個人重複出現時，請核對證件。</span></div>${note(r)}`); nextGo(); feedback('warn'); log('warn', r.name + ' 重複報到'); return; }
       const n = (r.items || []).length;
