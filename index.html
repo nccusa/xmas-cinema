@@ -695,7 +695,6 @@ body:has(#home.hidden) .flowtiles{display:block}
 .hero.kv>.sky,.hero.kv>.beam,.hero.kv>.hero-art{display:none}
 /* 首頁時，頁首疊在開場上（不擋海報） */
 body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;z-index:6;background:linear-gradient(rgba(10,30,35,.62),rgba(10,30,35,0))}
-body:has(#home:not(.hidden)) .testbar:not(.hidden)~.topwrap{position:relative}
 .kv-track{position:relative;height:100vh;height:100svh}
 .kv.full .kv-track{height:340vh;height:340svh}
 .kv-stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:#15404a}
@@ -1239,7 +1238,7 @@ body:has(#home:not(.hidden)) .testbar:not(.hidden)~.topwrap{position:relative}
     // 日期、時間、地點已經在首屏，這裡只放注意事項（有填才顯示）
     $('facts').innerHTML = catalog.venue_note ? `<li>${icon('info')}<b>注意事項</b><span>${esc(catalog.venue_note)}</span></li>` : '';
     $('facts').classList.toggle('hidden', !catalog.venue_note);
-    $('vlist').innerHTML = foods().map(v => ({ v, its: v.items.filter(i => !i.addon_for) })).map(({ v, its }) => `<div class="vcard"><span class="ill">${illo(vIcon(v))}</span><div><b>${esc(v.name)}</b><span>${esc(its.slice(0, 4).map(i => i.name).join('、'))}${its.length > 4 ? ' 等' : ''}${its.length ? `・$${Math.min(...its.map(i => i.price))} 起` : ''}</span></div></div>`).join('') || '<p class="muted">餐點待公布</p>';
+    $('vlist').innerHTML = foods().map(v => ({ v, its: v.items.filter(i => !i.addon_for) })).map(({ v, its }) => `<div class="vcard">${v.image_url ? `<img class="vth" src="${esc(v.image_url)}" alt="" loading="lazy">` : `<span class="ill">${illo(vIcon(v))}</span>`}<div><b>${esc(v.name)}</b><span>${esc(its.slice(0, 4).map(i => i.name).join('、'))}${its.length > 4 ? ' 等' : ''}${its.length ? `・$${Math.min(...its.map(i => i.price))} 起` : ''}</span></div></div>`).join('') || '<p class="muted">餐點待公布</p>';
     $('vlist').insertAdjacentHTML('afterbegin', rentals().flatMap(v => v.items).map(i => `<div class="vcard rent">${i.image_url ? `<img class="vth" src="${esc(i.image_url)}" alt="" loading="lazy">` : `<span class="ill">${illo('mat')}</span>`}<div><b>${esc(i.name.replace(/（.*）/, ''))}<span class="rtag">加購</span></b><span>報名時可以加購・$${esc(i.price)}／張・活動後可以帶回家</span></div></div>`).join(''));
     $('how').innerHTML = [1, 2, 3].map(i => [cp('s' + i + '_t'), cp('s' + i + '_d')])
       .map(([t, d], i) => `<li><span class="no num" aria-hidden="true">${i + 1}</span><div><h3><span class="sr">第 ${i + 1} 步：</span>${esc(t)}</h3><p>${esc(d)}</p></div></li>`).join('');
