@@ -321,6 +321,13 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
 .dphone{display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-weight:700;color:var(--green);text-decoration:none;font-size:15px}
 .dphone .i{width:16px;height:16px}
 .cands{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px}
+.cands2{display:grid;gap:6px}
+.cand{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--rule);border-radius:10px;background:var(--surface)}
+.cand.top{border-color:var(--caution);background:var(--caution-bg)}
+.cand .btn{flex:none}
+.why{display:inline-block;font-size:12px;line-height:1.5;padding:0 8px;border-radius:99px;background:var(--ok-bg);color:var(--ok);margin:4px 4px 0 0}
+.why.warn{background:var(--crit-bg);color:var(--crit)}
+.batchlist{margin-top:12px}.batchlist summary{cursor:pointer;font-weight:700;color:var(--green);display:inline-flex;gap:6px;align-items:center}
 .linkbtn{background:none;border:0;padding:0;color:var(--green);text-decoration:underline;cursor:pointer;font:inherit;text-align:left}
 .prep h3{display:flex;align-items:center;gap:8px}
 .prep .ptotal{border-top:1px solid var(--line);font-weight:700}
@@ -917,26 +924,41 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
     acts(settings.test_mode && isAdmin() ? `<button class="btn sec" type="button" id="simBtn">${icon('flask-conical')}模擬一份明細</button>` : '');
     if ($('simBtn')) $('simBtn').onclick = e => busy(e.currentTarget, simulate);
     page().innerHTML = `<div class="card empty">${icon('loader-circle', 'spin')}載入中…</div>`;
-    const [txns, batches] = await Promise.all([
+    const [txns, batches, done] = await Promise.all([
       Api.select('bank_txns', 'select=*&status=in.(suggested,unmatched)&order=txn_at.desc'),
-      Api.select('import_batches', 'select=*&order=created_at.desc&limit=8')
+      Api.select('import_batches', 'select=*&order=created_at.desc&limit=8'),
+      Api.select('bank_txns', 'select=id,registration_id,txn_at,amount,account_last5,memo,match_method,status,match_note,batch_id&status=in.(matched,ignored)&order=txn_at.desc')
     ]);
     const byId = Object.fromEntries(regs.map(r => [r.id, r]));
+    // 每筆待處理款項：系統算出的可能訂單（分數＋理由）
+    const cands = Object.fromEntries(await Promise.all(txns.map(async t => [t.id, await Api.rpc('admin_txn_candidates', { p_txn: t.id }).catch(() => [])])));
+    const lastTx = batches.length ? await Api.select('bank_txns', 'select=*&batch_id=eq.' + batches[0].id + '&order=txn_at').catch(() => []) : [];
+    const paidBy = {}; done.filter(t => t.status === 'matched' && t.registration_id).forEach(t => (paidBy[t.registration_id] = paidBy[t.registration_id] || []).push(t));
+    const showTest = settings.test_mode;
+    const pend = regs.filter(r => r.status === 'pending_payment' && (showTest || !r.is_test));
     page().innerHTML = `
       <div class="card"><h2>${icon('file-up')}匯入郵局交易明細</h2><p>從電腦版網路郵局匯出 CSV，拖進來或點一下選檔。檔案只在這台電腦解析，只上傳時間、金額、帳號後五碼和附言；同一段期間重複匯入沒關係，系統會略過已經匯入的交易。</p>
         <label class="drop" id="drop">${icon('file-spreadsheet')}<b>拖曳 CSV 到這裡，或點一下選擇檔案</b><span class="small muted" id="preview">支援郵局匯出的 UTF-8 或 Big5 格式</span><input type="file" id="csv" accept=".csv,text/csv" hidden></label>
         <div id="impPrev"></div>
       </div>
       ${batches.length ? `<div class="card"><h2>${icon('clock')}最近一次匯入：${esc(fmtTime(batches[0].created_at))}</h2><p>明細期間 ${esc(batches[0].file_period || '—')}，共 ${batches[0].rows_total} 筆轉入，新增 ${batches[0].rows_new} 筆（其他是之前匯入過的）。</p>
-        <div class="lastbatch"><div><b style="color:var(--ok)">${batches[0].matched}</b><span>自動配對入帳</span></div><div><b style="color:var(--caution)">${batches[0].suggested}</b><span>建議配對，待確認</span></div><div><b style="color:var(--crit)">${batches[0].unmatched}</b><span>找不到對應訂單</span></div><div><b>${Math.max(0, batches[0].rows_total - batches[0].rows_new)}</b><span>重複，已略過</span></div></div></div>` : ''}
-      <div class="card"><h2>${icon('circle-alert')}需要人工確認（${txns.length}）</h2><p>「建議配對」是系統找到可能的訂單，確認無誤就按「確認配對」；「找不到」可以輸入訂單編號或學號指定，或略過非活動款項。</p>
-        ${txns.length ? `<div class="tblwrap"><table class="tbl"><thead><tr><th>入帳時間</th><th class="r">金額</th><th>後五碼</th><th>附言</th><th>系統判斷</th><th>可能的訂單</th><th>處理</th></tr></thead><tbody>
+        <div class="lastbatch"><div><b style="color:var(--ok)">${batches[0].matched}</b><span>自動配對入帳</span></div><div><b style="color:var(--caution)">${batches[0].suggested}</b><span>建議配對，待確認</span></div><div><b style="color:var(--crit)">${batches[0].unmatched}</b><span>找不到對應訂單</span></div><div><b>${Math.max(0, batches[0].rows_total - batches[0].rows_new)}</b><span>重複，已略過</span></div></div>
+        ${lastTx.length ? `<details class="batchlist"><summary>${icon('list-checks')}這一批每一筆的結果（${lastTx.length} 筆）</summary><div class="tblwrap"><table class="tbl"><thead><tr><th>入帳時間</th><th class="r">金額</th><th>後五碼</th><th>附言</th><th>結果</th><th>對到的訂單</th></tr></thead><tbody>
+          ${lastTx.map(t => { const r = byId[t.registration_id || t.suggested_registration_id]; return `<tr><td class="small">${esc(fmtTime(t.txn_at))}</td><td class="r num">${t.amount}</td><td class="num">${esc(t.account_last5 || '—')}</td><td>${esc(t.memo || '—')}</td><td>${TXST(t)}</td><td class="small">${r ? `<b>${esc(r.name)}</b> <span class="num">${esc(r.order_no)}</span>` : '<span class="muted">—</span>'}</td></tr>`; }).join('')}
+        </tbody></table></div></details>` : ''}</div>` : ''}
+      <div class="card"><div class="row" style="justify-content:space-between;align-items:flex-start"><h2 style="margin:0">${icon('circle-alert')}需要人工確認（${txns.length}）</h2>${txns.length ? `<button class="btn sm sec" type="button" id="rerunBtn" title="同學後來才報名、或改了資料時，重新比對一次">${icon('refresh-cw')}重新比對</button>` : ''}</div>
+        <p>每筆款項下面列出系統找到的<b>可能訂單</b>和理由（姓名、學號、帳號後五碼、金額哪些對得上）。確認是本人就按「入帳到這筆」；都不是的話，可以在右邊輸入訂單編號、學號或姓名指定，或略過非活動款項。</p>
+        ${txns.length ? `<div class="tblwrap"><table class="tbl"><thead><tr><th>入帳時間</th><th class="r">金額</th><th>後五碼</th><th style="min-width:90px">附言</th><th>系統判斷</th><th style="min-width:300px">可能的訂單</th><th>其他處理</th></tr></thead><tbody>
         ${txns.map(t => { const s = byId[t.suggested_registration_id]; return `<tr data-t="${t.id}"><td class="small">${esc(fmtTime(t.txn_at))}${t.is_test ? ' <span class="mini test">測試</span>' : ''}</td><td class="r num"><b>${t.amount}</b></td><td class="num">${esc(t.account_last5 || '—')}</td><td>${esc(t.memo || '—')}</td>
           <td><span class="badge ${t.status === 'suggested' ? 'b-caution' : 'b-crit'}">${t.status === 'suggested' ? '建議配對' : '找不到'}</span><div class="small muted" style="margin-top:4px">${esc(t.match_note || '')}</div></td>
-          <td class="small">${s ? `<b>${esc(s.name)}</b> <span class="num">${esc(s.order_no)}</span><br>${esc(s.student_id || '校外')}・應付 <span class="num">${s.total_amount - s.paid_amount}</span>・後五碼 <span class="num">${esc(s.payer_last5)}</span>` : '<span class="muted">—</span>'}</td>
-          <td>${!s ? (() => { const c = regs.filter(r => r.status === 'pending_payment' && !!r.is_test === !!t.is_test && r.total_amount - r.paid_amount === t.amount); return c.length ? `<div class="cands"><span class="small muted">金額相同、還沒付款：</span>${c.slice(0, 6).map(r => `<button class="btn sm sec" type="button" data-ok="${r.id}" title="入帳到這筆訂單">${esc(r.order_no)} ${esc(r.name)}</button>`).join('')}${c.length > 6 ? `<span class="small muted">還有 ${c.length - 6} 筆，請輸入編號</span>` : ''}</div>` : '<div class="small muted" style="margin-bottom:6px">沒有金額相同的待付款訂單</div>'; })() : ''}<div class="row">${s && s.status === 'pending_payment' ? `<button class="btn sm" type="button" data-ok="${s.id}">${icon('check')}確認配對</button>` : ''}<input class="in" style="width:120px;min-height:32px" placeholder="訂單編號／學號" data-in aria-label="指定訂單"><button class="btn sm sec" type="button" data-assign>指定</button><button class="btn sm quiet" type="button" data-ignore>略過</button></div></td></tr>`; }).join('')}
-        </tbody></table></div>` : batches.length ? `<div class="empty">${icon('circle-check')}目前匯入的款項都處理完了。之後有新的轉帳，要再匯入最新明細。</div>` : `<div class="empty">${icon('file-up')}<b>還沒有匯入過郵局明細</b>，所以還沒有對帳。上面匯入後，需要人工確認的款項會列在這裡。</div>`}
+          <td>${candHtml(t, s, cands[t.id] || [])}</td>
+          <td><div class="row" style="flex-wrap:wrap"><input class="in" style="width:150px;min-height:32px" placeholder="編號／學號／姓名" data-in list="pendList" aria-label="指定訂單"><button class="btn sm sec" type="button" data-assign>指定</button><button class="btn sm quiet" type="button" data-ignore>略過</button></div></td></tr>`; }).join('')}
+        </tbody></table></div><datalist id="pendList">${pend.map(r => `<option value="${esc(r.order_no)}">${esc(r.name)}・${esc(r.student_id || '校外')}・應付 ${r.total_amount - r.paid_amount}・後五碼 ${esc(r.payer_last5)}</option>`).join('')}</datalist>` : batches.length ? `<div class="empty">${icon('circle-check')}目前匯入的款項都處理完了。之後有新的轉帳，要再匯入最新明細。</div>` : `<div class="empty">${icon('file-up')}<b>還沒有匯入過郵局明細</b>，所以還沒有對帳。上面匯入後，需要人工確認的款項會列在這裡。</div>`}
       </div>
+      <div class="card" id="payBoard"><h2>${icon('list-checks')}訂單付款狀態</h2><p>每一筆訂單現在付了沒、是被哪一筆款項對到的。對帳時可以用來確認「誰已經對到、誰還沒有」；指定入帳前也可以在這裡找人。</p>
+        <div class="row" style="flex-wrap:wrap;gap:10px;margin-bottom:10px"><div class="seg" id="paySeg">${PAYF.map(([k, l]) => `<button type="button" data-pf="${k}" aria-pressed="${payFilter === k}">${l}<span class="c">${payRows(k).length}</span></button>`).join('')}</div>
+        <div class="searchbox" style="flex:1;min-width:180px">${icon('search')}<input class="in" id="paySearch" placeholder="搜尋姓名、學號、編號、後五碼" style="padding-left:34px;width:100%" value="${esc(paySearch)}"></div></div>
+        <div id="payTable">${payTable()}</div></div>
       <div class="card"><h2>${icon('clock')}最近匯入</h2>
         ${batches.length ? `<div class="tblwrap"><table class="tbl"><thead><tr><th>時間</th><th>明細期間</th><th class="r">筆數</th><th class="r">新增</th><th class="r">自動入帳</th><th class="r">建議</th><th class="r">找不到</th></tr></thead><tbody>
         ${batches.map(b => `<tr><td class="small">${esc(fmtTime(b.created_at))}</td><td class="small">${esc(b.file_period || '')}</td><td class="r num">${b.rows_total}</td><td class="r num">${b.rows_new}</td><td class="r num">${b.matched}</td><td class="r num">${b.suggested}</td><td class="r num">${b.unmatched}</td></tr>`).join('')}</tbody></table></div>` : '<p class="muted">還沒有匯入紀錄</p>'}
@@ -947,7 +969,35 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
     drop.addEventListener('drop', e => { if (e.dataTransfer.files[0]) readCSV(e.dataTransfer.files[0]); });
     $('csv').onchange = e => { if (e.target.files[0]) readCSV(e.target.files[0]); e.target.value = ''; };
     page().onclick = reconClick;
+    if ($('rerunBtn')) $('rerunBtn').onclick = e => busy(e.currentTarget, async () => { const r = await run(() => Api.rpc('admin_rerun_matching')); toast(`重新比對完成：自動入帳 ${r.matched}、建議 ${r.suggested}、找不到 ${r.unmatched}`); await loadAll(); renderRecon(); });
+    $('paySeg').onclick = e => { const b = e.target.closest('[data-pf]'); if (!b) return; payFilter = b.dataset.pf; $('paySeg').querySelectorAll('[data-pf]').forEach(x => x.setAttribute('aria-pressed', x === b)); $('payTable').innerHTML = payTable(); };
+    $('paySearch').oninput = e => { paySearch = e.target.value; $('payTable').innerHTML = payTable(); };
+    function payRows(k){
+      const q = paySearch.trim().toLowerCase();
+      return regs.filter(r => r.status !== 'cancelled' && (showTest || !r.is_test) && r.total_amount > 0)
+        .filter(r => k === 'all' || (k === 'pending' && r.paid_amount === 0 && r.status === 'pending_payment') || (k === 'partial' && r.paid_amount > 0 && r.paid_amount < r.total_amount) || (k === 'paid' && r.paid_amount >= r.total_amount) || (k === 'over' && r.paid_amount > r.total_amount))
+        .filter(r => !q || [r.name, r.student_id, r.order_no, r.payer_last5, r.phone].some(v => String(v || '').toLowerCase().includes(q)));
+    }
+    function payTable(){
+      const list = payRows(payFilter);
+      if (!list.length) return '<p class="muted">沒有符合的訂單</p>';
+      return `<div class="tblwrap"><table class="tbl"><thead><tr><th>訂單</th><th>姓名</th><th>學號</th><th>填的後五碼</th><th class="r">應付</th><th class="r">已收</th><th>狀態</th><th>對到的款項</th></tr></thead><tbody>${list.map(r => {
+        const tx = paidBy[r.id] || [], st = r.paid_amount >= r.total_amount ? (r.paid_amount > r.total_amount ? ['b-caution', `多收 ${r.paid_amount - r.total_amount}`] : ['b-ok', '已付款']) : r.paid_amount > 0 ? ['b-caution', `還差 ${r.total_amount - r.paid_amount}`] : overdue(r) ? ['b-crit', '逾期未付'] : ['b-neu', '待付款'];
+        return `<tr><td class="num">${esc(r.order_no)}${r.is_test ? ' <span class="mini test">測試</span>' : ''}</td><td><b>${esc(r.name)}</b></td><td class="num small">${esc(r.student_id || '校外')}</td><td class="num">${esc(r.payer_last5)}</td><td class="r num">${r.total_amount}</td><td class="r num">${r.paid_amount}</td><td><span class="badge ${st[0]}">${st[1]}</span>${r.status === 'pending_payment' && !r.paid_amount ? `<div class="small muted">期限 ${esc(fmtTime(r.payment_deadline))}</div>` : ''}</td>
+          <td class="small">${tx.length ? tx.map(t => `<div>${esc(fmtTime(t.txn_at))}・<b class="num">${t.amount}</b>・後五碼 <span class="num">${esc(t.account_last5 || '—')}</span>${t.memo ? `・附言「${esc(t.memo)}」` : ''}<span class="muted">（${esc(PAYM[t.match_method] || t.match_method || '')}）</span></div>`).join('') : r.paid_amount > 0 ? `<span class="muted">${esc(PAYM[r.paid_method] || '人工入帳')}</span>` : '<span class="muted">還沒有對到款項</span>'}</td></tr>`; }).join('')}</tbody></table></div>`;
+    }
     if (parsed) { drop.classList.add('slim'); drop.querySelector('b').textContent = '換一個檔案：拖曳到這裡或點一下'; $('preview').textContent = ''; renderImportPreview(); }
+  }
+  let payFilter = 'pending', paySearch = '';
+  const PAYF = [['pending', '待付款'], ['partial', '付一部分'], ['paid', '已付款'], ['over', '多收'], ['all', '全部']];
+  const PAYM = { memo: '附言學號／編號＋金額', memo_name: '附言姓名＋金額', last5_amount: '後五碼＋金額', manual_confirm: '人工確認配對', manual: '人工入帳', test: '測試付款', no_payment_needed: '免費' };
+  const TXST = t => t.status === 'matched' ? `<span class="badge b-ok">已入帳</span><div class="small muted">${esc(PAYM[t.match_method] || '')}</div>` : t.status === 'suggested' ? `<span class="badge b-caution">建議配對</span>` : t.status === 'ignored' ? `<span class="badge b-neu">已略過</span><div class="small muted">${esc(t.match_note || '')}</div>` : `<span class="badge b-crit">找不到</span>`;
+  function candHtml(t, s, list){
+    if (!list.length) return `<div class="small muted">系統找不到任何線索（姓名、學號、手機、後五碼都對不上，金額也沒有相同的）。可以在右邊輸入訂單編號、學號或姓名指定；或到下面「訂單付款狀態」找還沒付款的人比對。</div>`;
+    return `<div class="cands2">${list.map((c, i) => `<div class="cand${s && s.id === c.id ? ' top' : ''}"><div><div><b>${esc(c.name)}</b> <span class="num">${esc(c.order_no)}</span>${c.is_test ? ' <span class="mini test">測試</span>' : ''}${s && s.id === c.id ? ' <span class="mini">系統建議</span>' : ''}</div>
+      <div class="small muted">${esc(c.student_id || '校外')}・應付 <b class="num">${c.due}</b>・填的後五碼 <span class="num">${esc(c.payer_last5)}</span>・${esc(fmtTime(c.created_at))} 報名</div>
+      <div>${(c.reasons || []).map(x => `<span class="why">${esc(x)}</span>`).join('')}${c.amount_note ? `<span class="why warn">${esc(c.amount_note)}</span>` : ''}</div></div>
+      <button class="btn sm ${s && s.id === c.id ? '' : 'sec'}" type="button" data-ok="${c.id}" data-confirm="1">${icon('check')}入帳到這筆</button></div>`).join('')}</div>`;
   }
   const rocToIso = d => { const m = String(d || '').match(/(\d{2,3})\/(\d{1,2})\/(\d{1,2})/); return m ? `${+m[1] + 1911}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}` : ''; };
   const money = n => '$' + Number(n || 0).toLocaleString('en-US');
@@ -1038,13 +1088,18 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
     try {
       if (b.dataset.ok) {
         const r = regs.find(x => x.id === b.dataset.ok);
-        if (b.closest('.cands') && r && !(await ask({ title: '指定入帳', body: `把這筆款項入帳到 ${r.order_no} ${r.name}（應付 ${r.total_amount - r.paid_amount} 元、後五碼 ${r.payer_last5}）？`, ok: '入帳' }))) return;
+        const amt = +tr.querySelector('td.r b').textContent;
+        if (b.dataset.confirm && r && !(await ask({ title: '入帳到這筆訂單？', body: `把這筆 ${amt} 元的款項入帳到 ${r.order_no} ${r.name}（應付 ${r.total_amount - r.paid_amount} 元、填的後五碼 ${r.payer_last5}）。${amt < r.total_amount - r.paid_amount ? `入帳後還差 ${r.total_amount - r.paid_amount - amt} 元，訂單會維持待付款。` : amt > r.total_amount - r.paid_amount ? `會多收 ${amt - (r.total_amount - r.paid_amount)} 元，之後要退款。` : ''}`, ok: '入帳' }))) return;
         await run(() => Api.rpc('admin_resolve_txn', { p_txn: tid, p_reg: b.dataset.ok }), '已入帳');
       }
       else if (b.hasAttribute('data-assign')) {
-        const key = tr.querySelector('[data-in]').value.trim().toUpperCase(); const r = regs.find(x => x.order_no === key || x.student_id === key);
-        if (!r) return toast('找不到這筆訂單', 'err');
-        if (!(await ask({ title: '指定入帳', body: `把這筆款項入帳到 ${r.order_no} ${r.name}（應付 ${r.total_amount - r.paid_amount} 元）？`, ok: '入帳' }))) return;
+        const raw = tr.querySelector('[data-in]').value.trim(), key = raw.toUpperCase();
+        let r = regs.find(x => x.status !== 'cancelled' && (x.order_no === key || x.student_id === key));
+        if (!r && raw) { const byName = regs.filter(x => x.status === 'pending_payment' && String(x.name || '').toLowerCase() === raw.toLowerCase()); if (byName.length > 1) return toast(`有 ${byName.length} 筆同名的待付款訂單，請改輸入訂單編號`, 'err'); r = byName[0]; }
+        if (!r) return toast('找不到這筆訂單（已取消的訂單不能指定）', 'err');
+        const amt2 = +tr.querySelector('td.r b').textContent, due2 = r.total_amount - r.paid_amount;
+        if (r.status !== 'pending_payment' && !(await ask({ title: '這筆訂單已經付款了', body: `${r.order_no} ${r.name} 已經付清，再入帳會變成重複收款，之後要退款。確定要入帳嗎？`, ok: '仍要入帳', danger: true }))) return;
+        if (!(await ask({ title: '指定入帳', body: `把這筆 ${amt2} 元的款項入帳到 ${r.order_no} ${r.name}（應付 ${due2} 元、填的後五碼 ${r.payer_last5}）。${amt2 < due2 ? `入帳後還差 ${due2 - amt2} 元，訂單會維持待付款。` : amt2 > due2 ? `會多收 ${amt2 - due2} 元，之後要退款。` : ''}`, ok: '入帳' }))) return;
         await run(() => Api.rpc('admin_resolve_txn', { p_txn: tid, p_reg: r.id }), '已入帳');
       } else if (b.hasAttribute('data-ignore')) {
         const n = await ask({ title: '略過這筆款項', input: { label: '原因', placeholder: '例如：社課費、已退款' }, ok: '略過' }); if (!n) return;
@@ -1066,7 +1121,7 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
     cancelled: '已作廢，不會寄出。如果是誤作廢，勾選後按「重新產生」。'
   };
   const MAIL_ACTIONS = { pending_approval: ['cancel', 'approve'], failed: ['cancel', 'retry'], blocked: ['cancel', 'rerender'], cancelled: ['rerender'] };
-  const VARS = ['姓名','學號','附言代碼','身分','訂單編號','餐點明細','總金額','已付金額','付款期限','收款銀行','收款帳號','戶名','查詢連結','活動名稱','活動資訊','聯絡方式'];
+  const VARS = ['姓名','學號','附言代碼','身分','訂單編號','餐點明細','總金額','已付金額','付款期限','收款銀行','收款帳號','戶名','查詢連結','活動名稱','活動資訊','聯絡方式','收據明細','付款時間','付款方式'];
   async function renderMail(){
     pageDirty = false; if (!isAdmin()) mailView = 'queue';
     page().innerHTML = `<div class="card empty">${icon('loader-circle', 'spin')}載入中…</div>`;

@@ -35,7 +35,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&text=/0123456789%3A%E3%80%81%E3%80%8C%E3%80%8D%E3%83%BB%E4%B8%80%E4%B8%89%E4%B8%8A%E4%B8%8B%E4%B8%8D%E4%BA%86%E4%BB%80%E4%BB%98%E4%BD%A0%E4%BF%AE%E5%80%8B%E5%85%88%E5%85%A5%E5%88%86%E5%88%B0%E5%89%8D%E5%8A%A0%E5%8D%B3%E5%8F%96%E5%90%83%E5%90%8D%E5%92%8C%E5%95%8F%E5%96%AE%E5%9C%96%E5%9C%B0%E5%A0%B1%E5%A1%AB%E5%A4%A7%E5%A4%A9%E5%A5%BD%E5%AD%B8%E5%AE%8C%E5%AF%AB%E5%B0%87%E5%B0%8F%E5%B1%86%E5%B7%B2%E5%B8%B8%E5%B9%BE%E5%BD%B1%E6%80%8E%E6%83%B3%E6%88%90%E6%89%BE%E6%8C%89%E6%8F%AD%E6%94%B9%E6%94%BF%E6%95%B4%E6%96%99%E6%96%B9%E6%98%8E%E6%98%A0%E6%99%82%E6%9B%89%E6%9C%83%E6%9C%89%E6%9F%A5%E6%AC%BE%E6%AD%A5%E6%B2%BB%E6%B3%95%E6%B6%88%E7%84%A1%E7%85%A7%E7%86%B1%E7%89%87%E7%94%9F%E7%9A%84%E7%9B%AE%E7%9C%8B%E7%A2%BA%E7%AC%AC%E7%AD%86%E7%B5%90%E8%81%96%E8%A6%81%E8%A6%8B%E8%A8%82%E8%A9%A2%E8%AA%8D%E8%AA%95%E8%B3%87%E9%80%99%E9%80%A3%E9%81%B8%E9%82%84%E9%95%B7%E9%99%A2%E9%9B%BB%E9%9C%B2%E9%A1%8C%E9%A3%B2%E9%A4%90%E9%BA%BC%E9%BB%9E%EF%BC%81%EF%BC%88%EF%BC%89%EF%BC%8C%EF%BC%9A%EF%BC%9F&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="assets/qrcode.min.js?v=1.4.4"></script>
 <style>
 :root{
   --cream:#F2EFE5; --paper:#F8F6EF; --white:#FFFDF8; --green:#004E3B; --green-d:#003A2C; --green2:#009B7A; --red:#D9141A; --redtext:#B3121A; --gold:#B18B35; --ink:#182026;
@@ -1503,13 +1503,13 @@ body:has(#home.hidden) .flowtiles{display:block}
       <ol class="after">
         <li><span class="ic">${icon('send')}</span><div><b>轉帳，記得填備註</b><span>轉完就好，不用回到這個頁面回報。</span></div></li>
         <li><span class="ic">${icon('mail-check')}</span><div><b>收到「付款完成」信</b><span>我們核對入帳後（大約 1 個工作天）寄到你的 Email${guest ? '，信裡有報到用的 QR Code' : ''}。</span></div></li>
-        <li><span class="ic">${icon('ticket')}</span><div><b>活動當天報到、取餐</b><span>${guest ? '出示 QR Code 報到。' : '帶學生證報到。'}</span></div></li>
+        <li><span class="ic">${icon('ticket')}</span><div><b>活動當天報到、取餐</b><span>${guest ? '付款確認後，這一頁會出現報到用的 QR Code（付款完成信裡也有連結）。' : '帶學生證報到。付款確認後，這一頁也會出現報到用的 QR Code，沒帶學生證時可以用。'}</span></div></li>
       </ol>
       <p class="muted small-help">${icon('circle-help')}<span>轉帳超過 2 個工作天還沒收到「付款完成」信？私訊 IG <a href="https://www.instagram.com/nccu_sa/" target="_blank" rel="noopener">@nccu_sa</a>，告訴我們訂單編號 ${esc(r.order_no)}、轉帳時間和帳號後五碼。</span></p>
       <div class="more">
         <details><summary>訂單內容${icon('chevron-down')}</summary><div class="in review" style="border:none;padding:0;background:none">${itemsRows(r.items)}</div></details>
         <details><summary>想修改餐點？${icon('chevron-down')}</summary><div class="in cancelbox"><p>送出後不能直接修改。<b>還沒付款</b>的話，可以先取消這筆報名，再重新報名一次。</p><p>${icon('triangle-alert')}如果你已經轉帳了，請不要取消，私訊學生會處理。付款後不能修改或加訂。</p><button type="button" class="btn danger" id="selfCancel">${icon('circle-x')}取消這筆報名</button></div></details>
-        <details><summary>訂單查詢連結${icon('chevron-down')}</summary><div class="in"><p class="muted" style="margin:0 0 6px;font-size:14px">報名成功信裡也有這個連結，可以先存起來。</p><span class="num" style="font-size:13px;word-break:break-all">${esc(link)}</span> ${copyBtn(link, '查詢連結')}</div></details>
+        <details><summary>訂單查詢連結${icon('chevron-down')}</summary><div class="in"><p class="muted" style="margin:0 0 6px;font-size:14px">「已收到報名」確認信裡也有這個連結，可以先存起來。</p><span class="num" style="font-size:13px;word-break:break-all">${esc(link)}</span> ${copyBtn(link, '查詢連結')}</div></details>
       </div>`;
     el.onclick = async e => {
       const t = e.target.closest('[role="tab"]');
@@ -1554,9 +1554,9 @@ body:has(#home.hidden) .flowtiles{display:block}
       <p class="muted" style="font-size:14px;margin:0">這是你的報到憑證，建議現在就存進相簿。之後也可以點報名確認信（或付款完成信）裡的連結，或在報名網站用「查詢訂單」找回來。</p>` : ''}`
       : `<div class="ticket${celebrate ? ' print' : ''}"><svg class="band" viewBox="0 0 432 36" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${tileBand(12, 36)}</svg>
         <div class="tin"><div class="tinfo">${saMark('tmark', '國立政治大學學生會')}<span class="stamp" aria-hidden="true">${r.total_amount === 0 ? '已報名' : '已付款'}</span>${sparks}<div class="who">${esc(r.name)}</div><div class="meta"><span>學號 <span class="num">${esc(r.student_id)}</span></span><span>${itemCount(r)}</span></div>
-        <p style="margin:12px 0 0;display:flex;gap:8px;align-items:flex-start">${icon('id-card')}<span><b>活動當天帶學生證報到就好</b><br><span class="muted">工作人員掃你的學生證，就會看到你的餐點，不需要另外出示 QR Code。</span></span></p></div></div></div>
-      ${r.qr_token ? `<div class="more"><details><summary>忘了帶學生證？備用 QR Code${icon('chevron-down')}</summary><div class="in" style="text-align:center"><div class="qr" style="display:inline-block" aria-label="備用報到 QR Code">${qr}</div>
-        <p class="muted" style="font-size:14px">沒帶學生證時，出示這個 QR Code 也能報到。</p><div class="saveqr" style="justify-content:center"><button type="button" class="btn line" id="saveQr">${icon('download')}存到手機</button>${linkBtn}</div></div></details></div>` : ''}`) : ''}
+        <p class="muted" style="margin:12px 0 0">活動當天帶學生證報到；忘了帶學生證，出示這個 QR Code 也可以。報到後到取餐區（飲料到餐車）取餐。</p></div>
+        ${qr ? `<div class="qr" aria-label="報到用 QR Code">${qr}</div>` : ''}</div></div>
+      ${r.qr_token ? `<div class="saveqr"><button type="button" class="btn line" id="saveQr">${icon('download')}把 QR Code 存到手機</button>${linkBtn}</div>` : ''}`) : ''}
       ${r.total_amount === 0 && r.status === 'paid' && !r.checked_in_at ? `<div class="more"><details><summary>想加點餐點？${icon('chevron-down')}</summary><div class="in cancelbox"><p>只報名的訂單可以先取消，再重新報名並選餐點。</p><button type="button" class="btn danger" id="selfCancel">${icon('circle-x')}取消這筆報名</button></div></details></div>` : ''}
       <div class="more"><details open><summary>訂單內容${icon('chevron-down')}</summary><div class="in review" style="border:none;padding:0;background:none">${itemsRows(r.items)}</div></details>
       ${r.event_info ? `<details><summary>活動資訊${icon('chevron-down')}</summary><div class="in">${esc(r.event_info)}</div></details>` : ''}</div>`;
