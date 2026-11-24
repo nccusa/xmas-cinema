@@ -33,14 +33,14 @@
 <link rel="apple-touch-icon" href="icons/site-apple-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+TC:wght@400;700;900&family=Grenze+Gotisch:wght@800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&text=/0123456789%3A%E3%80%81%E3%80%8C%E3%80%8D%E3%83%BB%E4%B8%80%E4%B8%89%E4%B8%8A%E4%B8%8B%E4%B8%8D%E4%BA%86%E4%BB%80%E4%BB%98%E4%BD%A0%E4%BF%AE%E5%80%8B%E5%85%88%E5%85%A5%E5%88%86%E5%88%B0%E5%89%8D%E5%8A%A0%E5%8D%B3%E5%8F%96%E5%90%83%E5%90%8D%E5%92%8C%E5%95%8F%E5%96%AE%E5%9C%96%E5%9C%B0%E5%A0%B1%E5%A1%AB%E5%A4%A7%E5%A4%A9%E5%A5%BD%E5%AD%B8%E5%AE%8C%E5%AF%AB%E5%B0%87%E5%B0%8F%E5%B1%86%E5%B7%B2%E5%B8%B8%E5%B9%BE%E5%BD%B1%E6%80%8E%E6%83%B3%E6%88%90%E6%89%BE%E6%8C%89%E6%8F%AD%E6%94%B9%E6%94%BF%E6%95%B4%E6%96%99%E6%96%B9%E6%98%8E%E6%98%A0%E6%99%82%E6%9B%89%E6%9C%83%E6%9C%89%E6%9F%A5%E6%AC%BE%E6%AD%A5%E6%B2%BB%E6%B3%95%E6%B6%88%E7%84%A1%E7%85%A7%E7%86%B1%E7%89%87%E7%94%9F%E7%9A%84%E7%9B%AE%E7%9C%8B%E7%A2%BA%E7%AC%AC%E7%AD%86%E7%B5%90%E8%81%96%E8%A6%81%E8%A6%8B%E8%A8%82%E8%A9%A2%E8%AA%8D%E8%AA%95%E8%B3%87%E9%80%99%E9%80%A3%E9%81%B8%E9%82%84%E9%95%B7%E9%99%A2%E9%9B%BB%E9%9C%B2%E9%A1%8C%E9%A3%B2%E9%A4%90%E9%BA%BC%E9%BB%9E%EF%BC%81%EF%BC%88%EF%BC%89%EF%BC%8C%EF%BC%9A%EF%BC%9F&display=swap" rel="stylesheet">
 <script src="assets/qrcode.min.js?v=1.4.4"></script>
 <style>
 :root{
-  --cream:#F2EFE5; --paper:#F8F6EF; --white:#FFFDF8; --green:#004E3B; --green-d:#003A2C; --green2:#009B7A; --red:#D9141A; --redtext:#B3121A; --gold:#B18B35; --ink:#182026;
-  --muted:#5E646A; --line:#D8D2C2; --line2:#E6E1D4; --field:#A9A391;
-  --night:#0C211B; --night2:#112C24; --gold-l:#E8C468; --r:12px; --rc:16px; --font:"Noto Sans TC","PingFang TC","Heiti TC","Microsoft JhengHei",system-ui,sans-serif; --num:"Inter","Noto Sans TC",system-ui,sans-serif; --serif:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --cream:#F3E8CF; --paper:#F8F0DC; --white:#FFFAF0; --green:#173F48; --green-d:#0F2F36; --green2:#4B7B52; --red:#A8392C; --redtext:#8F2F24; --gold:#B08A43; --ink:#14262B;
+  --muted:#5B6466; --line:#DCCFB0; --line2:#E9DFC6; --field:#A99F86;
+  --night:#143F48; --night2:#12353D; --gold-l:#ECD8A4; --r:12px; --rc:16px; --font:"Noto Sans TC","PingFang TC","Heiti TC","Microsoft JhengHei",system-ui,sans-serif; --num:"Inter","Noto Sans TC",system-ui,sans-serif; --serif:"Noto Serif TC","Songti TC","PMingLiU",serif;
   --ease:cubic-bezier(.2,.8,.2,1);
 }
 *{box-sizing:border-box}
@@ -207,7 +207,7 @@ body:has(#home.hidden) .fmark{color:var(--green)}
 .flinks{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center}
 .flinks a{display:inline-flex;align-items:center;gap:6px;color:var(--gold-l);text-decoration:none;font-weight:700}
 .flinks a:hover{text-decoration:underline}
-.fsmall{flex-basis:100%;margin:0;font-size:12.5px;color:#8F9A90}
+.fsmall{flex-basis:100%;margin:0;font-size:12.5px;color:#B9C6C0}
 body:has(#home:not(.hidden)) .foot .tiles{display:none}
 body:has(#home:not(.hidden)) .fin{border-top:1px solid rgba(242,239,229,.12)}
 body:has(#home.hidden) .foot{background:var(--cream);color:var(--muted)}
@@ -688,6 +688,90 @@ body:has(#home.hidden) .flowtiles{display:block}
 .rtag{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:99px;font-size:12px;font-weight:700;font-family:var(--font);background:#F4ECD8;color:#6E5418;vertical-align:3px;letter-spacing:0}
 
 #step1 .subh{font-size:22px;margin:30px 0 4px;padding-top:22px;border-top:1px solid var(--line,rgba(0,0,0,.12))}
+/* ===== 主視覺開場（首頁方案 B，2026-11-25）=====
+   海報是一扇窗：往下捲時鏡頭穿過邊框、推向銀幕，銀幕放老電影倒數，最後停在「銀幕上放報名資訊」的首屏。
+   第一次來才播；看過、減少動態效果、從連結直接進流程的人，直接看到最後那一格（靜態首屏）。 */
+.hero.kv{display:block;min-height:0;overflow:visible;padding:0;background:#15404a;isolation:auto}
+.hero.kv>.sky,.hero.kv>.beam,.hero.kv>.hero-art{display:none}
+/* 首頁時，頁首疊在開場上（不擋海報） */
+body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;z-index:6;background:linear-gradient(rgba(10,30,35,.62),rgba(10,30,35,0))}
+body:has(#home:not(.hidden)) .testbar:not(.hidden)~.topwrap{position:relative}
+.kv-track{position:relative;height:100vh;height:100svh}
+.kv.full .kv-track{height:340vh;height:340svh}
+.kv-stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:#15404a}
+.kv-scene{position:absolute;left:0;top:0;width:0;height:0}
+.kv-g{position:absolute;left:0;top:0;width:0;height:0;transform-origin:0 0;will-change:transform}
+.kv-l{position:absolute;pointer-events:none;transform-origin:50% 50%}
+.kv-l>img{display:block;width:100%;height:100%;-webkit-user-drag:none;user-select:none}
+.kv-world{position:absolute;pointer-events:none;will-change:transform;background:#15404a url(images/kv/bg_tile.jpg) repeat}
+.kv-tap{pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.kv-tap::after{content:"";position:absolute;inset:-14px}
+.kv-dim{position:absolute;pointer-events:none;border-radius:6px;box-shadow:0 0 0 300vmax rgba(8,22,26,.7);opacity:0}
+.kv-beam{position:absolute;inset:0;pointer-events:none;opacity:0;background:linear-gradient(to top,rgba(255,236,190,.34),rgba(255,236,190,.07) 72%,rgba(255,236,190,0))}
+.kv-screen{position:absolute;container-type:size;display:grid;place-items:center;text-align:center;color:#173f48;pointer-events:none}
+.kv-screen canvas{position:absolute;inset:0;width:100%;height:100%;opacity:0;border-radius:2px}
+.kv-copy{position:relative;display:flex;flex-direction:column;align-items:center;gap:clamp(4px,3cqh,16px);padding:3cqh 4cqw;visibility:hidden;opacity:0;pointer-events:auto}
+.kv .marquee{background:none;box-shadow:none;padding:0;margin:0;border:0}
+.kv .marquee::before,.kv .marquee::after,.kv .bulbs{display:none!important}
+.kv .marquee h1{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;margin:0}
+.kv .showing{margin:0;text-align:center;color:#7a2e25;font-weight:700;letter-spacing:.06em;font-size:clamp(12px,6.4cqh,19px)}
+.kv .stub{background:none;box-shadow:none;padding:0;gap:4px clamp(8px,3cqw,18px);color:#173f48;flex-wrap:wrap;justify-content:center;max-width:100%}
+.kv .stub::before{display:none}
+.kv .stub{-webkit-mask:none;mask:none}
+.kv .stub b{font-family:"Grenze Gotisch",var(--num);font-weight:800;font-size:clamp(34px,30cqh,104px);line-height:.9;letter-spacing:.01em;color:#173f48}
+.kv .stub .wk{font-size:clamp(13px,6.6cqh,20px);font-weight:700}
+.kv .stub .cut{display:none!important}
+.kv .stub .lbl{flex-basis:100%;text-align:center;font-size:clamp(13px,6.6cqh,20px);color:#173f48;font-family:var(--num);font-weight:700;letter-spacing:.02em}
+.kv .cta{justify-content:center}
+.kv .btn.hero-cta{min-height:max(48px,clamp(44px,19cqh,64px));font-size:clamp(16px,7cqh,20px);padding:0 clamp(22px,7cqw,40px);background:#a8392c;border-color:#a8392c;box-shadow:inset 0 -3px 0 rgba(0,0,0,.2),0 0 0 2px #e9d29a,0 10px 24px -10px rgba(80,20,12,.8)}
+.kv .btn.hero-cta:hover{background:#8f2f24}
+.kv-below{position:absolute;left:0;top:0;text-align:center;color:#f3e8cf;visibility:hidden;opacity:0;padding:10px 16px 0;display:flex;flex-direction:column;align-items:center;gap:2px;text-shadow:0 1px 8px rgba(5,16,19,.9)}
+.kv-below::before{content:"";position:absolute;inset:-6px -10% -26px;z-index:-1;background:radial-gradient(closest-side,rgba(6,19,22,.72),rgba(6,19,22,0));pointer-events:none}
+.kv .hero-meta{margin:0;justify-content:center;color:#f3e8cf;font-size:clamp(14px,1.2vw,16px)}
+.kv .hero-meta a{color:#f3e8cf}
+.kv .cta-sub{text-align:center;margin:0;color:#e4d6b4}
+.kv .cta-note{margin-top:2px;color:#e4d6b4;font-size:13.5px}
+.kv .countdown{justify-content:center;color:#e4d6b4}
+.kv-hint{position:absolute;left:0;right:0;text-align:center;color:#f3e8cf;font-size:14px;letter-spacing:.14em;margin:0;pointer-events:none;text-shadow:0 1px 6px rgba(0,0,0,.6)}
+.kv-hint i{display:block;width:1.5px;height:28px;margin:8px auto 0;background:linear-gradient(#f3e8cf,rgba(243,232,207,0));animation:kvDrop 1.8s ease-in-out infinite;transform-origin:top}
+@keyframes kvDrop{0%{transform:scaleY(0);opacity:1}60%{transform:scaleY(1);opacity:1}100%{transform:scaleY(1);opacity:0}}
+.kv-btn{position:absolute;z-index:3;bottom:calc(96px + env(safe-area-inset-bottom));right:12px;min-height:44px;padding:0 16px;border-radius:999px;border:1px solid rgba(243,232,207,.45);background:rgba(13,38,44,.62);color:#f3e8cf;font:600 14px/1 var(--font);cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.kv-btn:hover{border-color:#e9d29a}
+.kv-btn.replay{min-height:40px;font-size:13px;padding:0 14px;opacity:.85}
+.kv-tip{position:absolute;z-index:4;transform:translate(-50%,calc(-100% - 10px));background:#f8f0dc;color:#173f48;border-radius:10px;padding:7px 12px;font-size:13.5px;line-height:1.35;box-shadow:0 8px 24px -10px rgba(0,0,0,.6);pointer-events:none;opacity:0;transition:opacity .2s;white-space:nowrap}
+.kv-tip.on{opacity:1}
+.kv-stage>.snow{display:none}
+.kv-snowfx{position:absolute;inset:0;pointer-events:none;z-index:2;overflow:hidden}
+.kv-snowfx i{position:absolute;top:-12px;width:var(--s);height:var(--s);border-radius:50%;background:#fffaf0;animation:kvFall var(--d) linear var(--dl) infinite;will-change:transform}
+@keyframes kvFall{0%{transform:translate3d(0,-2vh,0)}50%{transform:translate3d(var(--x),52vh,0)}100%{transform:translate3d(0,106vh,0)}}
+.hero.kv.paused .kv-snowfx i{animation-play-state:paused}
+@media (prefers-reduced-motion:reduce){.kv-snowfx{display:none}}
+
+/* 待機的小動作：只動 img，不和捲動算出來的位置衝突 */
+@keyframes kvTw{0%,100%{opacity:.4;transform:scale(.84)}50%{opacity:1;transform:scale(1.06)}}
+@keyframes kvGlow{0%,100%{opacity:.08}40%{opacity:.95}70%{opacity:.35}}
+@keyframes kvSway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+@keyframes kvRing{0%{transform:rotate(0)}12%{transform:rotate(20deg)}30%{transform:rotate(-16deg)}48%{transform:rotate(11deg)}66%{transform:rotate(-6deg)}84%{transform:rotate(3deg)}100%{transform:rotate(0)}}
+@keyframes kvBreathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.01,1.022)}}
+@keyframes kvBob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-1.2%) rotate(-1.2deg)}}
+@keyframes kvDeer{0%,80%,100%{transform:rotate(0)}85%{transform:rotate(-3deg)}90%{transform:rotate(2.4deg)}95%{transform:rotate(-1.2deg)}}
+@keyframes kvHop{0%,100%{transform:translateY(0)}30%{transform:translateY(-30%)}55%{transform:translateY(0)}75%{transform:translateY(-8%)}}
+@keyframes kvFloat{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-5%) rotate(1.5deg)}}
+.kv-l.a-star>img{animation:kvTw 3.4s ease-in-out infinite}
+.kv-l.a-glow>img{animation:kvGlow 2.6s ease-in-out infinite}
+.kv-l.a-bell>img{transform-origin:50% 6%;animation:kvSway 3.8s ease-in-out infinite}
+.kv-l.a-bell.ringing>img{animation:kvRing 1.1s ease-out 1}
+.kv-l.a-santa>img{transform-origin:50% 100%;animation:kvBreathe 3.6s ease-in-out infinite}
+.kv-l.a-snow>img{transform-origin:50% 100%;animation:kvBob 4.4s ease-in-out infinite}
+.kv-l.a-deer>img{transform-origin:50% 95%;animation:kvDeer 6.5s ease-in-out infinite}
+.kv-l.a-float>img{animation:kvFloat 5s ease-in-out infinite}
+.kv-l.hopping>img{animation:kvHop .7s ease-out 1!important}
+.hero.kv.paused .kv-l>img,.hero.kv.moving .kv-l>img{animation-play-state:paused}
+@media (prefers-reduced-motion:reduce){.kv-hint i{animation:none}}
+
+/* 其他深色區塊也用主視覺的菱格紋 */
+.screening.night2{background:#12353d url(images/kv/bg_tile.jpg) center top/900px 1125px}
+.closing.night{background:radial-gradient(ellipse 60% 70% at 50% 0,rgba(236,216,164,.14),transparent 70%),#143f48 url(images/kv/bg_tile.jpg) center top/900px 1125px}
 </style>
 </head>
 <body>
@@ -705,23 +789,35 @@ body:has(#home.hidden) .flowtiles{display:block}
 <!-- 首頁 -->
 <main id="home">
   <div id="resume" class="resume hidden" role="region" aria-label="上次的進度"></div>
-  <section class="hero night" aria-labelledby="evTitle">
-    <div class="sky" aria-hidden="true"><div class="stars" id="stars"></div><canvas class="snow" id="snow"></canvas></div>
+  <section class="hero night kv" id="kv" aria-labelledby="evTitle">
+    <div class="sky" aria-hidden="true"><div class="stars" id="stars"></div></div>
     <div class="beam" aria-hidden="true"></div>
     <div class="hero-art" aria-hidden="true"><svg id="heroArt" viewBox="0 0 460 620" preserveAspectRatio="xMinYMid slice"></svg></div>
-    <div class="wrap">
-      <div class="hero-copy">
-        <div class="marquee" id="marquee">
-          <div class="bulbs" id="bulbs" aria-hidden="true"></div>
-          <h1 id="evTitle"><span class="l1">聖誕</span><span class="l2">露天電影院</span></h1>
-          <p class="showing" id="showing"></p>
+    <div class="kv-track" id="kvTrack">
+      <div class="kv-stage" id="kvStage">
+        <div class="kv-scene" id="kvScene"></div>
+        <div class="kv-screen" id="kvScreen">
+          <canvas id="kvLeader" aria-hidden="true"></canvas>
+          <div class="kv-copy" id="kvCopy">
+            <div class="marquee" id="marquee">
+              <div class="bulbs" id="bulbs" aria-hidden="true"></div>
+              <h1 id="evTitle"><span class="l1">政大聖誕</span><span class="l2">露天電影院</span></h1>
+              <p class="showing" id="showing"></p>
+            </div>
+            <div class="stub" id="evDate"><b class="num">12/9</b><span class="wk">週三</span><span class="cut hidden" aria-hidden="true"></span><span class="lbl hidden" id="stubTime"></span></div>
+            <div class="cta"><button class="btn hero-cta" type="button" id="startBtn" disabled>免費報名</button></div>
+          </div>
         </div>
-        <div class="stub" id="evDate"><b class="num">12/9</b><span class="wk">週三</span><span class="cut hidden" aria-hidden="true"></span><span class="lbl hidden" id="stubTime"></span></div>
-        <p class="hero-meta" id="evMeta" aria-busy="true"><span class="skl" aria-hidden="true"></span></p>
-        <div class="cta"><button class="btn hero-cta" type="button" id="startBtn" disabled>免費報名</button></div>
-        <p class="cta-sub">可加購餐點、野餐墊</p>
-        <div class="cta-note" id="openNote">載入中…</div>
-        <p class="countdown" id="countdown"></p>
+        <div class="kv-below" id="kvBelow">
+          <p class="hero-meta" id="evMeta" aria-busy="true"><span class="skl" aria-hidden="true"></span></p>
+          <p class="cta-sub">可加購餐點、野餐墊</p>
+          <div class="cta-note" id="openNote">載入中…</div>
+          <p class="countdown" id="countdown"></p>
+        </div>
+        <canvas class="snow" id="snow" aria-hidden="true"></canvas>
+        <p class="kv-hint" id="kvHint" aria-hidden="true">往下滑，走進電影院<i></i></p>
+        <button class="kv-btn" type="button" id="kvSkip">跳過開場</button>
+        <div class="kv-tip" id="kvTip" aria-hidden="true"></div>
       </div>
     </div>
   </section>
@@ -881,7 +977,7 @@ body:has(#home.hidden) .flowtiles{display:block}
   const SA_D = 'M256.9 767.8C257.4 766.5 269.4 737.6 283.5 703.5C297.6 669.4 311.6 635.4 314.6 628.0L320.1 614.5L327.7 610.0C375.5 581.6 407.5 535.2 417.0 480.5C419.6 465.0 420.1 460.5 420.4 443.5C420.8 425.6 419.8 411.5 416.9 396.4L414.8 385.2L429.8 348.9C438.1 328.9 450.7 298.1 458.0 280.5C465.3 262.9 473.4 243.3 476.0 237.0C478.6 230.7 486.2 212.0 493.0 195.5C499.8 179.0 505.8 164.9 506.3 164.2C507.0 163.3 509.3 163.0 513.3 163.2L519.3 163.5L528.2 185.0C533.1 196.8 561.4 265.2 591.0 337.0C620.6 408.8 653.4 488.2 663.8 513.5C674.2 538.8 699.3 599.5 719.5 648.5C739.7 697.5 759.1 744.4 762.6 752.9C766.1 761.4 769.0 768.7 769.0 769.2C769.0 769.6 749.0 770.0 724.6 770.0L680.2 770.0L672.2 749.8C667.8 738.6 659.6 717.7 654.0 703.2L643.7 677.0L512.7 677.2L381.8 677.5L368.8 710.5C361.7 728.6 353.6 749.5 350.8 756.8L345.6 770.0L300.8 770.0L256.0 770.0L256.9 767.8ZM173.0 608.5C119.8 601.9 69.7 579.1 29.3 543.1C20.8 535.6 6.5 520.3 2.0 514.0L0.1 511.4L29.1 482.4L58.2 453.5L59.8 456.0C71.8 473.9 91.1 494.8 105.8 505.7C132.4 525.7 160.2 535.3 195.0 536.7C243.6 538.6 284.4 518.9 301.9 485.1C308.7 471.8 311.4 459.9 311.2 442.9C310.9 419.0 303.5 402.4 284.8 384.4C267.5 367.6 245.1 355.1 191.5 332.2C128.4 305.2 105.1 292.6 81.3 272.7C44.2 241.5 27.1 198.8 31.0 146.8C34.1 104.9 49.5 71.5 78.1 44.6C108.5 16.0 150.0 0.8 198.0 0.7C234.8 0.6 264.1 7.2 295.5 22.5C323.0 35.8 350.4 57.3 370.5 81.3L375.3 87.1L362.9 99.8C356.1 106.8 344.9 118.3 338.1 125.3L325.8 138.1L311.1 123.8C280.1 93.4 255.9 80.1 223.5 75.5C173.2 68.3 130.9 85.7 114.4 120.5C108.7 132.5 107.5 138.6 107.6 156.0C107.6 169.9 107.9 172.3 110.2 179.2C121.2 212.1 146.0 230.4 222.8 262.0C258.7 276.7 270.6 282.1 288.0 291.2C337.4 316.9 366.6 347.8 379.9 388.6C393.2 429.4 389.9 480.6 371.4 518.6C357.5 547.2 333.7 571.5 304.0 587.3C283.6 598.1 256.8 606.2 231.8 608.9C218.8 610.4 186.1 610.1 173.0 608.5ZM613.1 598.8C610.4 591.7 516.8 352.4 513.8 345.0C512.9 342.8 512.0 344.6 505.4 361.5C501.3 371.9 495.3 387.2 492.0 395.5C488.8 403.8 478.4 430.3 469.0 454.5C459.5 478.7 442.8 521.4 431.9 549.4C421.0 577.4 412.0 600.4 412.0 600.6C412.0 600.8 457.4 601.0 513.0 601.0L614.0 601.0L613.1 598.8Z', SA_VB = '0 0 769 770';
   const saMark = (cls, label) => `<svg class="sa ${cls || ''}" viewBox="${SA_VB}" ${label ? `role="img" aria-label="${label}"` : 'aria-hidden="true"'}><path fill="currentColor" fill-rule="evenodd" d="${SA_D}"/></svg>`;
   document.querySelectorAll('[data-sa]').forEach(el => el.outerHTML = saMark(el.dataset.sa, el.getAttribute('aria-label')));
-  const C = { cream:'#F2EFE5', green:'#004E3B', green2:'#009B7A', red:'#D9141A', gold:'#B18B35' };
+  const C = { cream:'#F3E8CF', green:'#173F48', green2:'#4B7B52', red:'#A8392C', gold:'#C8A463' };
   document.querySelectorAll('.ipt > span[data-icon]').forEach(el => el.outerHTML = icon(el.dataset.icon));
   hydrateIcons();
   $('lookupLink').innerHTML = icon('ticket') + '查詢訂單';
@@ -918,11 +1014,12 @@ body:has(#home.hidden) .flowtiles{display:block}
     return `<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="${G}"/><path d="M14 28h36v22H14z" fill="${W}"/><path d="M10 28l6-12h32l6 12z" fill="${R}"/><rect x="28" y="36" width="8" height="14" fill="${Y}"/></svg>`;
   }
   document.querySelectorAll('.tiles').forEach(t => t.innerHTML = `<svg viewBox="0 0 1680 28" preserveAspectRatio="xMinYMid slice">${tileBand(60, 28)}</svg>`);
-  let canRegister = false;
+  let canRegister = false, kvCtaHidden = false, hbarSync = () => {};
   // 首頁往下捲、第一顆報名按鈕不在畫面上時，底部出現固定的報名列
   if ('IntersectionObserver' in window) {
     const vis = new Map();
-    const io2 = new IntersectionObserver(es => { es.forEach(en => vis.set(en.target.id, en.isIntersecting)); $('hbar').classList.toggle('on', canRegister && !vis.get('startBtn') && !vis.get('startBtn2') && !$('home').classList.contains('hidden')); });
+    hbarSync = () => $('hbar').classList.toggle('on', canRegister && (!vis.get('startBtn') || kvCtaHidden) && !vis.get('startBtn2') && !$('home').classList.contains('hidden'));
+    const io2 = new IntersectionObserver(es => { es.forEach(en => vis.set(en.target.id, en.isIntersecting)); hbarSync(); });
     ['startBtn', 'startBtn2'].forEach(id => io2.observe($(id)));
   }
 
@@ -947,7 +1044,7 @@ body:has(#home.hidden) .flowtiles{display:block}
   const snow = { c: $('snow'), on: false, flakes: [], raf: 0 };
   function snowStart(){
     if (reduce || snow.on || document.hidden || !heroVisible) return; snow.on = true; snow.c.classList.remove('off');
-    const c = snow.c, x = c.getContext('2d'), dpr = Math.min(2, devicePixelRatio || 1);
+    const c = snow.c, x = c.getContext('2d'), dpr = Math.min(innerWidth < 600 ? 1 : 1.5, devicePixelRatio || 1);   // 雪花是柔邊小點，不需要高解析度；手機 3 倍畫布每幀重畫很吃效能
     const size = () => { c.width = c.offsetWidth * dpr; c.height = c.offsetHeight * dpr; };
     size(); if (!snow.flakes.length) snow.flakes = Array.from({ length: innerWidth < 600 ? 16 : 28 }, () => ({ x: Math.random(), y: Math.random(), r: .8 + Math.random() * 1.8, v: .00025 + Math.random() * .0005, s: Math.random() * 6 }));
     let last = performance.now();
@@ -1131,7 +1228,7 @@ body:has(#home.hidden) .flowtiles{display:block}
     else { can = true; note = catalog.test_mode ? '測試模式：現在就可以報名' : `報名截止 ${fmtTime(catalog.close_at)}・剩 ${catalog.spots_left} 個名額`; }
     ['openNote', 'openNote2'].forEach(id => $(id).textContent = note);
     ['startBtn', 'startBtn2', 'hbarBtn'].forEach(id => { $(id).disabled = !can; $(id).innerHTML = icon('ticket') + '免費報名'; });
-    canRegister = can;
+    canRegister = can; hbarSync();
     $('poster').classList.toggle('has', !!catalog.film_image_url); document.querySelector('.poster-wrap').classList.toggle('empty', !catalog.film_image_url); document.querySelector('.film').classList.toggle('nofilm', !catalog.film_image_url);
     $('poster').innerHTML = catalog.film_image_url ? `<img src="${esc(catalog.film_image_url)}" alt="${esc(catalog.film_title || '電影海報')}">` : `<div class="soon"><svg viewBox="0 0 200 200" aria-hidden="true">${star(34, 30, 12, 5, 5, 'tw')}${star(168, 22, 8, 3.5, 5, 'tw')}${star(178, 186, 10, 4, 5, 'tw')}${star(20, 192, 6, 2.5, 5, 'tw')}</svg>${catalog.film_title ? `<b class="ptitle">${catalog.film_title.split(/[：:]/).map(esc).join('<br>')}</b>` : '<span class="q">?</span><b>片單即將揭曉</b>'}</div>`;
     $('filmBody').innerHTML = catalog.film_title ? `<p class="title">${esc(catalog.film_title)}</p>${catalog.film_note ? `<p>${esc(catalog.film_note)}</p>` : ''}` : `<p class="muted">${esc(cp('film_empty'))}</p>`;
@@ -1708,6 +1805,211 @@ body:has(#home.hidden) .flowtiles{display:block}
     else { if (location.hash === '#order') history.replaceState(null, '', location.pathname + location.search); renderResume(d); }
   }
   init();
+  // ---------- 主視覺開場（方案 B）：海報是一扇窗，往下捲穿過邊框、推向銀幕、放老電影倒數，停在銀幕上的報名資訊 ----------
+  // 效能：同一個深度的圖層放在同一組，每一格只改「組」的 transform（約 9 個），不逐張改 80 張圖；
+  //       銀幕內容只有位置真的變了才重排；雪用 CSS 動畫。實測（手機、CPU 降速 4 倍）見技術文件。
+  (function kvIntro(){
+    const L = {"bell":[46.5,6.1,7.5,6.2],"frame":[0.0,0.0,100.0,100.0],"tree_l":[-10.625,41.8,43.0,50.3],"tree_l_glow0":[-10.0,56.1,38.25,26.3],"tree_l_glow1":[-8.375,56.1,40.125,26.7],"tree_l_glow2":[-6.5,56.5,36.625,26.3],"tree_r":[67.875,41.8,43.0,50.3],"tree_r_glow0":[68.5,56.1,38.25,26.3],"tree_r_glow1":[70.125,56.1,40.125,26.7],"tree_r_glow2":[72.0,56.5,36.625,26.3],"ground":[0.0,59.0,100.0,41.0],"star_tl":[21.75,11.2,4.375,3.3],"star_r":[86.375,29.5,4.375,3.2],"star_l1":[9.625,23.8,4.375,3.3],"star_l2":[17.0,40.1,4.375,3.2],"star_tr":[71.75,8.1,4.375,3.3],"moon":[25.125,36.1,4.25,3.5],"t_zheng":[17.5,17.8,14.5,9.4],"t_da":[29.875,16.0,11.75,11.1],"t_sheng":[41.0,16.3,12.0,11.1],"t_dan":[52.75,14.4,36.375,13.4],"year":[73.875,15.6,9.25,3.3],"hat":[14.875,12.6,13.75,8.4],"potion":[47.625,17.5,4.875,5.2],"broom":[34.0,18.2,7.125,9.8],"t_lou":[18.875,29.2,12.75,10.3],"t_tian":[31.125,28.0,13.5,11.4],"t_dian":[43.625,29.1,12.875,9.6],"envelope":[58.125,29.4,5.125,2.8],"wand":[31.375,33.3,12.375,0.9],"t_ying":[56.0,29.4,12.75,9.9],"t_yuan":[69.5,29.2,15.5,10.6],"screen_frame":[25.625,41.8,49.0,25.9],"screen_inner":[27.25,43.3,45.875,20.5],"s_in":[31.875,44.4,15.75,2.7],"s_play":[52.875,44.4,15.25,3.1],"s_12":[31.625,48.6,14.125,9.3],"s_slash":[46.75,48.6,3.0,8.6],"s_09":[50.875,48.5,17.625,8.6],"s_loc":[32.125,59.3,35.875,3.6],"mat":[21.25,77.5,59.75,13.2],"snowman":[25.0,76.0,12.25,11.9],"santa":[37.0,64.5,25.5,24.0],"deer":[61.625,73.4,14.375,14.3],"g_xuefulan":[16.5,88.2,9.625,5.0],"g_shuipingheng":[26.375,89.7,8.125,4.5],"g_womo":[34.75,88.5,8.75,4.1],"g_posino":[43.5,89.0,6.75,4.9],"g_meko":[50.5,88.5,7.375,6.6],"g_vilson":[57.875,88.0,9.5,4.6],"g_colaz":[71.625,87.8,4.875,4.9],"g_kuke":[67.25,89.4,4.5,5.1],"g_allez":[76.75,88.6,7.375,4.1],"sa_l":[5.375,2.3,6.625,6.2],"sa_r":[88.125,2.3,6.625,6.2],"goeugo":[65.875,18.2,21.625,8.4]};
+    const GIFTS = { g_xuefulan:'雪芙蘭', g_shuipingheng:'水平衡', g_womo:'WOMO', g_posino:'POSINO', g_meko:'MEKO', g_vilson:'Vilson 米森', g_colaz:'Colaz', g_kuke:'酷可創念', g_allez:'ALLEZ' };
+    const TITLE = ['moon','t_zheng','t_da','t_sheng','t_dan','year','hat','potion','broom','t_lou','t_tian','t_dian','envelope','wand','t_ying','t_yuan','goeugo'];
+    const MAGIC = { hat:[-14,-26,-16], potion:[0,-34,12], broom:[10,-22,-18], envelope:[16,-30,14], wand:[-20,-14,-16], moon:[-14,8,24] };
+    // 分組（由後往前）：[名稱, 深度, 圖層]；深度越大，鏡頭推進時放大越多、越快離開畫面
+    const GROUPS = [
+      ['star', .78, ['star_tl','star_r','star_l1','star_l2','star_tr']],
+      ['screen', 1, ['screen_frame','screen_inner']],
+      ['stext', 1, ['s_in','s_play','s_12','s_slash','s_09','s_loc']],
+      ['@screen'],
+      ['tree', 1.4, ['tree_l','tree_l_glow0','tree_l_glow1','tree_l_glow2','tree_r','tree_r_glow0','tree_r_glow1','tree_r_glow2']],
+      ['@dim'],
+      ['mat', 1.62, ['mat'], true],
+      ['aud', 1.72, ['snowman','santa','deer'], true],
+      ['gift', 1.9, Object.keys(GIFTS), true],
+      ['title', 0, TITLE],
+      ['frame', 3.2, ['frame','bell','sa_l','sa_r']]
+    ];
+    const anim = n => n.startsWith('star') ? 'a-star' : n.includes('glow') ? 'a-glow' : n === 'bell' ? 'a-bell' : n === 'santa' ? 'a-santa' : n === 'snowman' ? 'a-snow' : n === 'deer' ? 'a-deer' : MAGIC[n] ? 'a-float' : '';
+    const kv = $('kv'), stage = $('kvStage'), scene = $('kvScene'), scr = $('kvScreen'), copy = $('kvCopy'), below = $('kvBelow'), leader = $('kvLeader'), tip = $('kvTip'), hint = $('kvHint'), skip = $('kvSkip');
+    let seen = false; try { seen = localStorage.getItem('xc_kv_seen') === '1'; } catch (e) {}
+    let full = !reduce && !seen && !location.hash && !urlParam('t');
+    kv.classList.toggle('full', full); kvCtaHidden = full;
+    const world = document.createElement('div'); world.className = 'kv-world'; world.style.inset = '0'; stage.insertBefore(world, stage.firstChild);
+    const G = {}, imgs = {}, dims = [];
+    const mk = (n, src, cls) => { const d = document.createElement('div'); d.className = 'kv-l ' + (cls || ''); d.setAttribute('aria-hidden', 'true'); const im = new Image(); im.alt = ''; im.decoding = 'async'; im.src = src; d.appendChild(im); return d; };
+    let dimBox;
+    for (const [g, dep, names, dark] of GROUPS) {
+      if (g === '@screen') { scene.appendChild(scr); continue; }
+      if (g === '@dim') { dimBox = document.createElement('div'); dimBox.className = 'kv-dim'; scene.appendChild(dimBox); continue; }
+      const box = document.createElement('div'); box.className = 'kv-g'; box.dataset.g = g; scene.appendChild(box); G[g] = { box, dep, names };
+      for (const n of names) {
+        if (!L[n]) continue;
+        const d = mk(n, `images/kv/${n}.webp`, anim(n));
+        const im = d.firstChild;
+        if (n.includes('glow')) im.style.animationDelay = (+n.slice(-1) * .85 + (n.startsWith('tree_r') ? .4 : 0)) + 's';
+        if (n.startsWith('star')) im.style.animationDelay = (n.length * .37 % 3).toFixed(2) + 's';
+        if (GIFTS[n] || ['bell','santa','snowman','deer','goeugo'].includes(n)) { d.classList.add('kv-tap'); d.dataset.n = n; }
+        box.appendChild(d); imgs[n] = d;
+        if (dark) { const k = mk(n, `images/kv/${n}_dk.webp`); k.dataset.base = n; box.appendChild(k); dims.push(k); }
+      }
+    }
+    // ---------- 尺寸 ----------
+    const SF = L.screen_frame, SI = L.screen_inner;
+    const fx = (SF[0] + SF[2] / 2) / 100, fy = (SF[1] + SF[3] / 2) / 100;     // 鏡頭焦點：銀幕中心
+    const TB = (() => { let a = 1e9, b = 1e9, c = -1e9, d = -1e9; for (const n of TITLE) { const [x, y, w, h] = L[n]; a = Math.min(a, x); b = Math.min(b, y); c = Math.max(c, x + w); d = Math.max(d, y + h); } return { x: a / 100, y: b / 100, w: (c - a) / 100, h: (d - b) / 100 }; })();
+    let vw, vh, pw, ph, pxo, pyo, Zh, FHx, FHy, Tw, Gx, Gy, mobile;
+    function layout(){
+      vw = stage.clientWidth; vh = stage.clientHeight; mobile = vw / vh < .8;
+      // 上面讓出頁首（疊在開場上），下面讓出固定的報名列
+      const hdr = (document.querySelector('.topwrap') || {}).offsetHeight || 0, top0 = hdr + 4, bot0 = vh - (mobile ? 84 : 100), avh = bot0 - top0;
+      if (mobile) { pw = Math.min(vw, avh * .8); ph = pw * 1.25; pxo = (vw - pw) / 2; pyo = top0 + Math.max(0, (avh - ph) * .4); }
+      else { ph = Math.min(avh, vh * .94); pw = ph * .8; pxo = (vw - pw) / 2; pyo = top0 + (avh - ph) / 2; }
+      const place = (d, n) => { const [x, y, w, h] = L[n]; d.style.cssText = `left:${pxo + x / 100 * pw}px;top:${pyo + y / 100 * ph}px;width:${w / 100 * pw}px;height:${h / 100 * ph}px`; };
+      for (const n in imgs) place(imgs[n], n); for (const k of dims) { place(k, k.dataset.base); k.style.opacity = 0; }
+      for (const g in G) G[g]._t = G[g]._o = null; for (const n in MAGIC) if (imgs[n]) imgs[n]._t = null;
+      // 最後一格（首屏）：銀幕寬度、位置；標題放在銀幕上方剩下的空間
+      const sfw0 = SF[2] / 100 * pw, ratio = (SF[2] * 4) / (SF[3] * 5), tr = (TB.w * 4) / (TB.h * 5);
+      const sfw = mobile ? vw * .94 : Math.min(vw * .64, vh * .5 * ratio, 1000);
+      Zh = sfw / sfw0; FHx = vw / 2; FHy = mobile ? vh * .5 : vh * .55;
+      const top = hdr + (mobile ? 2 : 6), avail = FHy - sfw / ratio / 2 - top - 10;
+      Tw = Math.min(vw * (mobile ? .86 : .7), avail * tr, mobile ? 520 : 600); Gx = vw / 2; Gy = top + Tw / tr / 2;
+      hint.style.top = Math.min(vh - (mobile ? 132 : 150), pyo + ph + 10) + 'px';
+      cache.scr = cache.dim = cache.below = cache.dark = null; dirty = true;
+    }
+    // ---------- 進度 ----------
+    const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v)), seg = (p, a, b) => clamp((p - a) / (b - a));
+    const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    let pT = full ? 0 : 1, pN = pT, dirty = true, mx = 0, my = 0, mxs = 0, mys = 0, lp = -1, ctaHidden = full, running = false;
+    const sent = {}, cache = {};
+    const setT = (o, el, T) => { if (o._t !== T) { el.style.transform = T; o._t = T; } };
+    const setO = (o, el, v) => { const O = v.toFixed(3); if (o._o !== O) { el.style.opacity = O; el.style.visibility = v < .01 ? 'hidden' : ''; o._o = O; } };
+    const setCss = (k, el, css) => { if (cache[k] !== css) { el.style.cssText = css; cache[k] = css; } };
+    function readScroll(){ if (!full) return; const r = $('kvTrack').getBoundingClientRect(); pT = clamp(-r.top / Math.max(1, r.height - vh)); }
+    addEventListener('scroll', readScroll, { passive: true });
+    addEventListener('pointermove', e => { if (e.pointerType === 'mouse') { mx = e.clientX / innerWidth * 2 - 1; my = e.clientY / innerHeight * 2 - 1; } }, { passive: true });
+    function render(p){
+      const e1 = ease(seg(p, .05, .40)), e2 = ease(seg(p, .05, .34)), back = ease(seg(p, .74, .86));
+      const Zc = Zh * 1.07, Z = 1 + (Zc - 1) * e1 + (Zh - Zc) * back;
+      const F0x = pxo + fx * pw, F0y = pyo + fy * ph, Fx = F0x + (FHx - F0x) * e1, Fy = F0y + (FHy - F0y) * e1;
+      const par = mobile ? 0 : (1 - e1) * 9;
+      for (const g in G) {
+        const o = G[g];
+        if (g === 'title') {
+          const s = 1 + (Tw / (TB.w * pw) - 1) * e2, cx0 = pxo + (TB.x + TB.w / 2) * pw, cy0 = pyo + (TB.y + TB.h / 2) * ph;
+          const Cx = cx0 + (Gx - cx0) * e2, Cy = cy0 + (Gy - cy0) * e2;
+          setT(o, o.box, `translate3d(${(Cx - s * cx0).toFixed(1)}px,${(Cy - s * cy0).toFixed(1)}px,0) scale(${s.toFixed(4)})`);
+          const b = Math.sin(e2 * Math.PI);
+          for (const n in MAGIC) { const d = imgs[n]; if (!d) continue; const m = MAGIC[n]; setT(d, d, b > .001 ? `translate(${(m[0] * b * pw / 400).toFixed(1)}px,${(m[1] * b * pw / 400).toFixed(1)}px) rotate(${(m[2] * b).toFixed(2)}deg)` : 'none'); }
+          continue;
+        }
+        const s = 1 + (Z - 1) * o.dep, k = par * (Math.min(o.dep, 1.8) - .9);
+        const a = Fx + mxs * k - s * (pxo + fx * pw), b2 = Fy + mys * k * .5 - s * (pyo + fy * ph);
+        setT(o, o.box, `translate3d(${a.toFixed(1)}px,${b2.toFixed(1)}px,0) scale(${s.toFixed(4)})`);
+        if (g === 'frame') setO(o, o.box, 1 - seg(p, .2, .32));
+        if (g === 'stext') setO(o, o.box, 1 - seg(p, .34, .4));
+      }
+      // 觀眾變成剪影（換成暗版圖，只動透明度）
+      const dark = (seg(p, .36, .46) - .33 * back).toFixed(3);
+      if (cache.dark !== dark) { for (const k of dims) { k.style.opacity = dark; } cache.dark = dark; }
+      // 背景磚、草地：永遠蓋滿整個畫面（不會漏出海報外面）
+      const sb = 1 + (Z - 1) * .82, tw = 2 * pw * sb, th = 2 * ph * sb, oy = Fy - fy * ph * sb;   // 背景磚的原點對齊海報原點
+      const gx0 = Fx - (fx * pw) * sb, gy = Fy + (.5904 - fy) * ph * Z, gb = .028 * ph * Z;
+      const wk = `${gy.toFixed(0)}|${tw.toFixed(0)}|${gx0.toFixed(0)}|${oy.toFixed(0)}`;
+      if (cache.world !== wk) {
+        world.style.backgroundImage = `linear-gradient(rgba(41,79,58,0) ${gy.toFixed(1)}px,rgba(41,79,58,.6) ${(gy + gb * .45).toFixed(1)}px,#294f3a ${(gy + gb).toFixed(1)}px),url(images/kv/bg_tile.jpg)`;
+        world.style.backgroundSize = `100% 100%,${tw.toFixed(1)}px ${th.toFixed(1)}px`;
+        world.style.backgroundPosition = `0 0,${(gx0 % tw).toFixed(1)}px ${(oy % th).toFixed(1)}px`; cache.world = wk;
+      }
+      // 銀幕內容、暗場、銀幕下方資訊：看得到時才更新位置
+      const sx = Fx + (SI[0] / 100 - fx) * pw * Z, sy = Fy + (SI[1] / 100 - fy) * ph * Z, sw = SI[2] / 100 * pw * Z, sh = SI[3] / 100 * ph * Z;
+      const fX = Fx + (SF[0] / 100 - fx) * pw * Z, fY = Fy + (SF[1] / 100 - fy) * ph * Z, fW = SF[2] / 100 * pw * Z, fH = SF[3] / 100 * ph * Z;
+      const onScreen = p > .38 || !full;
+      if (onScreen) setCss('scr', scr, `left:${sx.toFixed(1)}px;top:${sy.toFixed(1)}px;width:${sw.toFixed(1)}px;height:${sh.toFixed(1)}px`);
+      const dimOp = seg(p, .36, .46) - .55 * back;
+      setCss('dim', dimBox, dimOp > .001 ? `left:${fX.toFixed(1)}px;top:${fY.toFixed(1)}px;width:${fW.toFixed(1)}px;height:${fH.toFixed(1)}px;opacity:${dimOp.toFixed(3)}` : 'opacity:0');
+      const cOp = full ? seg(p, .78, .86) : 1, show = cOp > .02, bw = Math.min(vw, Math.max(fW, 340));
+      setCss('below', below, show ? `top:${(fY + fH).toFixed(1)}px;left:${(vw / 2 - bw / 2).toFixed(1)}px;width:${bw.toFixed(1)}px;opacity:${cOp.toFixed(3)};visibility:visible` : 'visibility:hidden;opacity:0');
+      setCss('copy', copy, show ? `opacity:${cOp.toFixed(3)};visibility:visible` : 'visibility:hidden;opacity:0');
+      if (ctaHidden === show) { ctaHidden = !show; kvCtaHidden = ctaHidden; hbarSync(); }
+      // 放映機的光：從觀眾後方照到銀幕
+      const beamOp = seg(p, .38, .46) * (1 - .55 * back);
+      setCss('beam', beam, beamOp > .001 ? `opacity:${beamOp.toFixed(3)};clip-path:polygon(${vw / 2 - 30}px ${vh + 20}px,${vw / 2 + 30}px ${vh + 20}px,${(sx + sw).toFixed(1)}px ${sy.toFixed(1)}px,${sx.toFixed(1)}px ${sy.toFixed(1)}px)` : 'opacity:0');
+      const lOp = seg(p, .40, .44) * (1 - seg(p, .76, .80));
+      setCss('leader', leader, `opacity:${lOp.toFixed(3)}`); if (lOp > 0) drawLeader(p, sw, sh);
+      setCss('hint', hint, `top:${hint.style.top};opacity:${full ? (1 - seg(p, 0, .04)).toFixed(2) : 0}`);
+      setCss('snow', snowfx, `opacity:${(1 - seg(p, .38, .44) + seg(p, .8, .9)).toFixed(2)}`);
+      const sk = full ? (p < .86 ? 'skip' : 'none') : (reduce ? 'none' : 'replay');
+      if (cache.skip !== sk) { cache.skip = sk; skip.style.display = sk === 'none' ? 'none' : ''; skip.textContent = sk === 'replay' ? '重看開場' : '跳過開場'; skip.classList.toggle('replay', sk === 'replay'); }
+      if (full) for (const q of [25, 50, 75, 100]) if (p * 100 >= q - .5 && !sent[q]) { sent[q] = 1; track('xc_intro_progress', { xc_percent: q }); }
+      if (full && p > .985 && !seen) { seen = true; try { localStorage.setItem('xc_kv_seen', '1'); } catch (e) {} }
+    }
+    // 老電影倒數：底片顆粒、刮痕、閃爍、掃過的扇形
+    const noise = document.createElement('canvas'); noise.width = noise.height = 160;
+    (() => { const x = noise.getContext('2d'), im = x.createImageData(160, 160); for (let i = 0; i < im.data.length; i += 4) { const v = Math.random() * 255; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = Math.random() < .5 ? 0 : 26; } x.putImageData(im, 0, 0); })();
+    let fontOk = false; if (document.fonts && document.fonts.load) document.fonts.load('800 80px "Grenze Gotisch"').then(() => { fontOk = true; dirty = true; }).catch(() => {});
+    function drawLeader(p, w, h){
+      const dpr = Math.min(1.25, devicePixelRatio || 1), W = Math.round(w * dpr), H = Math.round(h * dpr);
+      if (leader.width !== W || leader.height !== H) { leader.width = W; leader.height = H; }
+      const x = leader.getContext('2d'), cp = seg(p, .44, .74), num = 3 - Math.min(2, Math.floor(cp * 3)), fr = cp >= 1 ? 1 : (cp * 3) % 1;
+      const fl = .94 + Math.random() * .06, cx = W / 2, cy = H / 2, R = Math.min(W, H) * .4;
+      const g = x.createRadialGradient(cx, cy, R * .2, cx, cy, Math.max(W, H) * .7);
+      g.addColorStop(0, `rgba(${246 * fl | 0},${232 * fl | 0},${196 * fl | 0},1)`); g.addColorStop(1, `rgba(${196 * fl | 0},${170 * fl | 0},${122 * fl | 0},1)`);
+      x.fillStyle = g; x.fillRect(0, 0, W, H);
+      x.save(); x.translate(cx, cy); x.strokeStyle = 'rgba(23,63,72,.85)'; x.fillStyle = 'rgba(23,63,72,.17)';
+      if (fr > 0 && fr < 1) { x.beginPath(); x.moveTo(0, 0); x.arc(0, 0, R * 1.02, -Math.PI / 2, -Math.PI / 2 + fr * Math.PI * 2); x.closePath(); x.fill(); }
+      x.lineWidth = Math.max(1, R * .025); x.beginPath(); x.arc(0, 0, R, 0, 6.283); x.stroke();
+      x.lineWidth = Math.max(1, R * .012); x.beginPath(); x.arc(0, 0, R * .8, 0, 6.283); x.stroke();
+      x.beginPath(); x.moveTo(-W / 2, 0); x.lineTo(W / 2, 0); x.moveTo(0, -H / 2); x.lineTo(0, H / 2); x.stroke();
+      x.fillStyle = '#173f48'; x.textAlign = 'center'; x.textBaseline = 'middle';
+      x.font = `800 ${R * 1.25}px ${fontOk ? '"Grenze Gotisch",' : ''}Georgia,serif`; x.fillText(String(num), 0, R * .08);
+      x.restore();
+      x.globalAlpha = .55; x.drawImage(noise, -Math.random() * 160, -Math.random() * 160, W + 320, H + 320); x.globalAlpha = 1;
+      x.strokeStyle = 'rgba(60,40,20,.28)'; x.lineWidth = 1; const sc = (p * 997 | 0) % 3; for (let i = 0; i < sc; i++) { const sx = (Math.sin(p * 1e4 + i * 77) * .5 + .5) * W; x.beginPath(); x.moveTo(sx, 0); x.lineTo(sx + (i - 1) * 3, H); x.stroke(); }
+      const v = x.createRadialGradient(cx, cy, Math.min(W, H) * .35, cx, cy, Math.max(W, H) * .75); v.addColorStop(0, 'rgba(40,24,10,0)'); v.addColorStop(1, 'rgba(40,24,10,.42)'); x.fillStyle = v; x.fillRect(0, 0, W, H);
+      const flash = seg(p, .735, .76) * (1 - seg(p, .76, .79)); if (flash > 0) { x.fillStyle = `rgba(255,250,235,${flash})`; x.fillRect(0, 0, W, H); }
+    }
+    const beam = document.createElement('div'); beam.className = 'kv-beam'; stage.insertBefore(beam, $('snow'));
+    // 雪：用 CSS 動畫的小點（交給顯示卡），不用畫布逐格重畫
+    const snowfx = document.createElement('div'); snowfx.className = 'kv-snowfx'; snowfx.setAttribute('aria-hidden', 'true');
+    snowfx.innerHTML = Array.from({ length: innerWidth < 600 ? 22 : 36 }, (_, i) => { const r = (i * 9301 + 49297) % 233280 / 233280, q = (i * 4271 + 1663) % 1000 / 1000;
+      return `<i style="left:${(r * 100).toFixed(1)}%;--d:${(9 + q * 9).toFixed(1)}s;--dl:-${(q * 18).toFixed(1)}s;--s:${(2 + r * 3).toFixed(1)}px;--x:${((q - .5) * 40).toFixed(0)}px;opacity:${(.45 + r * .45).toFixed(2)}"></i>`; }).join('');
+    stage.insertBefore(snowfx, $('snow'));
+    // ---------- 迴圈：只在首屏看得到、首頁開著時跑 ----------
+    let last = performance.now(), visible = true;
+    function frame(t){
+      running = false; if (!visible || $('home').classList.contains('hidden')) return;
+      const dt = Math.min(.05, (t - last) / 1000); last = t; const k = 1 - Math.exp(-dt * 7);
+      pN += (pT - pN) * k; mxs += (mx - mxs) * k * .6; mys += (my - mys) * k * .6; if (Math.abs(pT - pN) < 1e-4) pN = pT;
+      const moving = dirty || Math.abs(pN - lp) > 1e-5 || Math.abs(mx - mxs) + Math.abs(my - mys) > 1e-3 || (pN > .4 && pN < .8);   // 倒數時底片要一直閃
+      if (moving) { render(pN); lp = pN; dirty = false; }
+      const mv = Math.abs(pT - pN) > 2e-3; if (mv !== kv._mv) { kv.classList.toggle('moving', mv); kv._mv = mv; }   // 捲動中先暫停小動作
+      // 停下來就不再每格跑（省電），等捲動或滑鼠再叫醒
+      if (moving) { running = true; requestAnimationFrame(frame); }
+    }
+    function kick(){ if (!running) { running = true; last = performance.now(); requestAnimationFrame(frame); } }
+    addEventListener('scroll', kick, { passive: true }); addEventListener('pointermove', kick, { passive: true });
+    if ('IntersectionObserver' in window) new IntersectionObserver(es => es.forEach(en => { visible = en.isIntersecting; kv.classList.toggle('paused', !visible); if (visible) kick(); })).observe($('kvTrack'));
+    addEventListener('resize', () => { layout(); readScroll(); kick(); });
+    addEventListener('popstate', () => setTimeout(() => { layout(); kick(); }, 0));
+    // ---------- 互動 ----------
+    let tipT = 0;
+    function showTip(text, el){ const r = el.getBoundingClientRect(), s = stage.getBoundingClientRect(); tip.textContent = text; tip.style.left = (r.left + r.width / 2 - s.left) + 'px'; tip.style.top = (r.top - s.top) + 'px'; tip.classList.add('on'); clearTimeout(tipT); tipT = setTimeout(() => tip.classList.remove('on'), 1800); }
+    function hop(el){ el.classList.remove('hopping'); void el.offsetWidth; el.classList.add('hopping'); setTimeout(() => el.classList.remove('hopping'), 720); }
+    scene.addEventListener('click', e => {
+      const d = e.target.closest('.kv-tap'); if (!d) return; const n = d.dataset.n;
+      if (n === 'bell') { d.classList.remove('ringing'); void d.offsetWidth; d.classList.add('ringing'); return; }
+      if (GIFTS[n]) { hop(d); showTip('贊助夥伴：' + GIFTS[n], d); track('xc_sponsor_click', { xc_sponsor: GIFTS[n], xc_where: 'kv' }); return; }
+      if (n === 'goeugo') { showTip('冠名贊助：歐來歐去・瑞獅旅行社', d); track('xc_sponsor_click', { xc_sponsor: 'goeugo', xc_where: 'kv_title' }); return; }
+      hop(d);
+    });
+    let rang = false;
+    addEventListener('scroll', () => { if (!rang && full && pT > .04) { rang = true; const b = imgs.bell; if (b) { b.classList.add('ringing'); setTimeout(() => b.classList.remove('ringing'), 1200); } } }, { passive: true });
+    // 網站整體是平滑捲動；跳過／重看要瞬間到位，不然會在中途把報名按鈕藏起來
+    const jump = y => { const h = document.documentElement, b = h.style.scrollBehavior; h.style.scrollBehavior = 'auto'; scrollTo(0, y); h.style.scrollBehavior = b; };
+    skip.onclick = () => {
+      if (full) { track('xc_intro_skip', { xc_percent: Math.round(pN * 100) }); const t = $('kvTrack'), y0 = t.getBoundingClientRect().top + scrollY; jump(y0 + t.offsetHeight - innerHeight); pN = pT = 1; dirty = true; render(1); kick(); setTimeout(() => { const b = $('startBtn'); if (!b.disabled) b.focus({ preventScroll: true }); }, 60); return; }
+      full = true; kv.classList.add('full'); for (const q in sent) delete sent[q]; jump($('kvTrack').getBoundingClientRect().top + scrollY); pN = pT = 0; layout(); track('xc_intro_replay'); kick();
+    };
+    layout(); readScroll(); pN = pT; render(pN); kick();
+  })();
 })();
 </script>
 </body>
