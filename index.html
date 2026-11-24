@@ -545,7 +545,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:70;opa
 @keyframes projector{0%{opacity:.2}20%{opacity:.9}35%{opacity:.35}55%{opacity:1}100%{opacity:.8}}
 .hero-art svg .tier{will-change:transform}
 /* 「上次的進度」細橫條 */
-#resume.resume{margin:0;border:0;border-radius:0;background:#1A3A30;color:var(--cream);padding:8px max(20px,calc((100% - 1120px) / 2));gap:10px;font-size:14px}
+#resume.resume{margin:0;border:0;border-radius:0;background:var(--green-d);color:var(--cream);padding:8px max(20px,calc((100% - 1120px) / 2));gap:10px;font-size:14px}
 #resume .i{color:var(--gold-l)}
 #resume .t{min-width:0}#resume .t b{display:inline;font-size:14px}#resume .t span{display:none}
 #resume .btn{min-height:36px;padding:0 14px;font-size:14px;box-shadow:none}
@@ -694,6 +694,7 @@ body:has(#home.hidden) .flowtiles{display:block}
 .hero.kv{display:block;min-height:0;overflow:visible;padding:0;background:#15404a;isolation:auto}
 .hero.kv>.sky,.hero.kv>.beam,.hero.kv>.hero-art{display:none}
 /* 首頁時，頁首疊在開場上（不擋海報） */
+body:has(#home:not(.hidden)) #resume:not(.hidden){position:absolute;left:0;right:0;top:auto;margin-top:var(--kvHdr,74px);z-index:6;background:rgba(12,36,42,.78);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-top:1px solid rgba(236,216,164,.18);border-bottom:1px solid rgba(236,216,164,.18)}
 body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;z-index:6;background:linear-gradient(rgba(10,30,35,.62),rgba(10,30,35,0))}
 .kv-track{position:relative;height:100vh;height:100svh}
 .kv.full .kv-track{height:340vh;height:340svh}
@@ -1136,6 +1137,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
   }
 
   // ---------- 狀態 ----------
+  let orderFull = false;   // 餐點預訂名額滿了：還是可以只報名
   let catalog = null, step = 0, evDay = '12/9', evWk = '三'; const cart = {};
   // 暫存：填到一半的報名（24 小時）、這台裝置最近的訂單（方便回來看 QR Code）
   const DRAFT_KEY = 'xc_draft_v1', ORDER_KEY = 'xc_order_v1', DRAFT_TTL = 24 * 3600e3, ORDER_TTL = 60 * 24 * 3600e3;
@@ -1223,8 +1225,8 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     const now = new Date(); let note = '', can = false;
     if (!catalog.is_open && now < new Date(catalog.open_at)) note = `${fmtTime(catalog.open_at)} 開放報名`;
     else if (!catalog.is_open) note = '報名已截止。已經報名的人可以用 Email 裡的連結查詢訂單。';
-    else if (catalog.spots_left <= 0) note = '名額已滿';
-    else { can = true; note = catalog.test_mode ? '測試模式：現在就可以報名' : `報名截止 ${fmtTime(catalog.close_at)}・剩 ${catalog.spots_left} 個名額`; }
+    else if (catalog.spots_left <= 0) { can = true; note = '餐點預訂名額已滿・還是可以只報名入場'; }
+    else { can = true; note = catalog.test_mode ? '測試模式：現在就可以報名' : `報名截止 ${fmtTime(catalog.close_at)}・餐點預訂剩 ${catalog.spots_left} 個名額`; }
     ['openNote', 'openNote2'].forEach(id => $(id).textContent = note);
     ['startBtn', 'startBtn2', 'hbarBtn'].forEach(id => { $(id).disabled = !can; $(id).innerHTML = icon('ticket') + '免費報名'; });
     canRegister = can; hbarSync();
@@ -1319,7 +1321,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     return `<div class="ds">${esc(d.slice(0, k))}</div><details class="more"><summary>查看介紹</summary><p>${esc(d.slice(k + 1).trim())}</p></details>`;
   }
   function ctl(item){
-    if (item.remaining === 0) return '<span class="soldout">已售完</span>';
+    if (item.remaining === 0) return `<span class="soldout">${orderFull ? '預訂已滿' : '已售完'}</span>`;
     const i = curLine(item), q = cart[i.id] || 0, d = `data-id="${esc(i.id)}" data-base="${esc(i.base)}"`;
     if (!q) return `<button type="button" class="add" data-act="plus" ${d}>${icon('plus')}加入<span class="sr"> ${esc(i.name)}</span></button>`;
     return `<span class="qty" role="group" aria-label="${esc(i.name)} 數量"><button type="button" data-act="minus" ${d} aria-label="減少 ${esc(i.name)}">${icon(q === 1 ? 'trash-2' : 'minus')}</button><output>${q}</output><button type="button" data-act="plus" ${d} aria-label="增加 ${esc(i.name)}">${icon('plus')}</button></span>`;
@@ -1364,7 +1366,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     const b = $('onlyReg'); if (!b || b.dataset.armed === '1') return;
     const hasRent = catalog && rentals().length > 0;
     b.innerHTML = count() ? icon('trash-2') + `清空已選的 ${count()} 項，只報名` : icon('ticket') + (hasRent ? '只報名，不加購' : '只報名，不訂餐');
-    $('onlyRegNote').textContent = count() ? '' : hasRent ? '不買野餐墊、不點餐，也可以來看電影。' : '不吃東西也可以來看電影。';
+    $('onlyRegNote').textContent = count() ? '' : orderFull ? '餐點預訂名額已滿，還是可以只報名入場。' : hasRent ? '不買野餐墊、不點餐，也可以來看電影。' : '不吃東西也可以來看電影。';
   }
   $('onlyReg').onclick = () => {
     const b = $('onlyReg');
@@ -1794,6 +1796,9 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
       if (token) toast('目前無法查詢訂單，請稍後再試', 'wifi-off');
       return;
     }
+    // 名額只算有點餐／加購的人；滿了就把所有品項鎖起來，只能「只報名」
+    orderFull = !!catalog.is_open && catalog.spots_left <= 0;
+    if (orderFull) (catalog.vendors || []).forEach(v => (v.items || []).forEach(i => { i.remaining = 0; }));
     renderHome();
     if (token) return showLookup(token);
     const d = loadDraft();
@@ -1858,7 +1863,10 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     function layout(){
       vw = stage.clientWidth; vh = stage.clientHeight; mobile = vw / vh < .8;
       // 上面讓出頁首（疊在開場上），下面讓出固定的報名列
-      const hdr = (document.querySelector('.topwrap') || {}).offsetHeight || 0, top0 = hdr + 4, bot0 = vh - (mobile ? 84 : 100), avh = bot0 - top0;
+      // 頁首和「上次的報名」提示列都疊在開場上，海報要放在它們下面
+      const hdr0 = (document.querySelector('.topwrap') || {}).offsetHeight || 0, rs = $('resume'), rh = rs && !rs.classList.contains('hidden') ? rs.offsetHeight : 0;
+      document.documentElement.style.setProperty('--kvHdr', hdr0 + 'px');
+      const hdr = hdr0 + rh, top0 = hdr + 4, bot0 = vh - (mobile ? 84 : 100), avh = bot0 - top0;
       if (mobile) { pw = Math.min(vw, avh * .8); ph = pw * 1.25; pxo = (vw - pw) / 2; pyo = top0 + Math.max(0, (avh - ph) * .4); }
       else { ph = Math.min(avh, vh * .94); pw = ph * .8; pxo = (vw - pw) / 2; pyo = top0 + (avh - ph) / 2; }
       const place = (d, n) => { const [x, y, w, h] = L[n]; d.style.cssText = `left:${pxo + x / 100 * pw}px;top:${pyo + y / 100 * ph}px;width:${w / 100 * pw}px;height:${h / 100 * ph}px`; };
@@ -1987,6 +1995,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     addEventListener('scroll', kick, { passive: true }); addEventListener('pointermove', kick, { passive: true });
     if ('IntersectionObserver' in window) new IntersectionObserver(es => es.forEach(en => { visible = en.isIntersecting; kv.classList.toggle('paused', !visible); if (visible) kick(); })).observe($('kvTrack'));
     addEventListener('resize', () => { layout(); readScroll(); kick(); });
+    if ('ResizeObserver' in window && $('resume')) { let rw = -1; new ResizeObserver(() => { const h = $('resume').classList.contains('hidden') ? 0 : $('resume').offsetHeight; if (h !== rw) { rw = h; layout(); kick(); } }).observe($('resume')); new MutationObserver(() => { layout(); kick(); }).observe($('resume'), { attributes: true, attributeFilter: ['class'] }); }
     addEventListener('popstate', () => setTimeout(() => { layout(); kick(); }, 0));
     // ---------- 互動 ----------
     let tipT = 0;
