@@ -281,6 +281,7 @@ html[data-dir=back]::view-transition-new(flowstep){animation:vt-in-l .32s var(--
 .mi:last-child{border-bottom:0}
 .mi.wimg{grid-template-columns:64px minmax(0,1fr) auto}
 .mi .th{width:64px;height:64px;border-radius:var(--r);object-fit:cover;background:var(--paper)}
+.vcard .vth{width:64px;height:64px;border-radius:var(--r);object-fit:cover;flex:none;background:var(--paper)}
 .mi .side{display:grid;justify-items:end;gap:6px}
 .mi.has{background:#F1F7F3;box-shadow:inset 4px 0 0 var(--green)}
 .mi .nm{font-weight:700;font-size:17px}
@@ -682,7 +683,7 @@ body:has(#home.hidden) .flowtiles{display:block}
 }
 @media (prefers-reduced-motion:reduce){.screening .beam{animation:none}}
 
-/* 加購租借品（野餐墊） */
+/* 加購品（野餐墊，學生會販售） */
 #addons .addon{margin:16px 0 8px}
 .rtag{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:99px;font-size:12px;font-weight:700;font-family:var(--font);background:#F4ECD8;color:#6E5418;vertical-align:3px;letter-spacing:0}
 
@@ -718,7 +719,7 @@ body:has(#home.hidden) .flowtiles{display:block}
         <div class="stub" id="evDate"><b class="num">12/9</b><span class="wk">週三</span><span class="cut hidden" aria-hidden="true"></span><span class="lbl hidden" id="stubTime"></span></div>
         <p class="hero-meta" id="evMeta" aria-busy="true"><span class="skl" aria-hidden="true"></span></p>
         <div class="cta"><button class="btn hero-cta" type="button" id="startBtn" disabled>免費報名</button></div>
-        <p class="cta-sub">可加購餐點、租野餐墊</p>
+        <p class="cta-sub">可加購餐點、野餐墊</p>
         <div class="cta-note" id="openNote">載入中…</div>
         <p class="countdown" id="countdown"></p>
       </div>
@@ -775,7 +776,7 @@ body:has(#home.hidden) .flowtiles{display:block}
     <div class="wrap">
       <h2 id="seeYou">12/9 見</h2>
       <button class="btn hero-cta" type="button" id="startBtn2" disabled>免費報名</button>
-      <p class="cta-sub">可加購餐點、租野餐墊</p>
+      <p class="cta-sub">可加購餐點、野餐墊</p>
       <div class="cta-note" id="openNote2"></div>
     </div>
   </section>
@@ -1142,7 +1143,7 @@ body:has(#home.hidden) .flowtiles{display:block}
     $('facts').innerHTML = catalog.venue_note ? `<li>${icon('info')}<b>注意事項</b><span>${esc(catalog.venue_note)}</span></li>` : '';
     $('facts').classList.toggle('hidden', !catalog.venue_note);
     $('vlist').innerHTML = foods().map(v => ({ v, its: v.items.filter(i => !i.addon_for) })).map(({ v, its }) => `<div class="vcard"><span class="ill">${illo(vIcon(v))}</span><div><b>${esc(v.name)}</b><span>${esc(its.slice(0, 4).map(i => i.name).join('、'))}${its.length > 4 ? ' 等' : ''}${its.length ? `・$${Math.min(...its.map(i => i.price))} 起` : ''}</span></div></div>`).join('') || '<p class="muted">餐點待公布</p>';
-    $('vlist').insertAdjacentHTML('afterbegin', rentals().flatMap(v => v.items).map(i => `<div class="vcard rent"><span class="ill">${illo('mat')}</span><div><b>${esc(i.name.replace(/（.*）/, ''))}<span class="rtag">租借</span></b><span>報名時可以加租・$${esc(i.price)}／張</span></div></div>`).join(''));
+    $('vlist').insertAdjacentHTML('afterbegin', rentals().flatMap(v => v.items).map(i => `<div class="vcard rent">${i.image_url ? `<img class="vth" src="${esc(i.image_url)}" alt="" loading="lazy">` : `<span class="ill">${illo('mat')}</span>`}<div><b>${esc(i.name.replace(/（.*）/, ''))}<span class="rtag">加購</span></b><span>報名時可以加購・$${esc(i.price)}／張・活動後可以帶回家</span></div></div>`).join(''));
     $('how').innerHTML = [1, 2, 3].map(i => [cp('s' + i + '_t'), cp('s' + i + '_d')])
       .map(([t, d], i) => `<li><span class="no num" aria-hidden="true">${i + 1}</span><div><h3><span class="sr">第 ${i + 1} 步：</span>${esc(t)}</h3><p>${esc(d)}</p></div></li>`).join('');
     $('footContact').textContent = catalog.contact_info && !/nccu_sa/i.test(catalog.contact_info) ? '聯絡我們：' + catalog.contact_info : '';
@@ -1166,12 +1167,12 @@ body:has(#home.hidden) .flowtiles{display:block}
     $('pickupNote').innerHTML = `${icon('hand-platter')}<div><b>取餐方式</b><span>${esc(catalog.pickup_note || '活動當天報到後，到取餐區出示學生證（校外人士出示 QR Code）取餐。取餐時間和地點確定後會公布在這裡。')}</span></div>`;
     $('addons').innerHTML = rentals().map(v => `
       <section class="vendor addon" aria-labelledby="ad_${esc(v.id)}">
-        <div class="vhead"><span class="ill">${illo('mat')}</span><div><h3 id="ad_${esc(v.id)}" style="font-size:20px;margin:0">要不要加租${esc(v.items.length === 1 ? v.items[0].name.replace(/（.*）/, '') : '租借品')}？<span class="rtag">租借</span></h3>${v.description ? `<p class="vdesc">${esc(v.description)}</p>` : ''}</div></div>
+        <div class="vhead"><span class="ill">${illo('mat')}</span><div><h3 id="ad_${esc(v.id)}" style="font-size:20px;margin:0">要不要加購${esc(v.items.length === 1 ? v.items[0].name.replace(/（.*）/, '') : '這些用品')}？<span class="rtag">加購</span></h3>${v.description ? `<p class="vdesc">${esc(v.description)}</p>` : ''}</div></div>
         <ul class="items">${v.items.map(row).join('')}</ul>
       </section>`).join('');
     $('addons').onclick = e => $('menu').onclick(e);
     $('menu').onchange = e => { const sl = e.target.closest('[data-opt]'); if (!sl) return; optSel[sl.dataset.opt] = sl.value; refreshRow(sl.dataset.opt); };
-    // 有租借品時，這一步叫「加購與點餐」，野餐墊在前、餐點在後
+    // 有加購品（kind = rental，名稱沿用）時，這一步叫「加購與點餐」，野餐墊在前、餐點在後
     const hasRent = rentals().length > 0;
     $('s1t').textContent = hasRent ? '加購與點餐' : '想吃點什麼？';
     $('foodSubT').classList.toggle('hidden', !hasRent);
@@ -1267,7 +1268,7 @@ body:has(#home.hidden) .flowtiles{display:block}
     const b = $('onlyReg'); if (!b || b.dataset.armed === '1') return;
     const hasRent = catalog && rentals().length > 0;
     b.innerHTML = count() ? icon('trash-2') + `清空已選的 ${count()} 項，只報名` : icon('ticket') + (hasRent ? '只報名，不加購' : '只報名，不訂餐');
-    $('onlyRegNote').textContent = count() ? '' : hasRent ? '不租野餐墊、不點餐，也可以來看電影。' : '不吃東西也可以來看電影。';
+    $('onlyRegNote').textContent = count() ? '' : hasRent ? '不買野餐墊、不點餐，也可以來看電影。' : '不吃東西也可以來看電影。';
   }
   $('onlyReg').onclick = () => {
     const b = $('onlyReg');
