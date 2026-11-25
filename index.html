@@ -732,8 +732,12 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
 .kv .cta-sub{text-align:center;margin:0;color:#e4d6b4}
 .kv .cta-note{margin-top:2px;color:#e4d6b4;font-size:13.5px}
 .kv .countdown{justify-content:center;color:#e4d6b4}
-.kv-hint{position:absolute;left:0;right:0;text-align:center;color:#f3e8cf;font-size:14px;letter-spacing:.14em;margin:0;pointer-events:none;text-shadow:0 1px 6px rgba(0,0,0,.6)}
-.kv-hint i{display:block;width:1.5px;height:28px;margin:8px auto 0;background:linear-gradient(#f3e8cf,rgba(243,232,207,0));animation:kvDrop 1.8s ease-in-out infinite;transform-origin:top}
+.kv-hint{position:absolute;left:0;right:0;display:flex;justify-content:center;align-items:center;height:44px;color:#f3e8cf;margin:0;pointer-events:none}
+.kv-hint .pill{display:inline-flex;align-items:center;gap:9px;height:36px;padding:0 15px;border-radius:999px;background:rgba(11,32,37,.74);border:1px solid rgba(236,216,164,.28);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);font-size:13.5px;font-weight:600;letter-spacing:.08em;white-space:nowrap}
+.kv-hint i{display:block;width:8px;height:8px;border-right:2px solid #ecd8a4;border-bottom:2px solid #ecd8a4;transform:translateY(-2px) rotate(45deg);animation:kvArrowDn 1.6s ease-in-out infinite}
+.kv-hint.up i{transform:translateY(2px) rotate(-135deg);animation-name:kvArrowUp}
+@keyframes kvArrowDn{0%,100%{transform:translateY(-3px) rotate(45deg);opacity:.5}50%{transform:translateY(2px) rotate(45deg);opacity:1}}
+@keyframes kvArrowUp{0%,100%{transform:translateY(3px) rotate(-135deg);opacity:.5}50%{transform:translateY(-2px) rotate(-135deg);opacity:1}}
 @keyframes kvDrop{0%{transform:scaleY(0);opacity:1}60%{transform:scaleY(1);opacity:1}100%{transform:scaleY(1);opacity:0}}
 .kv-btn{position:absolute;z-index:3;bottom:calc(96px + env(safe-area-inset-bottom));right:12px;min-height:44px;padding:0 16px;border-radius:999px;border:1px solid rgba(243,232,207,.45);background:rgba(13,38,44,.62);color:#f3e8cf;font:600 14px/1 var(--font);cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .kv-btn:hover{border-color:#e9d29a}
@@ -854,7 +858,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
           <div class="kv-meta"><p class="hero-meta" id="evMeta" aria-busy="true"><span class="skl" aria-hidden="true"></span></p><div class="cta-note" id="openNote">載入中…</div></div>
         </div>
         <canvas class="snow" id="snow" aria-hidden="true"></canvas>
-        <p class="kv-hint" id="kvHint" aria-hidden="true">往下滑，走進電影院<i></i></p>
+        <p class="kv-hint" id="kvHint" aria-hidden="true"><span class="pill"><span class="t">往下捲動，走進電影院</span><i></i></span></p>
         <button class="kv-btn" type="button" id="kvSkip">跳過開場</button>
         <div class="kv-tip" id="kvTip" aria-hidden="true"></div>
       </div>
@@ -1899,16 +1903,21 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     const SF = L.screen_frame, SI = L.screen_inner;
     const fx = (SF[0] + SF[2] / 2) / 100, fy = (SF[1] + SF[3] / 2) / 100;     // 鏡頭焦點：銀幕中心
     const TB = (() => { let a = 1e9, b = 1e9, c = -1e9, d = -1e9; for (const n of TITLE) { const [x, y, w, h] = L[n]; a = Math.min(a, x); b = Math.min(b, y); c = Math.max(c, x + w); d = Math.max(d, y + h); } return { x: a / 100, y: b / 100, w: (c - a) / 100, h: (d - b) / 100 }; })();
-    let vw, vh, pw, ph, pxo, pyo, Zh, FHx, FHy, Tw, Gx, Gy, mobile, ctaH = 52;
+    let vw, vh, pw, ph, pxo, pyo, Zh, FHx, FHy, Tw, Gx, Gy, mobile, ctaH = 52, rowTop = 0;
+    // 觸控螢幕是手指「往上滑」，電腦是滾輪「往下捲」
+    const touch = matchMedia('(hover: none) and (pointer: coarse)').matches;
+    hint.classList.toggle('up', touch); hint.querySelector('.t').textContent = touch ? '手指往上滑，走進電影院' : '往下捲動，走進電影院';
     function layout(){
       vw = stage.clientWidth; vh = stage.clientHeight; mobile = vw / vh < .8;
       // 上面讓出頁首（疊在開場上），下面讓出固定的報名列
       // 頁首和「上次的報名」提示列都疊在開場上，海報要放在它們下面
       const hdr0 = (document.querySelector('.topwrap') || {}).offsetHeight || 0, rs = $('resume'), rh = rs && !rs.classList.contains('hidden') ? rs.offsetHeight : 0;
       document.documentElement.style.setProperty('--kvHdr', hdr0 + 'px');
-      const hdr = hdr0 + rh, top0 = hdr + 4, bot0 = vh - (mobile ? 84 : 100), avh = bot0 - top0;
-      if (mobile) { pw = Math.min(vw, avh * .8); ph = pw * 1.25; pxo = (vw - pw) / 2; pyo = top0 + Math.max(0, (avh - ph) * .4); }
-      else { ph = Math.min(avh, vh * .94); pw = ph * .8; pxo = (vw - pw) / 2; pyo = top0 + (avh - ph) / 2; }
+      const hdr = hdr0 + rh, top0 = hdr + 4, bot0 = vh - (mobile ? 76 + Math.max(0, (parseFloat(getComputedStyle($('hbar')).paddingBottom) || 10) - 10) : 100), avh = bot0 - top0;   // 底部報名列（iPhone 還要加上底部安全區）
+      // 海報下面留一列（48px）給提示和「跳過開場」，不疊在海報上
+      const avp = avh - 48;
+      if (mobile) { pw = Math.min(vw, avp * .8); ph = pw * 1.25; pxo = (vw - pw) / 2; pyo = top0 + Math.max(0, (avp - ph) * .4); }
+      else { ph = Math.min(avp, vh * .94); pw = ph * .8; pxo = (vw - pw) / 2; pyo = top0 + (avp - ph) / 2; }
       const place = (d, n) => { const [x, y, w, h] = L[n]; d.style.cssText = `left:${pxo + x / 100 * pw}px;top:${pyo + y / 100 * ph}px;width:${w / 100 * pw}px;height:${h / 100 * ph}px`; };
       for (const n in imgs) place(imgs[n], n); for (const k of dims) { place(k, k.dataset.base); k.style.opacity = 0; }
       for (const g in G) G[g]._t = G[g]._o = null; for (const n in MAGIC) if (imgs[n]) imgs[n]._t = null;
@@ -1918,7 +1927,10 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
       Zh = sfw / sfw0; FHx = vw / 2; FHy = vh * .5;   // 銀幕下面要放報名鈕、片名、倒數、一行資訊
       const top = hdr + (mobile ? 2 : 6), avail = FHy - sfw / ratio / 2 - top - 10;
       Tw = Math.min(vw * (mobile ? .86 : .7), avail * tr, mobile ? 520 : 600); Gx = vw / 2; Gy = top + Tw / tr / 2;
-      hint.style.top = Math.min(vh - (mobile ? 132 : 150), pyo + ph + 10) + 'px';
+      rowTop = pyo + ph + 2; hint.style.top = rowTop + 'px';
+      // 窄螢幕：提示放在「跳過開場」左邊的空間置中，兩個不會撞在一起
+      hint.style.right = mobile ? (skip.offsetWidth || 96) + 22 + 'px' : '0';
+      if (full) { skip.style.top = rowTop + 'px'; skip.style.bottom = 'auto'; } else { skip.style.top = ''; skip.style.bottom = ''; }
       ctaH = $('startBtn').offsetHeight || 52;
       cache.scr = cache.dim = cache.below = cache.dark = null; dirty = true;
     }
@@ -1983,7 +1995,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
       setCss('beam', beam, beamOp > .001 ? `opacity:${beamOp.toFixed(3)};clip-path:polygon(${vw / 2 - 30}px ${vh + 20}px,${vw / 2 + 30}px ${vh + 20}px,${(sx + sw).toFixed(1)}px ${sy.toFixed(1)}px,${sx.toFixed(1)}px ${sy.toFixed(1)}px)` : 'opacity:0');
       const lOp = seg(p, .40, .44) * (1 - seg(p, .76, .80));
       setCss('leader', leader, `opacity:${lOp.toFixed(3)}`); if (lOp > 0) drawLeader(p, sw, sh);
-      setCss('hint', hint, `top:${hint.style.top};opacity:${full ? (1 - seg(p, 0, .04)).toFixed(2) : 0}`);
+      setCss('hint', hint, `top:${hint.style.top};right:${hint.style.right};opacity:${full ? (1 - seg(p, 0, .04)).toFixed(2) : 0}`);
       setCss('snow', snowfx, `opacity:${(1 - seg(p, .38, .44) + seg(p, .8, .9)).toFixed(2)}`);
       const sk = full ? (p < .86 ? 'skip' : 'none') : (reduce ? 'none' : 'replay');
       if (cache.skip !== sk) { cache.skip = sk; skip.style.display = sk === 'none' ? 'none' : ''; skip.textContent = sk === 'replay' ? '重看開場' : '跳過開場'; skip.classList.toggle('replay', sk === 'replay'); }
@@ -2007,8 +2019,8 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
       x.lineWidth = Math.max(1, R * .025); x.beginPath(); x.arc(0, 0, R, 0, 6.283); x.stroke();
       x.lineWidth = Math.max(1, R * .012); x.beginPath(); x.arc(0, 0, R * .8, 0, 6.283); x.stroke();
       x.beginPath(); x.moveTo(-W / 2, 0); x.lineTo(W / 2, 0); x.moveTo(0, -H / 2); x.lineTo(0, H / 2); x.stroke();
-      x.fillStyle = '#173f48'; x.textAlign = 'center'; x.textBaseline = 'middle';
-      x.font = `800 ${R * 1.25}px ${fontOk ? '"Grenze Gotisch",' : ''}Georgia,serif`; x.fillText(String(num), 0, R * .08);
+      x.fillStyle = '#173f48'; x.textAlign = 'center'; x.textBaseline = 'alphabetic';
+      x.font = `800 ${R * 1.25}px ${fontOk ? '"Grenze Gotisch",' : ''}Georgia,serif`; { const t = x.measureText(String(num)); x.fillText(String(num), (t.actualBoundingBoxLeft - t.actualBoundingBoxRight) / 2, (t.actualBoundingBoxAscent - t.actualBoundingBoxDescent) / 2); }
       x.restore();
       x.globalAlpha = .55; x.drawImage(noise, -Math.random() * 160, -Math.random() * 160, W + 320, H + 320); x.globalAlpha = 1;
       x.strokeStyle = 'rgba(60,40,20,.28)'; x.lineWidth = 1; const sc = (p * 997 | 0) % 3; for (let i = 0; i < sc; i++) { const sx = (Math.sin(p * 1e4 + i * 77) * .5 + .5) * W; x.beginPath(); x.moveTo(sx, 0); x.lineTo(sx + (i - 1) * 3, H); x.stroke(); }
