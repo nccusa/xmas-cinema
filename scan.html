@@ -620,7 +620,7 @@ button{font:inherit;color:inherit}
   $('menuBtn').onclick = () => openSheet('menuSheet');
   $('searchForm').onsubmit = async e => {
     e.preventDefault(); const q = $('q').value.trim(); if (q.length < 2) return;
-    if (/^[0-9]{9,11}$/.test(q) || /^XCQR-/i.test(q)) { $('q').value = ''; $('q').blur(); return onCode(q, 'manual'); }
+    if (/^[0-9]{3}[0-9A-Z]{6,8}$/i.test(q) || /^XCQR-/i.test(q)) { $('q').value = ''; $('q').blur(); return onCode(q, 'manual'); }
     $('results').innerHTML = `<li style="color:var(--dim)">查詢中…</li>`;
     try {
       const rows = await Api.rpc('staff_search', { p_q: q });
