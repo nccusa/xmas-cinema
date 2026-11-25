@@ -433,6 +433,10 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
   function toLocalInput(iso){ if (!iso) return ''; return new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date(iso)).replace(' ', 'T'); }
   function fromLocalInput(v){ return v ? new Date(v + ':00+08:00').toISOString() : null; }
   const overdue = r => r.status === 'pending_payment' && new Date(r.payment_deadline) < new Date();
+  // 店家預購狀態（每家店可以各自截止）
+  const vendorOrderState = v => !v.order_close_at ? `<p class="small muted" style="margin:4px 0 0">${icon('clock')} 預購跟整體報名一起截止${settings && settings.registration_close_at ? `（${esc(fmtTime(settings.registration_close_at))}）` : ''}</p>`
+    : new Date(v.order_close_at) <= new Date() ? `<p class="small" style="margin:4px 0 0;color:var(--crit,#a8392c);font-weight:700">${icon('ban')} 預購已截止（${esc(fmtTime(v.order_close_at))}）</p>`
+    : `<p class="small" style="margin:4px 0 0;font-weight:700">${icon('clock')} 預購到 ${esc(fmtTime(v.order_close_at))}</p>`;
   const ST_TONE = { pending_payment: 'caution', paid: 'info', picked_up: 'ok', cancelled: 'neu' };
   const stBadge = r => overdue(r) ? '<span class="badge b-crit">逾期未付</span>' : `<span class="badge b-${ST_TONE[r.status]}">${STATUS_TEXT[r.status]}</span>`;
 
@@ -1190,11 +1194,12 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
     page().innerHTML = `
       <div class="note caution">${icon('triangle-alert')}<span>菜單會直接顯示在公開的報名頁上。已經成立的訂單會保留下單時的品名和價格，不受修改影響。</span></div>
       ${menu.vendors.map(v => `<div class="card" data-vendor="${v.id}">
-        ${!menuEdit.has('v_' + v.id) ? `<div class="vhead2">${v.image_url ? `<img class="mthumb" src="${esc(v.image_url)}" alt="">` : `<span class="mthumb">${icon('store')}</span>`}<div class="grow"><h2>${esc(v.name)}</h2><p class="small muted">${esc(v.description || '')}</p></div>${v.active ? '' : '<span class="badge b-neu">報名頁不顯示</span>'}<button class="btn quiet sm" type="button" data-edv="${v.id}">${icon('pencil')}編輯店家</button></div>` : `
+        ${!menuEdit.has('v_' + v.id) ? `<div class="vhead2">${v.image_url ? `<img class="mthumb" src="${esc(v.image_url)}" alt="">` : `<span class="mthumb">${icon('store')}</span>`}<div class="grow"><h2>${esc(v.name)}</h2><p class="small muted">${esc(v.description || '')}</p>${vendorOrderState(v)}</div>${v.active ? '' : '<span class="badge b-neu">報名頁不顯示</span>'}${v.order_close_at && new Date(v.order_close_at) <= new Date() ? `<button class="btn quiet sm" type="button" data-vopen="${v.id}">${icon('rotate-ccw')}重新開放預購</button>` : `<button class="btn quiet sm" type="button" data-vstop="${v.id}">${icon('ban')}立即停止預購</button>`}<button class="btn quiet sm" type="button" data-edv="${v.id}">${icon('pencil')}編輯店家</button></div>` : `
         <div class="row" style="align-items:flex-end">
           <label class="field grow" style="margin:0"><span>店家名稱</span><input data-vf="name" value="${esc(v.name)}" style="font-weight:700"></label>
           <label class="field grow" style="margin:0"><span>店家說明</span><input data-vf="description" value="${esc(v.description)}"></label>
           <div class="field" style="margin:0"><span class="small muted" style="display:block;margin-bottom:4px">店家照片</span>${photoCell(v.image_url, 'vendor')}</div>
+          <label class="field" style="margin:0"><span>預購截止（台北時間，空白＝跟報名一起截止）</span><input data-vf="order_close_at" type="datetime-local" value="${toLocalInput(v.order_close_at)}"></label>
           <label class="field" style="margin:0;width:76px"><span>排序</span><input data-vf="sort" type="number" value="${v.sort}"></label>
           <label class="row small" style="min-height:40px"><input type="checkbox" data-vf="active" ${v.active ? 'checked' : ''}>顯示</label>
           <button class="btn" type="button" data-sv>儲存店家</button><button class="btn quiet" type="button" data-cx="v_${v.id}">取消</button>
@@ -1217,7 +1222,16 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
       if (b.dataset.add) { if (!(await openOne('new_' + b.dataset.add))) return; renderMenu(); const el = page().querySelector('.editrow [data-if="name"]'); if (el) el.focus(); return; }
       if (b.dataset.cx) { menuEdit.delete(b.dataset.cx); pageDirty = false; return renderMenu(); }
       if (b.id === 'addV') { const n = $('newV').value.trim(); if (!n) return; await run(() => Api.insert('vendors', { name: n, sort: menu.vendors.length + 1 }), '已新增店家'); await loadAll(); return renderMenu(); }
-      if (b.hasAttribute('data-sv')) { const box = b.closest('[data-vendor]'); const g = f => box.querySelector(`[data-vf="${f}"]`); await run(() => Api.patch('vendors', 'id=eq.' + box.dataset.vendor, { name: g('name').value.trim(), description: g('description').value.trim(), image_url: box.querySelector('.vphoto [data-photo]').dataset.photo || null, sort: parseInt(g('sort').value, 10) || 0, active: g('active').checked }), '店家已儲存'); menuEdit.delete('v_' + box.dataset.vendor); await loadAll(); return renderMenu(); }
+      if (b.dataset.vstop || b.dataset.vopen) {
+        const v = menu.vendors.find(x => x.id === (b.dataset.vstop || b.dataset.vopen)); if (!v) return;
+        const stop = !!b.dataset.vstop;
+        if (!await ask({ title: stop ? `現在停止「${v.name}」的預購？` : `重新開放「${v.name}」的預購？`,
+          body: stop ? '報名頁上這家的品項會顯示「預購已截止」，不能再點；其他店照常。已經下的訂單不受影響。之後可以按「重新開放預購」。' : '會跟整體報名一起截止。要設定別的截止時間，請按「編輯店家」。',
+          ok: stop ? '停止預購' : '重新開放', danger: stop })) return;
+        await run(() => Api.patch('vendors', 'id=eq.' + v.id, { order_close_at: stop ? new Date().toISOString() : null }), stop ? '已停止預購' : '已重新開放預購');
+        await loadAll(); return renderMenu();
+      }
+      if (b.hasAttribute('data-sv')) { const box = b.closest('[data-vendor]'); const g = f => box.querySelector(`[data-vf="${f}"]`); await run(() => Api.patch('vendors', 'id=eq.' + box.dataset.vendor, { name: g('name').value.trim(), description: g('description').value.trim(), image_url: box.querySelector('.vphoto [data-photo]').dataset.photo || null, sort: parseInt(g('sort').value, 10) || 0, active: g('active').checked, order_close_at: fromLocalInput(g('order_close_at').value) }), '店家已儲存'); menuEdit.delete('v_' + box.dataset.vendor); await loadAll(); return renderMenu(); }
       if (b.hasAttribute('data-si')) {
         const tr = b.closest('tr'); const g = f => tr.querySelector(`[data-if="${f}"]`);
         const row = { image_url: tr.querySelector('[data-photo]') ? (tr.querySelector('[data-photo]').dataset.photo || null) : undefined, name: g('name').value.trim(), description: g('description').value.trim(), price: parseInt(g('price').value, 10), stock_limit: g('stock').value === '' ? null : parseInt(g('stock').value, 10), tag: g('tag').value.trim() || null, options: (o => o.length ? o : null)(g('options').value.split(/[,，、／\/]/).map(x => x.trim()).filter(Boolean)), sort: parseInt(g('sort').value, 10) || 0, active: g('active').checked };

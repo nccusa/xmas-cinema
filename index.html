@@ -818,6 +818,8 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
 @media (prefers-reduced-motion:reduce){.kv-hot,.kv-grain::before,.kv-grain i,.kv-beam i{animation:none}}
 .sponsor .sp-logo.kvlogo{background:none;box-shadow:none;padding:0;border-radius:0}
 .sponsor .kvlogo img{height:52px}
+.vclose{display:flex;align-items:center;gap:6px;margin:6px 0 0;font-size:14px;font-weight:700;color:var(--green2)}.vclose svg{width:16px;height:16px}.vclose.shut{color:var(--redtext)}
+.vclose2{display:block;font-style:normal;font-weight:700;font-size:13px;color:var(--green2);margin-top:2px}.vclose2.shut{color:var(--redtext)}
 </style>
 </head>
 <body>
@@ -1181,7 +1183,9 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
   }
 
   // ---------- 狀態 ----------
-  let orderFull = false;   // 餐點預訂名額滿了：還是可以只報名
+  let orderFull = false;
+  const twTime = iso => { const d = new Date(new Date(iso).getTime() + (480 + new Date().getTimezoneOffset()) * 6e4); return `${d.getMonth() + 1}/${d.getDate()}（${'日一二三四五六'[d.getDay()]}）${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
+  const closeNote = v => v.order_closed ? '預購已截止' : v.order_close_at ? `預購到 ${twTime(v.order_close_at)}` : '';   // 餐點預訂名額滿了：還是可以只報名
   let catalog = null, step = 0, evDay = '12/9', evWk = '三'; const cart = {};
   // 暫存：填到一半的報名（24 小時）、這台裝置最近的訂單（方便回來看 QR Code）
   const DRAFT_KEY = 'xc_draft_v1', ORDER_KEY = 'xc_order_v1', DRAFT_TTL = 24 * 3600e3, ORDER_TTL = 60 * 24 * 3600e3;
@@ -1284,8 +1288,8 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     // 日期、時間、地點已經在首屏，這裡只放注意事項（有填才顯示）
     $('facts').innerHTML = catalog.venue_note ? `<li>${icon('info')}<b>注意事項</b><span>${esc(catalog.venue_note)}</span></li>` : '';
     $('facts').classList.toggle('hidden', !catalog.venue_note);
-    $('vlist').innerHTML = foods().map(v => ({ v, its: v.items.filter(i => !i.addon_for) })).map(({ v, its }) => `<div class="vcard">${v.image_url ? `<img class="vth" src="${esc(v.image_url)}" alt="" loading="lazy">` : `<span class="ill">${illo(vIcon(v))}</span>`}<div><b>${esc(v.name)}</b><span>${esc(its.slice(0, 4).map(i => i.name).join('、'))}${its.length > 4 ? ' 等' : ''}${its.length ? `・$${Math.min(...its.map(i => i.price))} 起` : ''}</span></div></div>`).join('') || '<p class="muted">餐點待公布</p>';
-    $('vlist').insertAdjacentHTML('afterbegin', rentals().flatMap(v => v.items).map(i => `<div class="vcard rent">${i.image_url ? `<img class="vth" src="${esc(i.image_url)}" alt="" loading="lazy">` : `<span class="ill">${illo('mat')}</span>`}<div><b>${esc(i.name.replace(/（.*）/, ''))}<span class="rtag">加購</span></b><span>報名時可以加購・$${esc(i.price)}／張・活動後可以帶回家</span></div></div>`).join(''));
+    $('vlist').innerHTML = foods().map(v => ({ v, its: v.items.filter(i => !i.addon_for) })).map(({ v, its }) => `<div class="vcard">${v.image_url ? `<img class="vth" src="${esc(v.image_url)}" alt="" loading="lazy">` : `<span class="ill">${illo(vIcon(v))}</span>`}<div><b>${esc(v.name)}</b><span>${esc(its.slice(0, 4).map(i => i.name).join('、'))}${its.length > 4 ? ' 等' : ''}${its.length ? `・$${Math.min(...its.map(i => i.price))} 起` : ''}${closeNote(v) ? `<em class="vclose2${v.order_closed ? ' shut' : ''}">${closeNote(v)}</em>` : ''}</span></div></div>`).join('') || '<p class="muted">餐點待公布</p>';
+    $('vlist').insertAdjacentHTML('afterbegin', rentals().flatMap(v => v.items.map(i => ({ v, i }))).map(({ v, i }) => `<div class="vcard rent">${i.image_url ? `<img class="vth" src="${esc(i.image_url)}" alt="" loading="lazy">` : `<span class="ill">${illo('mat')}</span>`}<div><b>${esc(i.name.replace(/（.*）/, ''))}<span class="rtag">加購</span></b><span>報名時可以加購・$${esc(i.price)}／張・活動後可以帶回家${closeNote(v) ? `<em class="vclose2${v.order_closed ? ' shut' : ''}">${closeNote(v)}</em>` : ''}</span></div></div>`).join(''));
     $('how').innerHTML = [1, 2, 3].map(i => [cp('s' + i + '_t'), cp('s' + i + '_d')])
       .map(([t, d], i) => `<li><span class="no num" aria-hidden="true">${i + 1}</span><div><h3><span class="sr">第 ${i + 1} 步：</span>${esc(t)}</h3><p>${esc(d)}</p></div></li>`).join('');
     $('footContact').textContent = catalog.contact_info && !/nccu_sa/i.test(catalog.contact_info) ? '聯絡我們：' + catalog.contact_info : '';
@@ -1303,13 +1307,13 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
   function renderMenu(){
     $('menu').innerHTML = foods().length ? foods().map((v, i) => `
       <section class="vendor" id="v${i}" aria-labelledby="vh${i}">
-        <div class="vhead">${v.image_url ? `<img src="${esc(v.image_url)}" alt="">` : `<span class="ill">${illo(vIcon(v))}</span>`}<div><h3 id="vh${i}" style="font-size:20px;margin:0">${esc(v.name)}</h3>${v.description ? `<p class="vdesc">${esc(v.description)}</p>` : ''}</div></div>
+        <div class="vhead">${v.image_url ? `<img src="${esc(v.image_url)}" alt="">` : `<span class="ill">${illo(vIcon(v))}</span>`}<div><h3 id="vh${i}" style="font-size:20px;margin:0">${esc(v.name)}</h3>${v.description ? `<p class="vdesc">${esc(v.description)}</p>` : ''}${closeNote(v) ? `<p class="vclose${v.order_closed ? ' shut' : ''}">${icon(v.order_closed ? 'ban' : 'clock')}${closeNote(v)}</p>` : ''}</div></div>
         <ul class="items">${v.items.map(row).join('') || '<li class="muted">目前沒有品項</li>'}</ul>
       </section>`).join('') : `<div class="state-page">${glyph()}<p>目前沒有開放預訂的餐點，可以直接下一步，只報名活動。</p></div>`;
     $('pickupNote').innerHTML = `${icon('hand-platter')}<div><b>取餐方式</b><span>${esc(catalog.pickup_note || '活動當天報到後，到取餐區出示學生證（校外人士出示 QR Code）取餐。取餐時間和地點確定後會公布在這裡。')}</span></div>`;
     $('addons').innerHTML = rentals().map(v => `
       <section class="vendor addon" aria-labelledby="ad_${esc(v.id)}">
-        <div class="vhead"><span class="ill">${illo('mat')}</span><div><h3 id="ad_${esc(v.id)}" style="font-size:20px;margin:0">要不要加購${esc(v.items.length === 1 ? v.items[0].name.replace(/（.*）/, '') : '這些用品')}？<span class="rtag">加購</span></h3>${v.description ? `<p class="vdesc">${esc(v.description)}</p>` : ''}</div></div>
+        <div class="vhead"><span class="ill">${illo('mat')}</span><div><h3 id="ad_${esc(v.id)}" style="font-size:20px;margin:0">要不要加購${esc(v.items.length === 1 ? v.items[0].name.replace(/（.*）/, '') : '這些用品')}？<span class="rtag">加購</span></h3>${v.description ? `<p class="vdesc">${esc(v.description)}</p>` : ''}${closeNote(v) ? `<p class="vclose${v.order_closed ? ' shut' : ''}">${icon(v.order_closed ? 'ban' : 'clock')}${closeNote(v)}</p>` : ''}</div></div>
         <ul class="items">${v.items.map(row).join('')}</ul>
       </section>`).join('');
     $('addons').onclick = e => $('menu').onclick(e);
@@ -1365,7 +1369,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     return `<div class="ds">${esc(d.slice(0, k))}</div><details class="more"><summary>查看介紹</summary><p>${esc(d.slice(k + 1).trim())}</p></details>`;
   }
   function ctl(item){
-    if (item.remaining === 0) return `<span class="soldout">${orderFull ? '預訂已滿' : '已售完'}</span>`;
+    if (item.remaining === 0) return `<span class="soldout">${item.closed ? '預購已截止' : orderFull ? '預訂已滿' : '已售完'}</span>`;
     const i = curLine(item), q = cart[i.id] || 0, d = `data-id="${esc(i.id)}" data-base="${esc(i.base)}"`;
     if (!q) return `<button type="button" class="add" data-act="plus" ${d}>${icon('plus')}加入<span class="sr"> ${esc(i.name)}</span></button>`;
     return `<span class="qty" role="group" aria-label="${esc(i.name)} 數量"><button type="button" data-act="minus" ${d} aria-label="減少 ${esc(i.name)}">${icon(q === 1 ? 'trash-2' : 'minus')}</button><output>${q}</output><button type="button" data-act="plus" ${d} aria-label="增加 ${esc(i.name)}">${icon('plus')}</button></span>`;
@@ -1844,6 +1848,8 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     // 名額剩多少不公開，只回傳「滿了沒」（舊版資料庫回傳 spots_left 也相容）
     orderFull = !!catalog.is_open && (catalog.orders_full != null ? !!catalog.orders_full : catalog.spots_left <= 0);
     if (orderFull) (catalog.vendors || []).forEach(v => (v.items || []).forEach(i => { i.remaining = 0; }));
+    // 每家店可以各自截止預購（後台「菜單」設定）；截止的店品項鎖起來
+    (catalog.vendors || []).forEach(v => { if (v.order_closed) (v.items || []).forEach(i => { i.remaining = 0; i.closed = true; }); });
     renderHome();
     if (token) return showLookup(token);
     const d = loadDraft();
