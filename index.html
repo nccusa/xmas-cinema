@@ -1264,8 +1264,8 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     const now = new Date(); let note = '', can = false;
     if (!catalog.is_open && now < new Date(catalog.open_at)) note = `${fmtTime(catalog.open_at)} 開放報名`;
     else if (!catalog.is_open) note = '報名已截止。已經報名的人可以用 Email 裡的連結查詢訂單。';
-    else if (catalog.spots_left <= 0) { can = true; note = '餐點預訂名額已滿・還是可以只報名入場'; }
-    else { can = true; note = catalog.test_mode ? '測試模式：現在就可以報名' : `報名截止 ${(d => `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`)(new Date(new Date(catalog.close_at).getTime() + (480 + new Date().getTimezoneOffset()) * 6e4))}・餐點預訂剩 ${catalog.spots_left} 個名額`; }
+    else if (orderFull) { can = true; note = '餐點預訂名額已滿・還是可以只報名入場'; }
+    else { can = true; note = catalog.test_mode ? '測試模式：現在就可以報名' : `報名截止 ${(d => `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`)(new Date(new Date(catalog.close_at).getTime() + (480 + new Date().getTimezoneOffset()) * 6e4))}`; }
     ['openNote', 'openNote2'].forEach(id => $(id).textContent = note);
     ['startBtn', 'startBtn2', 'hbarBtn'].forEach(id => { $(id).disabled = !can; $(id).innerHTML = icon('ticket') + '免費報名'; });
     canRegister = can; hbarSync();
@@ -1828,7 +1828,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     try { catalog = await Api.rpc('public_get_catalog'); }
     catch (e) {
       // 載入失敗：首頁的固定內容照樣顯示，只有報名按鈕改成錯誤狀態
-      catalog = { vendors: [], event_info: '日期：2026/12/9（三）', is_open: false, spots_left: 0, contact_info: 'IG @nccu_sa 私訊', offline: true };
+      catalog = { vendors: [], event_info: '日期：2026/12/9（三）', is_open: false, orders_full: false, contact_info: 'IG @nccu_sa 私訊', offline: true };
       renderHome();
       ['startBtn', 'startBtn2'].forEach(id => { $(id).disabled = false; $(id).innerHTML = icon('refresh-cw') + '重新載入報名'; $(id).onclick = () => location.reload(); });
       ['openNote', 'openNote2'].forEach(id => $(id).innerHTML = `<span class="neterr">${icon('wifi-off')}目前連不上報名系統，可能是網路不穩。請稍後重新載入。</span>`);
@@ -1836,7 +1836,8 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
       return;
     }
     // 名額只算有點餐／加購的人；滿了就把所有品項鎖起來，只能「只報名」
-    orderFull = !!catalog.is_open && catalog.spots_left <= 0;
+    // 名額剩多少不公開，只回傳「滿了沒」（舊版資料庫回傳 spots_left 也相容）
+    orderFull = !!catalog.is_open && (catalog.orders_full != null ? !!catalog.orders_full : catalog.spots_left <= 0);
     if (orderFull) (catalog.vendors || []).forEach(v => (v.items || []).forEach(i => { i.remaining = 0; }));
     renderHome();
     if (token) return showLookup(token);
