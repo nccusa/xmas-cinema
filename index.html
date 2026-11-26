@@ -11,6 +11,17 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
+  // 裝置資訊（2026-11-26 曹敦閔 要知道同學用什麼裝置）：GA 內建的「裝置類別」會把 iPad 算成 Mac 電腦，也分不出從哪個 App 點開，
+  // 所以每個事件（含瀏覽網頁）都多帶三個參數；要在 GA4「自訂定義」建立同名的自訂維度才看得到。不含任何個人資料。
+  (function(){try{
+    var ua = navigator.userAgent || '', tp = navigator.maxTouchPoints || 0;
+    var ipad = /iPad/.test(ua) || (/Macintosh/.test(ua) && tp > 1), ios = /iPhone|iPod/.test(ua), and = /Android/.test(ua);
+    var os = ipad ? 'iPadOS' : ios ? 'iOS' : and ? 'Android' : /Windows/.test(ua) ? 'Windows' : /CrOS/.test(ua) ? 'ChromeOS' : /Macintosh/.test(ua) ? 'macOS' : /Linux/.test(ua) ? 'Linux' : '其他';
+    var dev = (ipad || (and && !/Mobile/.test(ua))) ? '平板' : (ios || and || /Mobile/.test(ua)) ? '手機' : '電腦';
+    var app = /Barcelona/.test(ua) ? 'Threads' : /Instagram/.test(ua) ? 'Instagram' : /FBAN\/Messenger|FB_IAB\/MESSENGER|MessengerForiOS/.test(ua) ? 'Messenger'
+      : /FBAN|FBAV|FB_IAB/.test(ua) ? 'Facebook' : / Line\//.test(ua) ? 'LINE' : /Dcard/.test(ua) ? 'Dcard' : '一般瀏覽器';
+    gtag('set', { xc_device: dev, xc_os: os, xc_app: app });
+  }catch(e){}})();
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
