@@ -1782,9 +1782,13 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     $('cfBody').innerHTML = `<p class="cf-who">${esc($('f_name').value.trim())}・${guest ? '校外人士' : '學號 ' + esc($('f_sid').value.replace(/\s/g, '').toUpperCase())}・${esc($('f_phone').value.trim())}</p>
       <div class="cf-rows">${l.length ? l.map(i => `<div class="rw"><span>${esc(i.name)} × ${i.qty}<br><small class="muted">${esc(i.vendor)}</small></span><span class="num">$${i.price * i.qty}</span></div>`).join('') : '<div class="rw"><span>不點餐，只報名活動</span><span></span></div>'}</div>
       <div class="cf-tot"><span>總金額</span><span class="num">${money(total())}</span></div>`;
-    // 付款期限＝送出後 N 小時（payment_hold_hours），最晚不超過 payment_deadline；和資料庫的算法一致
-    const dl = catalog.test_mode ? new Date(Math.max(new Date(catalog.payment_deadline || 0), Date.now() + 3 * 864e5))
-      : catalog.payment_hold_hours ? new Date(Math.min(new Date(catalog.payment_deadline || 8.64e15), Date.now() + catalog.payment_hold_hours * 36e5)) : catalog.payment_deadline;
+    // 付款期限＝送出後 N 小時（payment_hold_hours），最晚不超過 payment_deadline；
+    // 但離現在不到 6 小時時（接近或超過付款期限才下單），給到下單後 12 小時、最晚報名截止後一天。和資料庫 calc_payment_deadline 一致
+    const dl = catalog.test_mode ? new Date(Math.max(new Date(catalog.payment_deadline || 0), Date.now() + 3 * 864e5)) : (() => {
+      const now = Date.now(), H = 36e5, g = catalog.payment_deadline ? new Date(catalog.payment_deadline).getTime() : Infinity;
+      let b = Math.min(now + (catalog.payment_hold_hours || 24) * H, g);
+      if (b < now + 6 * H) { const c = new Date(catalog.close_at || catalog.payment_deadline || now).getTime(); b = Math.max(b, Math.min(now + 12 * H, c + 24 * H)); }
+      return new Date(b); })();
     $('cfDl').innerHTML = total() > 0 && dl ? `${icon('clock')}<span>送出後請在 <b>${esc(fmtTime(dl))}</b> 前轉帳 <b class="num">${money(total())}</b>，逾期訂單會取消、名額釋出。</span>` : '';
     $('cfDl').classList.toggle('hidden', !(total() > 0 && dl));
     $('cfPick').innerHTML = count() ? `${icon('hand-platter')}<span><b>取餐：</b>${esc(catalog.pickup_note || '活動當天報到後，到取餐區出示學生證（校外人士出示 QR Code）取餐。')}</span>` : '';
