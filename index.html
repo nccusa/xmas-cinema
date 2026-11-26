@@ -1918,7 +1918,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
         <p class="muted" style="margin:12px 0 0">活動當天帶學生證報到；忘了帶學生證，出示這個 QR Code 也可以。若有餐點，同憑此 QR Code 領取。</p></div>
         ${qr ? `<div class="qr" aria-label="報到用 QR Code">${qr}</div>` : ''}</div></div>
       ${r.qr_token ? `<div class="saveqr"><button type="button" class="btn line" id="saveQr">${icon('download')}把 QR Code 存到手機</button>${linkBtn}</div>` : ''}`) : ''}
-      ${r.total_amount === 0 && r.status === 'paid' && !r.checked_in_at ? `<div class="more"><details><summary>想加點餐點？${icon('chevron-down')}</summary><div class="in cancelbox"><p>若需修改訂單，因為網站程序限制，<b>請先按以下按鈕取消原訂單，再重新報名！</b></p><button type="button" class="btn danger" id="selfCancel">${icon('circle-x')}取消這筆報名</button></div></details></div>` : ''}
+      ${r.total_amount === 0 && r.status === 'paid' && !r.checked_in_at ? `<div class="more"><details><summary>想修改訂單？${icon('chevron-down')}</summary><div class="in cancelbox"><p>若需修改訂單，因為網站程序限制，<b>請先按以下按鈕取消原訂單，再重新報名！</b></p><button type="button" class="btn danger" id="selfCancel">${icon('circle-x')}取消這筆報名</button></div></details></div>` : ''}
       <div class="more"><details open><summary>訂單內容${icon('chevron-down')}</summary><div class="in review" style="border:none;padding:0;background:none">${itemsRows(r.items)}</div></details>
       ${r.event_info ? `<details><summary>活動資訊${icon('chevron-down')}</summary><div class="in">${esc(r.event_info)}</div></details>` : ''}</div>`;
     const sq = el.querySelector('#saveQr'); if (sq) sq.onclick = () => saveTicket(r, sq);
