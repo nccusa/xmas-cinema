@@ -1234,8 +1234,9 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
       if (b.hasAttribute('data-sv')) { const box = b.closest('[data-vendor]'); const g = f => box.querySelector(`[data-vf="${f}"]`); await run(() => Api.patch('vendors', 'id=eq.' + box.dataset.vendor, { name: g('name').value.trim(), description: g('description').value.trim(), image_url: box.querySelector('.vphoto [data-photo]').dataset.photo || null, sort: parseInt(g('sort').value, 10) || 0, active: g('active').checked, order_close_at: fromLocalInput(g('order_close_at').value) }), '店家已儲存'); menuEdit.delete('v_' + box.dataset.vendor); await loadAll(); return renderMenu(); }
       if (b.hasAttribute('data-si')) {
         const tr = b.closest('tr'); const g = f => tr.querySelector(`[data-if="${f}"]`);
-        const row = { image_url: tr.querySelector('[data-photo]') ? (tr.querySelector('[data-photo]').dataset.photo || null) : undefined, name: g('name').value.trim(), description: g('description').value.trim(), price: parseInt(g('price').value, 10), stock_limit: g('stock').value === '' ? null : parseInt(g('stock').value, 10), tag: g('tag').value.trim() || null, options: (o => o.length ? o : null)(g('options').value.split(/[,，、／\/]/).map(x => x.trim()).filter(Boolean)), sort: parseInt(g('sort').value, 10) || 0, active: g('active').checked };
-        if (!row.name || isNaN(row.price) || row.price < 0) return toast('請填寫品名和正確的價格', 'err'); if (row.options && (row.options.length < 2 || row.options.length > 6 || new Set(row.options).size !== row.options.length)) return toast('「讓客人選」要填 2～6 個不重複的選項，例如：熱，冰；只有一種就留空、寫在說明', 'err');
+        const row = { image_url: tr.querySelector('[data-photo]') ? (tr.querySelector('[data-photo]').dataset.photo || null) : undefined, name: g('name').value.trim(), description: g('description').value.trim(), price: parseInt(g('price').value, 10), list_price: g('list').value === '' ? null : parseInt(g('list').value, 10), stock_limit: g('stock').value === '' ? null : parseInt(g('stock').value, 10), tag: g('tag').value.trim() || null, options: (o => o.length ? o : null)(g('options').value.split(/[,，、／\/]/).map(x => x.trim()).filter(Boolean)), sort: parseInt(g('sort').value, 10) || 0, active: g('active').checked };
+        if (!row.name || isNaN(row.price) || row.price < 0) return toast('請填寫品名和正確的價格', 'err');
+        if (row.list_price != null && (isNaN(row.list_price) || row.list_price <= row.price)) return toast('原價要比價格高；不想顯示原價就留空', 'err'); if (row.options && (row.options.length < 2 || row.options.length > 6 || new Set(row.options).size !== row.options.length)) return toast('「讓客人選」要填 2～6 個不重複的選項，例如：熱，冰；只有一種就留空、寫在說明', 'err');
         if (tr.dataset.item) await run(() => Api.patch('menu_items', 'id=eq.' + tr.dataset.item, row), '品項已儲存');
         else await run(() => Api.insert('menu_items', { ...row, vendor_id: tr.dataset.vendor }), '已新增品項');
         menuEdit.delete(tr.dataset.item || 'new_' + tr.dataset.vendor); pageDirty = false; await loadAll(); return renderMenu();
@@ -1276,7 +1277,7 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
     const n = sold(i.id);
     return `<tr class="mitem" data-item="${i.id}" data-vendor="${i.vendor_id}"><td>${i.image_url ? `<img class="mthumb" src="${esc(i.image_url)}" alt="">` : `<span class="mthumb">${icon('camera')}</span>`}</td>
       <td class="nm"><b>${esc(i.name)}</b>${i.tag ? ` <span class="mini">${esc(i.tag)}</span>` : ''}${i.options && i.options.length ? ` <span class="mini">選：${esc(i.options.join('／'))}</span>` : ''}${i.description ? `<small>${esc(i.description)}</small>` : ''}</td>
-      <td class="num r">$${i.price}</td><td class="num r">${n}${i.stock_limit != null ? `<span class="small muted">／${i.stock_limit}</span>` : ''}</td>
+      <td class="num r">${i.list_price > i.price ? `<s class="small muted">$${i.list_price}</s> ` : ''}$${i.price}</td><td class="num r">${n}${i.stock_limit != null ? `<span class="small muted">／${i.stock_limit}</span>` : ''}</td>
       <td>${i.active ? '<span class="badge b-ok">上架中</span>' : '<span class="badge b-neu">已下架</span>'}</td>
       <td class="r"><button class="btn quiet sm" type="button" data-ed="${i.id}">${icon('pencil')}編輯</button></td></tr>`;
   }
@@ -1286,6 +1287,7 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
       <label class="field"><span>品名</span><input class="in" data-if="name" value="${esc(i.name)}" placeholder="${i.id ? '' : '新品項名稱'}"></label>
       <label class="field"><span>說明</span><input class="in" data-if="description" value="${esc(i.description)}"></label>
       <label class="field"><span>價格</span><input class="in num" data-if="price" type="number" min="0" value="${esc(i.price)}"></label>
+      <label class="field"><span>原價（選填，要比價格高；網站上會劃掉顯示，價格就變成優惠價）</span><input class="in num" data-if="list" type="number" min="1" value="${i.list_price == null ? '' : esc(i.list_price)}" placeholder="不顯示"></label>
       <label class="field"><span>限量（空白＝不限）</span><input class="in num" data-if="stock" type="number" min="0" value="${i.stock_limit == null ? '' : i.stock_limit}" placeholder="不限"></label>
       <label class="field"><span>標籤</span><input class="in" data-if="tag" value="${esc(i.tag || '')}" placeholder="例如：熱門"></label>
       <label class="field"><span>讓客人選（用逗號分隔，空白＝不用選）</span><input class="in" data-if="options" value="${esc((i.options || []).join('，'))}" placeholder="例如：熱，冰"></label>
