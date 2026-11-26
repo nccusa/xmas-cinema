@@ -229,6 +229,7 @@ details.impmore{margin-top:10px}details.impmore summary{cursor:pointer;font-size
 .switch .sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .15s}
 .switch input:checked + .sw{background:var(--crit)}
 .switch input:checked + .sw::after{transform:translateX(20px)}
+.switch.go input:checked + .sw{background:var(--ok)}
 .switch b{display:block}
 .switch small{color:var(--dim)}
 .savebar{position:sticky;bottom:0;display:flex;justify-content:flex-end;gap:8px;padding:12px 0;background:linear-gradient(to top,var(--bg) 70%,rgba(245,242,234,0))}
@@ -307,7 +308,9 @@ details.fold[open] > summary .i:last-child{transform:rotate(180deg)}
 .egrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px 14px;align-items:start;padding:6px 0}
 .egrid .field{margin:0}.mitem .nm b{display:block}.mitem .nm small{color:var(--dim)}
 .mthumb{width:40px;height:40px;border-radius:9px;object-fit:cover;background:var(--sunk);display:grid;place-items:center;color:var(--dim)}
-.vhead2{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.vhead2 .grow{min-width:0}
+.vhead2{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.vhead2 .grow{flex:1 1 220px;min-width:0}
+/* 手機：品名欄至少留一段寬度，表格太寬就左右滑，不要把字擠成一個字一行（2026-11-27） */
+.mitem .nm{min-width:150px}
 .vhead2 h2{margin:0}.vhead2 p{margin:2px 0 0}
 @media (max-width:720px){
   .ofilters{grid-template-columns:1fr 1fr}.ofilters .field:first-child{grid-column:1 / -1}
@@ -470,7 +473,7 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
   $('nav').onclick = e => { const b = e.target.closest('[data-v]'); if (b) go(b.dataset.v); };
   addEventListener('hashchange', () => { const v = location.hash.slice(1); if (v && v !== view && $('app').offsetParent !== null) go(v); });
   $('page').addEventListener('input', e => { if (['copy', 'settings', 'menu', 'mail'].includes(view) && !e.target.closest('[data-q], #mAll, #oq, #newV')) pageDirty = true; });
-  $('page').addEventListener('change', e => { if (['copy', 'settings', 'menu', 'mail'].includes(view) && e.target.matches('input[type=file], input[type=checkbox][data-vf], input[type=checkbox][data-if], input[type=date], input[type=datetime-local], select')) pageDirty = true; });
+  $('page').addEventListener('change', e => { if (['copy', 'settings', 'menu', 'mail'].includes(view) && e.target.matches('input[type=file], input[type=checkbox][data-vf], input[type=checkbox][data-if], input[type=checkbox][data-s], input[type=date], input[type=datetime-local], select')) pageDirty = true; });
   addEventListener('beforeunload', e => { if (pageDirty) { e.preventDefault(); e.returnValue = ''; } });
   let deferred = null; addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; });
   $('installBtn').onclick = async () => { if (deferred) { deferred.prompt(); deferred = null; return; } await ask({ title: '安裝成 App', body: /iPhone|iPad/.test(navigator.userAgent) ? 'iPhone／iPad：用 Safari 打開，點「分享」→「加入主畫面」。' : '電腦版 Chrome／Edge：點網址列右邊的「安裝」圖示。\n手機 Chrome：右上角選單 →「安裝應用程式」。', ok: '知道了', cancel: '關閉' }); };
@@ -540,6 +543,7 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
     if (d.email_blocked) todo.push(['crit', 'mail-warning', `${d.email_blocked} 封信寄送失敗或被擋下`, '通常是範本變數沒代入或 Email 錯誤', 'mail']);
     if (od) todo.push(['crit', 'clock', `${od} 筆逾期未付款`, '先匯入最新明細，確認沒付再設定新期限', 'orders']);
     const partial = regs.filter(r => !r.is_test && siteState(r) === 'partial').length;
+    if (settings && settings.film_revealed === false) todo.push(['info', 'film', '電影還沒在網站上公布', '要公布時到「設定」打開「在網站上公布電影」，再按「儲存設定」', 'settings']);
     if (partial) todo.push(['info', 'hand-platter', `${partial} 人已報到但餐點還沒領完`, '到訂單頁用「現場進度」篩選', 'orders']);
     for (let i = todo.length - 1; i >= 0; i--) if (!pageOk(todo[i][4])) todo.splice(i, 1);
     const kpi = (ic, t, v, sub, bar) => `<div class="kpi"><div class="k">${icon(ic)}${t}</div><div class="v">${v}${sub ? `<small>${sub}</small>` : ''}</div>${bar != null ? `<div class="bar"><i style="width:${Math.min(100, bar)}%"></i></div>` : ''}</div>`;
@@ -1192,7 +1196,7 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
   function renderMenu(){
     acts(`<a class="btn sec" href="./" target="_blank" rel="noopener">${icon('external-link')}看報名頁</a>`);
     page().innerHTML = `
-      <div class="note caution">${icon('triangle-alert')}<span>菜單會直接顯示在公開的報名頁上。已經成立的訂單會保留下單時的品名和價格，不受修改影響。</span></div>
+      <div class="note caution">${icon('triangle-alert')}<span>菜單會直接顯示在公開的報名頁上。已經成立的訂單會保留下單時的品名和價格，不受修改影響。首頁的「販賣部」看板每家店只列 5 項：有填「首頁看板順序」的排前面，其餘照排序補滿。</span></div>
       ${menu.vendors.map(v => `<div class="card" data-vendor="${v.id}">
         ${!menuEdit.has('v_' + v.id) ? `<div class="vhead2">${v.image_url ? `<img class="mthumb" src="${esc(v.image_url)}" alt="">` : `<span class="mthumb">${icon('store')}</span>`}<div class="grow"><h2>${esc(v.name)}</h2><p class="small muted">${esc(v.description || '')}</p>${vendorOrderState(v)}</div>${v.active ? '' : '<span class="badge b-neu">報名頁不顯示</span>'}${v.order_close_at && new Date(v.order_close_at) <= new Date() ? `<button class="btn quiet sm" type="button" data-vopen="${v.id}">${icon('rotate-ccw')}重新開放預購</button>` : `<button class="btn quiet sm" type="button" data-vstop="${v.id}">${icon('ban')}立即停止預購</button>`}<button class="btn quiet sm" type="button" data-edv="${v.id}">${icon('pencil')}編輯店家</button></div>` : `
         <div class="row" style="align-items:flex-end">
@@ -1234,7 +1238,8 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
       if (b.hasAttribute('data-sv')) { const box = b.closest('[data-vendor]'); const g = f => box.querySelector(`[data-vf="${f}"]`); await run(() => Api.patch('vendors', 'id=eq.' + box.dataset.vendor, { name: g('name').value.trim(), description: g('description').value.trim(), image_url: box.querySelector('.vphoto [data-photo]').dataset.photo || null, sort: parseInt(g('sort').value, 10) || 0, active: g('active').checked, order_close_at: fromLocalInput(g('order_close_at').value) }), '店家已儲存'); menuEdit.delete('v_' + box.dataset.vendor); await loadAll(); return renderMenu(); }
       if (b.hasAttribute('data-si')) {
         const tr = b.closest('tr'); const g = f => tr.querySelector(`[data-if="${f}"]`);
-        const row = { image_url: tr.querySelector('[data-photo]') ? (tr.querySelector('[data-photo]').dataset.photo || null) : undefined, name: g('name').value.trim(), description: g('description').value.trim(), price: parseInt(g('price').value, 10), list_price: g('list').value === '' ? null : parseInt(g('list').value, 10), stock_limit: g('stock').value === '' ? null : parseInt(g('stock').value, 10), tag: g('tag').value.trim() || null, options: (o => o.length ? o : null)(g('options').value.split(/[,，、／\/]/).map(x => x.trim()).filter(Boolean)), sort: parseInt(g('sort').value, 10) || 0, active: g('active').checked };
+        const row = { image_url: tr.querySelector('[data-photo]') ? (tr.querySelector('[data-photo]').dataset.photo || null) : undefined, name: g('name').value.trim(), description: g('description').value.trim(), price: parseInt(g('price').value, 10), list_price: g('list').value === '' ? null : parseInt(g('list').value, 10), stock_limit: g('stock').value === '' ? null : parseInt(g('stock').value, 10), tag: g('tag').value.trim() || null, options: (o => o.length ? o : null)(g('options').value.split(/[,，、／\/]/).map(x => x.trim()).filter(Boolean)), sort: parseInt(g('sort').value, 10) || 0, board_rank: g('board').value === '' ? null : parseInt(g('board').value, 10), active: g('active').checked };
+        if (row.board_rank != null && (isNaN(row.board_rank) || row.board_rank < 1 || row.board_rank > 99)) return toast('首頁看板順序請填 1～99；不指定就留空', 'err');
         if (!row.name || isNaN(row.price) || row.price < 0) return toast('請填寫品名和正確的價格', 'err');
         if (row.list_price != null && (isNaN(row.list_price) || row.list_price <= row.price)) return toast('原價要比價格高；不想顯示原價就留空', 'err'); if (row.options && (row.options.length < 2 || row.options.length > 6 || new Set(row.options).size !== row.options.length)) return toast('「讓客人選」要填 2～6 個不重複的選項，例如：熱，冰；只有一種就留空、寫在說明', 'err');
         if (tr.dataset.item) await run(() => Api.patch('menu_items', 'id=eq.' + tr.dataset.item, row), '品項已儲存');
@@ -1276,7 +1281,7 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
   function itemView(i){
     const n = sold(i.id);
     return `<tr class="mitem" data-item="${i.id}" data-vendor="${i.vendor_id}"><td>${i.image_url ? `<img class="mthumb" src="${esc(i.image_url)}" alt="">` : `<span class="mthumb">${icon('camera')}</span>`}</td>
-      <td class="nm"><b>${esc(i.name)}</b>${i.tag ? ` <span class="mini">${esc(i.tag)}</span>` : ''}${i.options && i.options.length ? ` <span class="mini">選：${esc(i.options.join('／'))}</span>` : ''}${i.description ? `<small>${esc(i.description)}</small>` : ''}</td>
+      <td class="nm"><b>${esc(i.name)}</b>${i.tag ? ` <span class="mini">${esc(i.tag)}</span>` : ''}${i.options && i.options.length ? ` <span class="mini">選：${esc(i.options.join('／'))}</span>` : ''}${i.board_rank ? ` <span class="mini">看板 ${esc(i.board_rank)}</span>` : ''}${i.description ? `<small>${esc(i.description)}</small>` : ''}</td>
       <td class="num r">${i.list_price > i.price ? `<s class="small muted">$${i.list_price}</s> ` : ''}$${i.price}</td><td class="num r">${n}${i.stock_limit != null ? `<span class="small muted">／${i.stock_limit}</span>` : ''}</td>
       <td>${i.active ? '<span class="badge b-ok">上架中</span>' : '<span class="badge b-neu">已下架</span>'}</td>
       <td class="r"><button class="btn quiet sm" type="button" data-ed="${i.id}">${icon('pencil')}編輯</button></td></tr>`;
@@ -1292,6 +1297,7 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
       <label class="field"><span>標籤</span><input class="in" data-if="tag" value="${esc(i.tag || '')}" placeholder="例如：熱門"></label>
       <label class="field"><span>讓客人選（用逗號分隔，空白＝不用選）</span><input class="in" data-if="options" value="${esc((i.options || []).join('，'))}" placeholder="例如：熱，冰"></label>
       <label class="field"><span>排序</span><input class="in num" data-if="sort" type="number" value="${i.sort}"></label>
+      <label class="field"><span>首頁看板順序（選填，1 排最前）</span><input class="in num" data-if="board" type="number" min="1" max="99" value="${i.board_rank == null ? '' : esc(i.board_rank)}" placeholder="照排序"></label>
       <label class="row small" style="align-self:end;min-height:40px"><input type="checkbox" data-if="active" ${i.active ? 'checked' : ''}>上架</label>
       <div class="row" style="grid-column:1 / -1"><button class="btn sm" type="button" data-si>${icon('check')}${i.id ? '儲存' : '新增品項'}</button><button class="btn quiet sm" type="button" data-cx="${i.id || 'new_' + i.vendor_id}">取消</button>${i.id ? `<span class="small muted">已售 ${sold(i.id)} 份</span>` : ''}</div>
     </div></td></tr>`;
@@ -1321,7 +1327,7 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
     ],
   };
   const COPY_FIELDS = [
-    ['電影區', [['film_h', '標題'], ['film_empty', '片名還沒填時顯示的文字', 'textarea']]],
+    ['電影區', [['film_h', '標題'], ['film_empty', '片名還沒填、或還沒公布時顯示的文字', 'textarea']]],
     ['首屏', [['fee', '費用說明（時間地點下面那行，空白就不顯示）']]],
     ['餐點區', [['food_h', '標題'], ['food_lede', '說明', 'textarea'], ['food_points', '重點（一行一點）', 'textarea'], ['menu_lead', '選餐頁開頭那句']]],
     ['報名方式', [['how_h', '標題'], ['s1_t', '第 1 步標題'], ['s1_d', '第 1 步說明'], ['s2_t', '第 2 步標題'], ['s2_d', '第 2 步說明'], ['s3_t', '第 3 步標題'], ['s3_d', '第 3 步說明']]],
@@ -1388,6 +1394,7 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
           <label class="field"><span>地點</span><input id="evP" value="${esc(evParts.place)}" placeholder="還沒定就留空"></label>
         </div>
         <p class="small muted" style="margin:-4px 0 12px">留空的欄位，報名頁會顯示「待公布」。</p>
+        <label class="switch go" style="margin:4px 0 14px"><input type="checkbox" data-s="film_revealed" id="filmRev" ${s.film_revealed ? 'checked' : ''}><span class="sw"></span><span><b id="filmRevT">${s.film_revealed ? '電影已在網站上公布' : '電影還沒公布（網站上看不到片名）'}</b><small>關閉時，報名頁不會出現片名、海報和電影介紹，連網頁收到的資料裡都沒有；電影區會顯示「片單即將揭曉」。要公布時打開，再按最下面的「儲存設定」，報名頁重新整理就會出現。</small></span></label>
         <div class="grid2">${f('film_title', '放映電影片名', 'text', '還沒確定可以先空白，首頁會顯示「片單待公布」')}<div><label class="field"><span>電影海報</span><input data-s="film_image_url" value="${esc(s.film_image_url || '')}" placeholder="上傳或貼上圖片網址"></label><div class="row" style="margin:-6px 0 12px"><label class="btn sec sm">${icon('upload')}上傳海報<input type="file" accept="image/*" id="posterUp" hidden></label>${s.film_image_url ? `<img src="${esc(s.film_image_url)}" alt="" style="height:56px;border-radius:6px">` : ''}<span class="small muted">海報是片商的著作，請先確認公播授權包含宣傳使用。</span></div></div></div>
         ${f('film_note', '電影介紹', 'textarea')}${f('venue_note', '現場說明（座位、自備物品、雨備）', 'textarea')}${f('pickup_note', '取餐說明（顯示在選餐頁）', 'textarea', '例如：開演前 30 分鐘在草坪入口取餐，熱飲現場製作。空白時會顯示預設說明。')}</div>
       <div class="card"><h2>${icon('calendar')}報名與名額</h2>
@@ -1397,10 +1404,11 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
       <div class="card"><h2>${icon('mail')}信件與其他</h2>
         <div class="grid2">${f('contact_info', '聯絡方式')}${f('site_url', '報名頁網址', 'text', '信件裡的查詢連結會用到')}${f('email_cap_24h', '每 24 小時寄信上限', 'number', '一般 Gmail 上限是 500，建議 450')}</div>${f('privacy_notice', '個人資料蒐集告知', 'textarea')}</div>
       <div class="savebar"><button class="btn" type="button" id="saveS">${icon('check')}儲存設定</button></div>`;
+    $('filmRev').onchange = e => { $('filmRevT').textContent = e.target.checked ? '儲存後，網站就會公布電影' : '儲存後，網站上會先藏起片名、海報和介紹'; };
     $('posterUp').onchange = async e => { const f0 = e.target.files[0]; if (!f0) return; const lab = e.target.closest('label'); lab.classList.add('busy');
       try { const url = await Api.upload('poster/' + Date.now().toString(36) + '.jpg', await shrink(f0)); page().querySelector('[data-s="film_image_url"]').value = url; toast('海報已上傳，記得按「儲存設定」'); } catch (er) { toast('上傳失敗：' + er.message, 'err'); } finally { lab.classList.remove('busy'); e.target.value = ''; } };
     $('saveS').onclick = e => busy(e.currentTarget, async () => {
-      const p = { event_info: buildEventInfo($('evD').value, $('evT').value, $('evP').value) }; page().querySelectorAll('[data-s]').forEach(el => { const k = el.dataset.s; p[k] = el.type === 'datetime-local' ? fromLocalInput(el.value) : el.type === 'number' ? parseInt(el.value, 10) : el.value.trim(); });
+      const p = { event_info: buildEventInfo($('evD').value, $('evT').value, $('evP').value) }; page().querySelectorAll('[data-s]').forEach(el => { const k = el.dataset.s; p[k] = el.type === 'checkbox' ? el.checked : el.type === 'datetime-local' ? fromLocalInput(el.value) : el.type === 'number' ? parseInt(el.value, 10) : el.value.trim(); });
       if (p.qr_image_url === '') p.qr_image_url = null; if (p.film_image_url === '') p.film_image_url = null;
       p.updated_at = new Date().toISOString();
       await run(() => Api.patch('settings', 'id=eq.1', p), '設定已儲存'); await loadAll(); renderSettings();

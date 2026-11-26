@@ -27,13 +27,13 @@
 </script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>政大聖誕露天電影院｜12/9 哈利波特免費放映・線上報名｜政大學生會</title>
-<meta name="description" content="政大學生會 2026 聖誕露天電影院：12/9（三）16:30 入場、17:15 播映《哈利波特：神秘的魔法石》，地點在政大達賢圖書館草坡。免費入場、校外人士也能報名，可線上預訂 AA Sandwiches、咖啡杯杯餐點和野餐墊。">
+<title>政大聖誕露天電影院｜12/9 免費放映・線上報名｜政大學生會</title>
+<meta name="description" content="政大學生會 2026 聖誕露天電影院：12/9（三）16:30 入場、17:15 播映，地點在政大達賢圖書館草坡。免費入場、校外人士也能報名，可線上預訂 AA Sandwiches、咖啡杯杯餐點和野餐墊。">
 <link rel="canonical" href="https://nccusa.github.io/xmas-cinema/">
 <meta name="theme-color" content="#0C211B">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="國立政治大學學生會">
-<meta property="og:title" content="政大聖誕露天電影院｜12/9 哈利波特免費放映">
+<meta property="og:title" content="政大聖誕露天電影院｜12/9 免費露天放映">
 <meta property="og:description" content="12/9（三）16:30 入場、17:15 播映，政大達賢圖書館草坡。免費報名，校外也能來，餐點可線上預訂。">
 <meta property="og:url" content="https://nccusa.github.io/xmas-cinema/">
 <meta property="og:image" content="https://nccusa.github.io/xmas-cinema/og-v2.jpg">
@@ -44,13 +44,14 @@
 <meta property="og:locale" content="zh_TW">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="robots" content="index,follow,max-image-preview:large"><!-- 2026-11-25 曹敦閔 同意開放搜尋引擎收錄 -->
-<!-- 給搜尋引擎看的活動資訊（Google 活動搜尋結果）。日期、時間、地點、報名截止改了要一起改這裡 -->
-<script type="application/ld+json">
+<!-- 給搜尋引擎看的活動資訊（Google 活動搜尋結果）。日期、時間、地點、報名截止改了要一起改這裡
+     片名不寫在這裡（也不寫在 title／description）：後台「公布電影」打開後，網頁才用程式補上片名（2026-11-27） -->
+<script type="application/ld+json" id="ld">
 {
  "@context": "https://schema.org",
  "@type": "ScreeningEvent",
- "name": "政大聖誕露天電影院 2026：哈利波特：神秘的魔法石",
- "description": "政大學生會 2026 聖誕露天電影院：12/9（三）16:30 入場、17:15 播映《哈利波特：神秘的魔法石》，地點在政大達賢圖書館草坡。免費入場、校外人士也能報名，可線上預訂 AA Sandwiches、咖啡杯杯餐點和野餐墊。",
+ "name": "政大聖誕露天電影院 2026",
+ "description": "政大學生會 2026 聖誕露天電影院：12/9（三）16:30 入場、17:15 播映，地點在政大達賢圖書館草坡。免費入場、校外人士也能報名，可線上預訂 AA Sandwiches、咖啡杯杯餐點和野餐墊。",
  "startDate": "2026-12-09T16:30:00+08:00",
  "endDate": "2026-12-09T20:15:00+08:00",
  "doorTime": "2026-12-09T16:30:00+08:00",
@@ -78,12 +79,6 @@
   "@type": "Organization",
   "name": "國立政治大學學生會",
   "url": "https://www.instagram.com/nccu_sa/"
- },
- "workPresented": {
-  "@type": "Movie",
-  "name": "哈利波特：神秘的魔法石",
-  "alternateName": "Harry Potter and the Philosopher's Stone",
-  "dateCreated": "2001"
  },
  "offers": {
   "@type": "Offer",
@@ -1050,7 +1045,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
         </div>
         <div class="kv-below" id="kvBelow">
           <div class="cta"><button class="btn hero-cta" type="button" id="startBtn" disabled>免費報名</button></div>
-          <p class="kv-film" id="kvFilm"><span class="k">本場放映</span><span class="showing" id="showing">哈利波特：神秘的魔法石</span></p>
+          <p class="kv-film hidden" id="kvFilm"><span class="k">本場放映</span><span class="showing" id="showing"></span></p>
           <p class="countdown" id="countdown"></p>
           <div class="kv-meta"><p class="hero-meta" id="evMeta" aria-busy="true"><span class="skl" aria-hidden="true"></span></p><div class="cta-note" id="openNote">載入中…</div></div>
           <button type="button" class="kv-replay" id="kvReplay" hidden>重看開場動畫</button>
@@ -1462,6 +1457,10 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     const tm = real(info['時間']) ? info['時間'] : '', place = real(info['地點']) ? info['地點'] : '';
     $('stubTime').textContent = tm || '時間待公布'; $('stubTime').classList.remove('hidden'); $('evDate').querySelector('.cut').classList.remove('hidden');
     $('showing').textContent = catalog.film_title || ''; $('kvFilm').classList.toggle('hidden', !catalog.film_title);
+    // 後台「公布電影」打開後才有片名：分頁標題和給搜尋引擎的活動資訊補上片名（網頁原始碼裡不寫片名）
+    if (catalog.film_title && !document.title.includes(catalog.film_title.split(/[：:]/)[0])) {
+      const sh = catalog.film_title.split(/[：:]/)[0].trim(); document.title = document.title.replace('免費放映', `${sh}免費放映`);
+      try { const ld = $('ld'), j = JSON.parse(ld.textContent); j.name = `${j.name}：${catalog.film_title}`; j.workPresented = { '@type': 'Movie', name: catalog.film_title }; ld.textContent = JSON.stringify(j); } catch (e) {} }
     $('showDay').textContent = evDay ? `${evDay}${evWk ? `（${evWk}）` : ''}・露天放映` : ''; $('showDay').classList.toggle('hidden', !evDay);
     startCountdown(info);
     // 地點附 Google 地圖連結（用「國立政治大學＋地點」搜尋）；載入失敗時不要顯示「待公布」，改說明載入失敗
@@ -1490,7 +1489,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     $('facts').classList.toggle('hidden', !catalog.venue_note);
     // 販賣部菜單板：每家列出前幾樣和價格，價格用點點線連過去；野餐墊做成板子下方的一張加購券
     { const lead = (n, p, extra) => `<li><span class="n">${n}</span><i aria-hidden="true"></i><span class="p num">${extra || ''}$${esc(p)}</span></li>`;
-      const vs = foods().map(v => { const its = v.items.filter(i => !i.addon_for), adds = v.items.filter(i => i.addon_for), show = its.slice(0, 5), more = its.length - show.length;
+      const vs = foods().map(v => { const its = v.items.filter(i => !i.addon_for), adds = v.items.filter(i => i.addon_for), show = [...its.filter(i => i.board_rank).sort((a, b) => a.board_rank - b.board_rank), ...its.filter(i => !i.board_rank)].slice(0, 5), more = its.length - show.length;   // 後台「首頁看板順序」有填的排前面
         const lo = its.length ? Math.min(...its.map(i => i.price)) : 0, hi = its.length ? Math.max(...its.map(i => i.price)) : 0;
         return `<div class="bd-v"><div class="bd-vh">${v.image_url ? `<img class="bd-ph" src="${esc(v.image_url)}" alt="" loading="lazy">` : `<span class="bd-ph ill">${illo(vIcon(v))}</span>`}<div><b class="bd-vn">${esc(v.name)}</b><span class="bd-vs">${its.length} 款・$${lo}${hi > lo ? '–' + hi : ''}</span>${closeNote(v) ? `<em class="vclose2${v.order_closed ? ' shut' : ''}">${closeNote(v)}</em>` : ''}</div></div>`
           + `<ul class="bd-items">${show.map(i => lead(esc(i.name), i.price, wasPrice(i))).join('')}</ul>`
