@@ -92,7 +92,7 @@
   "availability": "https://schema.org/InStock",
   "url": "https://nccusa.github.io/xmas-cinema/",
   "validFrom": "2026-11-19T22:23:00+08:00",
-  "validThrough": "2026-12-04T23:59:00+08:00"
+  "validThrough": "2026-12-07T23:59:00+08:00"
  }
 }
 </script>
@@ -287,6 +287,11 @@ body:has(#home.hidden) .flinks a{color:var(--green)}
 .hbar .in{max-width:1120px}
 .hbar .hmeta{flex:1;min-width:0;line-height:1.3}.hbar .hmeta b{display:block;font-size:15px}.hbar .hmeta span{font-size:13px;color:var(--muted)}
 .hbar.on{display:block}
+/* 手機選餐／填資料時底部有固定列：頁尾多留空間，最後一行不會被蓋住（2026-11-27 跨瀏覽器檢查） */
+body:has(#mbar.on) .fin{padding-bottom:calc(100px + env(safe-area-inset-bottom))}
+/* 小的文字按鈕：外觀不變，手指可以按的範圍加大 */
+.draftnote .linkbtn,details.more>summary{position:relative}
+.draftnote .linkbtn::after,details.more>summary::before{content:"";position:absolute;inset:-9px -6px}
 body:has(#home.hidden) .hbar{display:none!important}
 .hbar .btn.hero-cta{min-height:50px;padding:0 22px;font-size:16px}
 
@@ -557,7 +562,7 @@ fieldset.field{border:none;margin:0 0 22px;padding:0}
 .sheet.on{transform:none;visibility:visible;transition:transform .26s var(--ease)}
 .sheet .grab{width:44px;height:5px;border-radius:9px;background:var(--line);margin:0 auto 14px}
 
-.toast{position:fixed;left:50%;top:16px;transform:translate(-50%,-20px);opacity:0;display:flex;align-items:center;gap:8px;background:var(--ink);color:var(--cream);padding:10px 18px;border-radius:99px;z-index:50;font-size:15px;max-width:90vw;transition:all .25s var(--ease);pointer-events:none}
+.toast{position:fixed;left:50%;top:calc(var(--kvHdr,64px) + 10px);transform:translate(-50%,-20px);opacity:0;display:flex;align-items:center;gap:8px;background:var(--ink);color:var(--cream);padding:10px 18px;border-radius:99px;z-index:50;font-size:15px;max-width:90vw;transition:all .25s var(--ease);pointer-events:none}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 .state-page{max-width:560px;margin:48px auto 96px;text-align:center}
 .state-page .glyph{width:72px;height:72px;margin:0 auto 16px;display:block}
@@ -843,6 +848,121 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
 .hero.kv.paused .kv-l>img,.hero.kv.moving .kv-l>img{animation-play-state:paused}
 @media (prefers-reduced-motion:reduce){.kv-hint i{animation:none}}
 
+/* ---- 華麗版（2026-11-26）：四周燈串、散景光點、海報後暖光；開場亮場＋金粉、銀幕布幕、倒數後星芒 ---- */
+.kv-amb{position:absolute;inset:0;pointer-events:none;transform-origin:50% 40%;will-change:transform,opacity}
+.kv-halo{position:absolute;pointer-events:none}
+.kv-halo::before{content:"";position:absolute;inset:0;background:radial-gradient(closest-side,rgba(255,214,140,.34),rgba(255,190,110,.13) 55%,rgba(255,190,110,0));animation:kvHalo 5s ease-in-out infinite}
+@keyframes kvHalo{0%,100%{opacity:.7}50%{opacity:1}}
+.kv-bk{position:absolute;overflow:hidden}
+.kv-bk i{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(255,226,160,var(--a)) 0,rgba(255,200,120,calc(var(--a) * .45)) 38%,rgba(255,200,120,0) 70%);animation:kvBk var(--d) ease-in-out var(--dl) infinite}
+@keyframes kvBk{0%,100%{opacity:.3;transform:scale(.92)}50%{opacity:1;transform:scale(1.04)}}
+.kv-lights{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.kv-lights .w{fill:none;stroke:#132219;stroke-width:1.9;stroke-linecap:round}
+.kv-lights .w2{fill:none;stroke:#2c4434;stroke-width:.8;stroke-dasharray:3 4;stroke-linecap:round}
+.kv-lights .wf{fill:none;stroke:#1c2c22;stroke-width:.9;opacity:.85}
+.kv-lights .fy{fill:#fff4cf}
+.kv-lights .fg{fill:#ffd36e;opacity:.28}
+.kv-lights .bb{opacity:.42;transition:opacity .3s ease var(--td)}
+.kv-amb.on .kv-lights .bb{opacity:1}
+.kv-bulbs{position:absolute;left:0;top:0;width:0;height:0;pointer-events:none}
+.kv-bulbs i{position:absolute;width:40px;height:40px;margin:-20px;border-radius:50%;background:radial-gradient(circle,rgba(var(--c),.55) 0,rgba(var(--c),.22) 30%,rgba(var(--c),0) 68%);opacity:0;transition:opacity .3s ease var(--td)}
+.kv-amb.on .kv-bulbs i{opacity:1}
+.kv-amb.tw .kv-bulbs i{animation:kvBulb 2.6s ease-in-out var(--ad) infinite}
+@keyframes kvBulb{0%,100%{opacity:1}50%{opacity:.5}}
+.hero.kv.paused .kv-amb *,.hero.kv.moving .kv-amb *{animation-play-state:paused}
+.kv-veil{position:absolute;inset:0;z-index:5;pointer-events:none;background:radial-gradient(ellipse 60% 55% at 50% 45%,#0b1d22,#040c0f);transition:opacity 1s cubic-bezier(.4,0,.2,1)}
+.kv-veil.off{opacity:0}
+.kv-dust{position:absolute;left:0;top:0;width:0;height:0;z-index:4;pointer-events:none}
+.kv-dust i{position:absolute;width:var(--s);height:var(--s);margin:calc(var(--s) / -2);border-radius:50%;background:#ffe9b0;box-shadow:0 0 6px 1px rgba(255,210,120,.85);opacity:0;animation:kvDust var(--d) cubic-bezier(.15,.7,.3,1) var(--dl) forwards}
+.kv-dust i.st{background:none;box-shadow:none;width:calc(var(--s) * 3);height:calc(var(--s) * 3);margin:calc(var(--s) * -1.5)}
+.kv-dust i.st::before{content:"";position:absolute;inset:0;background:#ffe39a;clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%);filter:drop-shadow(0 0 3px rgba(255,210,120,.9))}
+@keyframes kvDust{0%{opacity:0;transform:translate(0,0) scale(.3)}12%{opacity:1}70%{opacity:.9}100%{opacity:0;transform:translate(var(--x),var(--y)) scale(1) rotate(var(--r))}}
+.kv-curs{position:absolute;inset:0;overflow:hidden;pointer-events:none;visibility:hidden;border-radius:2px}
+.kv-curs svg{display:block;width:100%;height:100%}
+.kv-glow{position:absolute;left:0;top:0;width:0;height:0;pointer-events:none;visibility:hidden}
+.kv-glow .ray{position:absolute;left:-55vmax;top:-55vmax;width:110vmax;height:110vmax;border-radius:50%;will-change:transform;-webkit-mask:radial-gradient(closest-side,rgba(0,0,0,.95) 25%,rgba(0,0,0,.45) 55%,transparent 88%);mask:radial-gradient(closest-side,rgba(0,0,0,.95) 25%,rgba(0,0,0,.45) 55%,transparent 88%)}
+.kv-glow .bloom{position:absolute;left:calc(var(--w) * -1.45);top:calc(var(--h) * -2);width:calc(var(--w) * 2.9);height:calc(var(--h) * 4);border-radius:50%;background:radial-gradient(closest-side,rgba(255,236,186,.85),rgba(255,214,140,.4) 50%,rgba(255,214,140,0))}
+.kv-spk{position:absolute;left:0;top:0;width:0;height:0;pointer-events:none;visibility:hidden}
+.kv-spk i{position:absolute;width:var(--s);height:var(--s);margin:calc(var(--s) / -2);background:#fff0c4;clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%);
+  transform:translate(calc(var(--ux) * var(--w) * 2.04 + var(--dx) * var(--k)),calc(var(--uy) * var(--h) * 2.08 + var(--dy) * var(--k) + 30px * var(--k) * var(--k))) rotate(calc(var(--k) * 90deg)) scale(calc(1.1 - var(--k) * .8))}
+.kv-side{position:absolute;inset:0;pointer-events:none}
+.kv-side .tr{position:absolute}
+.kv-side .tr>img{position:absolute;display:block}
+.kv-side .tr.far{filter:brightness(.6) saturate(.75)}
+.kv-side .tr:not(.far)>img:first-child{filter:brightness(.84) saturate(.9)}
+.kv-side .mh{position:absolute;border-radius:50%;background:radial-gradient(closest-side,rgba(255,236,190,.28),rgba(255,236,190,0))}
+@media (prefers-reduced-motion:reduce){.kv-halo::before,.kv-bk i,.kv-bulbs i,.kv-lights .bb{animation:none!important;transition:none}.kv-bulbs i,.kv-lights .bb{opacity:1}.kv-veil,.kv-dust{display:none}}
+
+/* 銀幕上的東西：倒數和布幕跟海報銀幕的毛邊完全同一個形狀（蓋住時把底下的紙藏起來，只剩一條邊）；放映機光、顆粒往邊緣淡掉，不留亮邊 */
+.kv-screen>canvas,.kv-screen>.kv-curs{inset:0;width:100%;height:100%;border-radius:0;-webkit-mask:url(images/kv/screen_inner.webp) 0 0/100% 100% no-repeat;mask:url(images/kv/screen_inner.webp) 0 0/100% 100% no-repeat}
+.kv-screen>.kv-sfx,.kv-screen>.kv-hot,.kv-screen>.kv-grain{inset:0;border-radius:0;-webkit-mask:url(images/kv/screen_soft.webp) 0 0/100% 100% no-repeat;mask:url(images/kv/screen_soft.webp) 0 0/100% 100% no-repeat}
+/* ---- 餐點／報名步驟／常見問題（2026-11-27 改版）：電影院販賣部的菜單板、三張票根、場刊式問答，跟海報同一套紅綠金 ---- */
+.food-intro{align-items:start}
+.lede .lp{display:block}.lede .lp+.lp{margin-top:10px}
+.foodfacts li{align-items:flex-start;line-height:1.6}
+.foodfacts .gdot{width:11px;height:11px;margin-top:.5em;border-radius:0;background:var(--gold);clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%)}
+.board{position:relative;margin-top:20px;padding:36px 26px 22px;border-radius:14px;color:#F3E8CF;
+  background:linear-gradient(rgba(11,33,36,.5),rgba(11,33,36,.62)),#173F3A url(images/kv/bg_tile.jpg) center top/560px 700px;
+  box-shadow:inset 0 0 0 2px #C9A24A,inset 0 0 0 7px rgba(16,45,47,.9),inset 0 0 0 8px rgba(201,162,74,.55),0 20px 40px -24px rgba(10,30,30,.75)}
+.board .skel{height:120px;margin:10px 0;border-radius:10px;opacity:.25}
+.bd-sign{position:absolute;left:50%;top:0;transform:translate(-50%,-50%);margin:0;white-space:nowrap;display:flex;align-items:center;gap:10px}
+.bd-sign span{display:inline-block;padding:7px 22px 8px 30px;border-radius:8px;background:#A8392C;color:#FFF3D6;font-family:var(--serif);font-weight:900;font-size:20px;letter-spacing:.42em;box-shadow:0 0 0 2px #E9D29A,0 0 0 4px #A8392C,0 8px 18px -8px rgba(80,20,12,.7)}
+.bd-sign::before,.bd-sign::after{content:"";width:12px;height:12px;background:#C9A24A;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%)}
+.bd-v{padding:16px 0}
+.bd-v+.bd-v{border-top:1px dashed rgba(236,216,164,.35)}
+.bd-vh{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.bd-ph{width:58px;height:58px;flex:none;object-fit:cover;background:#FFFAF0;border:4px solid #FFFAF0;border-bottom-width:9px;border-radius:2px;box-shadow:0 6px 14px -6px rgba(0,0,0,.6);transform:rotate(-3deg)}
+.bd-v:nth-child(2n) .bd-ph{transform:rotate(2.5deg)}
+.bd-ph.ill{display:grid;place-items:center}.bd-ph.ill svg{width:40px;height:40px}
+.bd-vn{display:block;font-family:var(--serif);font-weight:900;font-size:19px;letter-spacing:.04em;color:#FFF3D6}
+.bd-vs{display:block;font-size:13px;color:#CBBD98}
+.board .vclose2{color:#A8DDAF}.board .vclose2.shut{color:#F4A595}
+.bd-items{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.bd-items li{display:flex;align-items:baseline;gap:8px;font-size:15px;line-height:1.45}
+.bd-items .n{min-width:0}
+.bd-items i{flex:1 1 18px;min-width:18px;border-bottom:2px dotted rgba(236,216,164,.42);transform:translateY(-4px)}
+.bd-items .p{flex:none;font-weight:700;color:#ECD8A4}
+.bd-add{display:flex;justify-content:space-between;gap:8px;margin:10px 0 0;font-size:13.5px;color:#CBBD98}
+.bd-add .num{color:#ECD8A4;font-weight:700}
+.bd-more{margin:10px 0 0;font-size:13px;color:#B9AC88}
+.bd-rent{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;margin-top:16px;padding:12px 16px 12px 14px;border-radius:10px;background:#F8F0DC;color:var(--ink);
+  -webkit-mask:radial-gradient(circle 8px at 0 50%,#0000 96%,#000) left/51% 100% no-repeat,radial-gradient(circle 8px at 100% 50%,#0000 96%,#000) right/51% 100% no-repeat;
+  mask:radial-gradient(circle 8px at 0 50%,#0000 96%,#000) left/51% 100% no-repeat,radial-gradient(circle 8px at 100% 50%,#0000 96%,#000) right/51% 100% no-repeat}
+.bd-rph{width:52px;height:52px;border-radius:8px;object-fit:cover}
+.bd-rt b{font-size:16px}
+.bd-rt>span:not(.rtag){display:block;font-size:13px;color:var(--muted);line-height:1.5}
+.bd-rent .rtag{margin:0 8px 0 0;padding:0 6px;border-radius:3px;background:none;border:1.5px solid var(--red);color:var(--red);transform:rotate(-4deg);vertical-align:2px}
+.bd-rp{font-size:22px;font-weight:800;color:var(--redtext);white-space:nowrap;padding-left:14px;border-left:2px dashed #CDBF9C}
+.bd-rp small{font-size:13px;font-weight:600;color:var(--muted)}
+.tickets{list-style:none;padding:0;margin:22px 0 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+.tk{filter:drop-shadow(0 10px 14px rgba(24,32,38,.14))}
+.tk-in{display:grid;grid-template-columns:72px 1fr;height:100%;border-radius:12px;background:#FFFAF0;
+  -webkit-mask:radial-gradient(circle 9px at 72px 0,#0000 96%,#000) top/100% 51% no-repeat,radial-gradient(circle 9px at 72px 100%,#0000 96%,#000) bottom/100% 51% no-repeat;
+  mask:radial-gradient(circle 9px at 72px 0,#0000 96%,#000) top/100% 51% no-repeat,radial-gradient(circle 9px at 72px 100%,#0000 96%,#000) bottom/100% 51% no-repeat}
+.tk-stub{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border-radius:12px 0 0 12px;background:#A8392C;color:#FFF3D6;border-right:2px dashed rgba(255,243,214,.55)}
+.tk:nth-child(2) .tk-stub{background:#2F5E46}
+.tk:nth-child(3) .tk-stub{background:#86672A}
+.tk-stub small{font-family:var(--serif);font-weight:700;font-size:12px;letter-spacing:.3em;padding-left:.3em}
+.tk .no{font-family:var(--serif);font-weight:900;font-size:40px;line-height:1}
+.tk-body{padding:18px 18px 18px 20px}
+.tk h3{font-size:17px;margin:0 0 6px}
+.tk p{margin:0;color:var(--muted);font-size:14.5px;line-height:1.65}
+.qa{max-width:none;display:grid;grid-template-columns:1fr 1fr;gap:0 48px;margin-top:14px}
+.qa .qcol{border-top:2px solid var(--ink)}
+.qa details{border-bottom:1px dashed #BDB59E}
+.qa details:first-child{border-top:0}
+.qa summary{justify-content:flex-start;gap:12px;padding:15px 0;font-weight:700;line-height:1.5}
+.qa summary .qt{flex:1}
+.qa .q,.qa .a{flex:none;display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;font-family:var(--serif);font-weight:900;font-size:15px;line-height:1}
+.qa .q{background:#A8392C;color:#FFF3D6}
+.qa .a{border:1.5px solid var(--gold);color:#8A6A2C}
+.qa p{display:flex;gap:12px;align-items:flex-start;margin:0 0 18px;color:var(--muted)}
+.qa p>span:last-child{padding-top:3px;line-height:1.75}
+@media (max-width:899px){
+  .tickets{grid-template-columns:1fr;gap:14px}
+  .qa{grid-template-columns:1fr}.qa .qcol+.qcol{border-top:0}
+  .board{padding:34px 18px 18px}
+}
 /* 其他深色區塊也用主視覺的菱格紋 */
 .screening.night2{background:#12353d url(images/kv/bg_tile.jpg) center top/900px 1125px}
 .closing.night{background:radial-gradient(ellipse 60% 70% at 50% 0,rgba(236,216,164,.14),transparent 70%),#143f48 url(images/kv/bg_tile.jpg) center top/900px 1125px}
@@ -874,6 +994,10 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
 .kv-film .k{font-family:var(--num);font-size:11.5px;font-weight:700;letter-spacing:.34em;padding-left:.34em;color:var(--gold-l)}
 .kv .kv-film .showing{margin:0;font-family:var(--serif);font-weight:900;font-size:clamp(19px,2vw,25px);line-height:1.3;letter-spacing:.08em;color:#fff3d6;text-shadow:0 0 18px rgba(243,210,122,.35),0 2px 10px rgba(5,16,19,.9)}
 .kv .kv-below .countdown{margin:4px 0 0;font-size:13px;color:#e4d6b4}
+.kv-replay{margin:2px 0 0;min-height:36px;padding:0 10px;border:0;background:none;color:#cbbd98;font:500 13px/1 var(--font);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.kv-replay:hover{color:#efe3c4}
+.kv-replay[hidden]{display:none}
+.kv.kv-tight .kv-below .countdown,.kv.kv-tight .kv-below .kv-meta{display:none}
 .kv-meta{display:flex;flex-direction:column;align-items:center;gap:1px;font-size:13px;color:#d4c7a6;max-width:560px}
 .kv .kv-meta .hero-meta{margin:0;font-size:13px;color:#d4c7a6;gap:2px 4px}
 .kv .kv-meta .hero-meta a{color:#efe3c4}
@@ -928,6 +1052,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
           <p class="kv-film" id="kvFilm"><span class="k">本場放映</span><span class="showing" id="showing">哈利波特：神秘的魔法石</span></p>
           <p class="countdown" id="countdown"></p>
           <div class="kv-meta"><p class="hero-meta" id="evMeta" aria-busy="true"><span class="skl" aria-hidden="true"></span></p><div class="cta-note" id="openNote">載入中…</div></div>
+          <button type="button" class="kv-replay" id="kvReplay" hidden>重看開場動畫</button>
         </div>
         <canvas class="snow" id="snow" aria-hidden="true"></canvas>
         <p class="kv-hint" id="kvHint" aria-hidden="true"><span class="pill"><span class="t">往下捲動，走進電影院</span><i></i></span></p>
@@ -963,21 +1088,21 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
           <li><span class="gdot" aria-hidden="true"></span><span>不想吃東西，只報名也可以</span></li>
         </ul>
       </div>
-      <div class="reveal vcards" id="vlist"><div class="skel"></div><div class="skel"></div></div>
+      <div class="reveal" id="vlist"><div class="board"><div class="skel"></div><div class="skel"></div></div></div>
     </div>
   </section>
 
   <section class="sec paper" aria-labelledby="howT">
     <div class="wrap">
       <h2 id="howT">怎麼報名</h2>
-      <ol class="program" id="how"></ol>
+      <ol class="tickets" id="how"></ol>
     </div>
   </section>
 
   <section class="sec cream" aria-labelledby="faqT">
     <div class="wrap">
       <h2 id="faqT">常見問題</h2>
-      <div class="reveal faq" id="faq"></div>
+      <div class="reveal faq qa" id="faq"></div>
     </div>
   </section>
 
@@ -1245,7 +1370,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
   function syncSerif(){
     const link = document.querySelector('link[href*="Noto+Serif+TC"]'); if (!link) return;
     const m = link.href.match(/text=([^&]+)/); const have = new Set(decodeURIComponent(m ? m[1] : ''));
-    const need = new Set(); document.querySelectorAll('.sec h2, .closing h2, .marquee h1, .program .no, .ticket .stamp, figcaption, .poster .ptitle').forEach(el => { for (const c of el.textContent) if (c.trim()) need.add(c); });
+    const need = new Set(); document.querySelectorAll('.sec h2, .closing h2, .marquee h1, .program .no, .tk .no, .tk-stub small, .bd-sign span, .bd-vn, .qa .q, .qa .a, .ticket .stamp, figcaption, .poster .ptitle').forEach(el => { for (const c of el.textContent) if (c.trim()) need.add(c); });
     const miss = [...need].filter(c => !have.has(c)); if (!miss.length) return;
     const all = [...new Set([...have, ...need])].join('');
     link.href = link.href.replace(/text=[^&]+/, 'text=' + encodeURIComponent(all));
@@ -1306,7 +1431,9 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
   // GA 事件：用 Google 代碼的 gtag('event')（這個容器是 GA 的 Google 代碼升級來的，會直接送到 GA4，不用另外在 GTM 設觸發條件）
   // 只送步驟、金額、份數這類統計，不送姓名、學號、手機、Email、訂單編號或查詢代碼
   function track(ev, p){ try { if (typeof window.gtag === 'function') window.gtag('event', ev, Object.assign({}, window.__xcEnv || {}, p || {})); } catch (e) {} }
-  function toast(m, ic){ const t = $('toast'); t.innerHTML = icon(ic || 'info') + `<span>${esc(m)}</span>`; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), 2600); }
+  function toast(m, ic){ const t = $('toast'); t.innerHTML = icon(ic || 'info') + `<span>${esc(m)}</span>`;
+    { const hd = document.querySelector('.topwrap'), b = hd ? hd.getBoundingClientRect().bottom : 0; t.style.top = Math.max(12, b + 10) + 'px'; }   // 不要蓋到頁首的「查詢訂單」
+    t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), 2600); }
   function say(m){ $('live').textContent = ''; setTimeout(() => $('live').textContent = m, 30); }
   const all = () => catalog.vendors.flatMap(v => v.items.map(i => ({ ...i, vendor: v.name })));
   // 有選項（例如熱／冰）的品項，購物車用「品項id::選項」記，品名變成「品名（選項）」
@@ -1351,21 +1478,33 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     $('poster').innerHTML = catalog.film_image_url ? `<img src="${esc(catalog.film_image_url)}" alt="${esc(catalog.film_title || '電影海報')}">` : `<div class="soon"><svg viewBox="0 0 200 200" aria-hidden="true">${star(34, 30, 12, 5, 5, 'tw')}${star(168, 22, 8, 3.5, 5, 'tw')}${star(178, 186, 10, 4, 5, 'tw')}${star(20, 192, 6, 2.5, 5, 'tw')}</svg>${catalog.film_title ? `<b class="ptitle">${catalog.film_title.split(/[：:]/).map(esc).join('<br>')}</b>` : '<span class="q">?</span><b>片單即將揭曉</b>'}</div>`;
     $('filmBody').innerHTML = catalog.film_title ? `<p class="title">${esc(catalog.film_title)}</p>${catalog.film_note ? String(catalog.film_note).replace(/\r/g, '').trim().split(/\n\s*\n+/).map(x => `<p>${esc(x.trim()).replace(/\n/g, '<br>')}</p>`).join('') : ''}` : `<p class="muted">${esc(cp('film_empty'))}</p>`;
     $('filmT').textContent = cp('film_h'); $('foodT').textContent = cp('food_h'); $('howT').textContent = cp('how_h'); $('faqT').textContent = cp('faq_h');
-    document.querySelector('.food-intro .lede').textContent = cp('food_lede');
+    // 後台文字裡空一行就分段（跟電影介紹一樣）
+    { const L = document.querySelector('.food-intro .lede'), ps = String(cp('food_lede') || '').replace(/\r/g, '').trim().split(/\n\s*\n+/).filter(Boolean); L.innerHTML = ps.map(x => `<span class="lp">${esc(x.trim()).replace(/\n/g, '<br>')}</span>`).join(''); }
     document.querySelector('.foodfacts').innerHTML = String(cp('food_points')).split('\n').map(x => x.trim()).filter(Boolean).map(x => `<li><span class="gdot" aria-hidden="true"></span><span>${esc(x)}</span></li>`).join('');
     $('menuLead').textContent = cp('menu_lead');
     // 日期、時間、地點已經在首屏，這裡只放注意事項（有填才顯示）
     $('facts').innerHTML = catalog.venue_note ? `<li>${icon('info')}<b>注意事項</b><span>${esc(catalog.venue_note)}</span></li>` : '';
     $('facts').classList.toggle('hidden', !catalog.venue_note);
-    $('vlist').innerHTML = foods().map(v => ({ v, its: v.items.filter(i => !i.addon_for) })).map(({ v, its }) => `<div class="vcard">${v.image_url ? `<img class="vth" src="${esc(v.image_url)}" alt="" loading="lazy">` : `<span class="ill">${illo(vIcon(v))}</span>`}<div><b>${esc(v.name)}</b><span>${esc(its.slice(0, 4).map(i => i.name).join('、'))}${its.length > 4 ? ' 等' : ''}${its.length ? `・$${Math.min(...its.map(i => i.price))} 起` : ''}${closeNote(v) ? `<em class="vclose2${v.order_closed ? ' shut' : ''}">${closeNote(v)}</em>` : ''}</span></div></div>`).join('') || '<p class="muted">餐點待公布</p>';
-    $('vlist').insertAdjacentHTML('afterbegin', rentals().flatMap(v => v.items.map(i => ({ v, i }))).map(({ v, i }) => `<div class="vcard rent">${i.image_url ? `<img class="vth" src="${esc(i.image_url)}" alt="" loading="lazy">` : `<span class="ill">${illo('mat')}</span>`}<div><b>${esc(i.name.replace(/（.*）/, ''))}<span class="rtag">加購</span></b><span>報名時可以加購・$${esc(i.price)}／張・活動後可以帶回家${closeNote(v) ? `<em class="vclose2${v.order_closed ? ' shut' : ''}">${closeNote(v)}</em>` : ''}</span></div></div>`).join(''));
+    // 販賣部菜單板：每家列出前幾樣和價格，價格用點點線連過去；野餐墊做成板子下方的一張加購券
+    { const lead = (n, p, extra) => `<li><span class="n">${n}</span><i aria-hidden="true"></i><span class="p num">$${esc(p)}${extra || ''}</span></li>`;
+      const vs = foods().map(v => { const its = v.items.filter(i => !i.addon_for), adds = v.items.filter(i => i.addon_for), show = its.slice(0, 5), more = its.length - show.length;
+        const lo = its.length ? Math.min(...its.map(i => i.price)) : 0, hi = its.length ? Math.max(...its.map(i => i.price)) : 0;
+        return `<div class="bd-v"><div class="bd-vh">${v.image_url ? `<img class="bd-ph" src="${esc(v.image_url)}" alt="" loading="lazy">` : `<span class="bd-ph ill">${illo(vIcon(v))}</span>`}<div><b class="bd-vn">${esc(v.name)}</b><span class="bd-vs">${its.length} 款・$${lo}${hi > lo ? '–' + hi : ''}</span>${closeNote(v) ? `<em class="vclose2${v.order_closed ? ' shut' : ''}">${closeNote(v)}</em>` : ''}</div></div>`
+          + `<ul class="bd-items">${show.map(i => lead(esc(i.name), i.price)).join('')}</ul>`
+          + adds.map(i => `<p class="bd-add">＋ ${esc(i.name)}<span class="num">$${esc(i.price)}</span></p>`).join('')
+          + (more > 0 ? `<p class="bd-more">還有 ${more} 款，報名時可以看完整菜單</p>` : '') + '</div>'; }).join('');
+      const rent = rentals().flatMap(v => v.items.map(i => ({ v, i }))).map(({ v, i }) => `<div class="bd-rent">${i.image_url ? `<img class="bd-rph" src="${esc(i.image_url)}" alt="" loading="lazy">` : ''}<div class="bd-rt"><span class="rtag">加購</span><b>${esc(i.name.replace(/（.*）/, ''))}</b><span>報名時可以加購・活動後可以帶回家${closeNote(v) ? `<em class="vclose2${v.order_closed ? ' shut' : ''}">${closeNote(v)}</em>` : ''}</span></div><span class="bd-rp num">$${esc(i.price)}<small>／張</small></span></div>`).join('');
+      $('vlist').innerHTML = `<div class="board"><p class="bd-sign"><span>販賣部</span></p><div class="bd-body">${vs || '<p class="bd-more">餐點待公布</p>'}</div>${rent}</div>`; }
+    // 報名三步驟：做成三張票根（左邊撕線那一截印步驟編號）
     $('how').innerHTML = [1, 2, 3].map(i => [cp('s' + i + '_t'), cp('s' + i + '_d')])
-      .map(([t, d], i) => `<li><span class="no num" aria-hidden="true">${i + 1}</span><div><h3><span class="sr">第 ${i + 1} 步：</span>${esc(t)}</h3><p>${esc(d)}</p></div></li>`).join('');
+      .map(([t, d], i) => `<li class="tk"><div class="tk-in"><span class="tk-stub" aria-hidden="true"><small>步驟</small><span class="no num">${i + 1}</span></span><div class="tk-body"><h3><span class="sr">第 ${i + 1} 步：</span>${esc(t)}</h3><p>${esc(d)}</p></div></div></li>`).join('');
     $('footContact').textContent = catalog.contact_info && !/nccu_sa/i.test(catalog.contact_info) ? '聯絡我們：' + catalog.contact_info : '';
     $('footIg').lastChild.textContent = catalog.contact_info && /私訊/.test(catalog.contact_info) ? 'IG @nccu_sa（有問題請私訊）' : 'IG @nccu_sa';
     $('privacyText').textContent = catalog.privacy_notice || '';
     const faqs = cp('faq').filter(x => x && x[0]);
-    $('faq').innerHTML = faqs.map(([q, a]) => `<details><summary>${esc(q)}${icon('chevron-down')}</summary><p>${esc(a)}</p></details>`).join('');
+    // 常見問題：場刊式 Q／A，電腦上分左右兩欄（前一半、後一半，順序不變）
+    { const one = ([q, a]) => `<details><summary><span class="q" aria-hidden="true">Q</span><span class="qt">${esc(q)}</span>${icon('chevron-down')}</summary><p><span class="a" aria-hidden="true">A</span><span>${esc(a)}</span></p></details>`, h = Math.ceil(faqs.length / 2);
+      $('faq').innerHTML = `<div class="qcol">${faqs.slice(0, h).map(one).join('')}</div><div class="qcol">${faqs.slice(h).map(one).join('')}</div>`; }
     if (cp('end_h')) $('seeYou').textContent = cp('end_h');
     syncSerif();
     if (catalog.test_mode) { $('testbar').innerHTML = icon('flask-conical') + '測試模式・不用真的轉帳<span class="long">：這裡的報名都是測試資料，付款可以直接模擬</span>'; $('testbar').classList.remove('hidden'); }
@@ -1816,7 +1955,9 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
         catch (e) { if (e && e.name === 'AbortError') return; }
       }
       const url = URL.createObjectURL(blob);
-      if (isIOS()) { $('imgSheetImg').src = url; $('scrim').classList.add('on'); $('imgSheet').classList.add('on'); return; }
+      // iPhone、以及 Instagram／Facebook／Threads／LINE 等 App 內建瀏覽器都不能直接下載檔案：改成把圖片秀出來，讓人長按儲存或截圖
+      const inApp = /; wv\)|Instagram|FBAN|FB_IAB|FBAV|Line\/|Barcelona|MicroMessenger|Messenger/.test(navigator.userAgent);
+      if (isIOS() || inApp) { $('imgT').textContent = isIOS() ? (inApp ? '長按圖片選「加入照片」，沒有出現就直接截圖' : '長按圖片，選「加入照片」') : '長按圖片儲存，沒有出現選項就直接截圖'; $('imgSheetImg').src = url; $('scrim').classList.add('on'); $('imgSheet').classList.add('on'); return; }
       const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
       toast('已下載報到 QR Code 圖片', 'download');
     } catch (e) { toast('無法產生圖片，請直接截圖這個畫面', 'circle-alert'); }
@@ -1957,6 +2098,111 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     let full = !reduce && !seen && !location.hash && !urlParam('t');
     kv.classList.toggle('full', full); kvCtaHidden = full;
     const world = document.createElement('div'); world.className = 'kv-world'; world.style.inset = '0'; stage.insertBefore(world, stage.firstChild);
+    // 華麗版：四周的燈串、散景光點、海報後的暖光（在海報後面，不擋海報）
+    const amb = document.createElement('div'); amb.className = 'kv-amb'; amb.setAttribute('aria-hidden', 'true'); world.after(amb);
+    const halo = document.createElement('div'); halo.className = 'kv-halo'; amb.appendChild(halo);
+    const bkL = document.createElement('div'), bkR = document.createElement('div'); bkL.className = bkR.className = 'kv-bk'; amb.append(bkL, bkR);
+    const side = document.createElement('div'); side.className = 'kv-side'; amb.insertBefore(side, halo);   // 兩側：遠處的聖誕樹、月亮、星星（沿用海報上的圖）
+    const lights = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); lights.setAttribute('class', 'kv-lights'); const bulbBox = document.createElement('div'); bulbBox.className = 'kv-bulbs'; amb.append(lights, bulbBox);
+    const bokeh = (box, n, seed) => { box.innerHTML = Array.from({ length: n }, (_, i) => { const r = ((i + seed) * 9301 + 49297) % 233280 / 233280, q = ((i + seed) * 4271 + 1663) % 1000 / 1000, z = 18 + q * 46;
+      return `<i style="left:${(r * 100).toFixed(1)}%;top:${(6 + ((i * 37 + seed * 11) % 100) * .86).toFixed(1)}%;width:${z.toFixed(0)}px;height:${z.toFixed(0)}px;margin:-${(z / 2).toFixed(0)}px;--a:${(.32 + r * .4).toFixed(2)};--d:${(3.5 + q * 4).toFixed(1)}s;--dl:-${(r * 6).toFixed(1)}s"></i>`; }).join(''); };
+    let ambKey = '', haloPos = '';
+    function buildSide(W, top0, bot0){
+      side.innerHTML = '';
+      if (W < 150) return;
+      const H = bot0 - top0, put = (src, cls, x, y, w, h, extra) => `<div class="${cls}" style="left:${x.toFixed(0)}px;top:${y.toFixed(0)}px;width:${w.toFixed(0)}px;height:${h.toFixed(0)}px${extra || ''}"><img src="images/kv/${src}.webp" alt="" style="width:100%;height:100%"></div>`;
+      const tree = (base, cx, hh, far, flip) => {   // 樹＋它的燈（燈用海報上同一套閃爍）
+        const T = L[base], ww = hh * T[2] * .8 / T[3], x = cx - ww / 2, y = bot0 - hh * .93;
+        let h = `<div class="tr${far ? ' far' : ''}" style="left:${x.toFixed(0)}px;top:${y.toFixed(0)}px;width:${ww.toFixed(0)}px;height:${hh.toFixed(0)}px"><img src="images/kv/${base}.webp" alt="" style="left:0;top:0;width:100%;height:100%">`;
+        if (!far) for (let g = 0; g < 3; g++) { const G2 = L[base + '_glow' + g]; if (!G2) continue;
+          h += `<div class="kv-l a-glow" style="left:${((G2[0] - T[0]) / T[2] * 100).toFixed(1)}%;top:${((G2[1] - T[1]) / T[3] * 100).toFixed(1)}%;width:${(G2[2] / T[2] * 100).toFixed(1)}%;height:${(G2[3] / T[3] * 100).toFixed(1)}%"><img src="images/kv/${base}_glow${g}.webp" alt="" style="animation-delay:${(g * .85 + (flip ? .4 : 0)).toFixed(2)}s"></div>`; }
+        return h + '</div>'; };
+      const hn = Math.min(H * .6, W * .95 / .684), hf = hn * .6;
+      let h = '';
+      h += tree('tree_l', W * .2, hf, true) + tree('tree_r', vw - W * .2, hf, true, 1);
+      h += tree('tree_l', W * .58, hn, false) + tree('tree_r', vw - W * .58, hn, false, 1);
+      const mw = Math.min(W * .2, 84), mx = W * .3, my = top0 + Math.max(H * .24, 150);
+      h += `<div class="mh" style="left:${(mx - mw * 1.6).toFixed(0)}px;top:${(my - mw * 1.6).toFixed(0)}px;width:${(mw * 3.2).toFixed(0)}px;height:${(mw * 3.2).toFixed(0)}px"></div>` + put('moon', 'kv-l', mx - mw / 2, my - mw / 2, mw, mw);
+      const S = [['star_tl', .7, .2], ['star_l1', .14, .4], ['star_l2', .62, .46], ['star_tr', .3, .19, 1], ['star_r', .8, .34, 1], ['star_l1', .5, .48, 1]];
+      for (const [n, fx, fy, r] of S) { const sz = Math.max(18, Math.min(34, W * .07)) * (n === 'star_l2' ? .8 : 1), x = r ? vw - W * fx : W * fx;
+        h += put(n, 'kv-l a-star', x - sz / 2, top0 + H * fy, sz, sz * .75).replace('<img ', `<img style="animation-delay:${(fx * 3).toFixed(2)}s" `); }
+      side.innerHTML = h;
+    }
+    function buildAmb(top0, bot0){
+      const sideW = pxo - 8, key = `${vw}|${vh}|${pxo | 0}|${top0 | 0}`; if (key === ambKey) return; ambKey = key;
+      haloPos = `left:${(pxo - pw * .28).toFixed(0)}px;top:${(pyo - ph * .16).toFixed(0)}px;width:${(pw * 1.56).toFixed(0)}px;height:${(ph * 1.32).toFixed(0)}px`;
+      const showSide = sideW > 70;
+      for (const [bx, left] of [[bkL, 0], [bkR, vw - sideW]]) { bx.style.cssText = showSide ? `left:${left}px;top:${top0}px;width:${sideW}px;height:${bot0 - top0}px` : 'display:none'; }
+      if (showSide) { const n = Math.max(3, Math.min(7, Math.round(sideW * (bot0 - top0) / 40000))); bokeh(bkL, n, 3); bokeh(bkR, n, 17); }
+      buildSide(sideW, top0, bot0);
+      // 燈串（平塗插畫風，跟海報同一套紅綠金）：一條掛 C9 大燈泡的主線＋一條細細的暖白小燈串，線頭收進海報後面
+      lights.setAttribute('width', vw); lights.setAttribute('height', vh); lights.setAttribute('viewBox', `0 0 ${vw} ${vh}`);
+      const COL = [['#d24a3c', '230,90,70'], ['#5b9a63', '120,210,130'], ['#f2c95e', '255,214,110'], ['#f7ead0', '255,240,205']];
+      const y0 = showSide ? top0 + 6 : top0 - 4, gap = pyo - y0, n1 = v => v.toFixed(1);
+      // 一條線：從 a 到 b，分成幾段垂下來；回傳 [路徑, 取樣函式]
+      const strand = (xa, ya, xb, yb, segW, sagK, sagMin, sagMax) => {
+        const nS = Math.max(1, Math.round(Math.abs(xb - xa) / segW)), pts = [];
+        let d = '';
+        for (let k = 0; k < nS; k++) { const t0 = k / nS, t1 = (k + 1) / nS, x0 = xa + (xb - xa) * t0, x1 = xa + (xb - xa) * t1, y0b = ya + (yb - ya) * t0, y1b = ya + (yb - ya) * t1;
+          const sg = Math.max(sagMin, Math.min(sagMax, Math.abs(x1 - x0) * sagK)), cx = (x0 + x1) / 2, cy = (y0b + y1b) / 2 + sg * 2;
+          d += `M${n1(x0)} ${n1(y0b)}Q${n1(cx)} ${n1(cy)} ${n1(x1)} ${n1(y1b)}`; pts.push([x0, y0b, cx, cy, x1, y1b]); }
+        const at = (seg, t) => { const [x0, y0b, cx, cy, x1, y1b] = pts[seg], u = 1 - t; return [u * u * x0 + 2 * u * t * cx + t * t * x1, u * u * y0b + 2 * u * t * cy + t * t * y1b, Math.atan2(2 * u * (cy - y0b) + 2 * t * (y1b - cy), 2 * u * (cx - x0) + 2 * t * (x1 - cx))]; };
+        return { d, n: nS, at, len: k => Math.hypot(pts[k][4] - pts[k][0], pts[k][5] - pts[k][1]) * 1.12 };
+      };
+      const lines = [];
+      if (showSide) { const inner = pxo + 26;   // 線頭伸到海報後面，被海報蓋住
+        for (const sgn of [1, -1]) { const X = x => sgn > 0 ? x : vw - x;
+          lines.push({ s: strand(X(-12), y0 - 12, X(inner), y0 + 4, 250, .17, 22, 56), big: true });
+          lines.push({ s: strand(X(-12), y0 + 18, X(inner), y0 + 26, 330, .26, 34, 84), big: false }); } }
+      else { const sm = Math.max(10, Math.min(30, gap - 6)); lines.push({ s: strand(-12, y0 - 8, vw + 12, y0 - 8, vw / 2, .16, 8, sm), big: true }); }
+      let wires = '', bulbsSvg = '', halos = '', bi = 0;
+      for (const { s: st, big } of lines) {
+        wires += big ? `<path class="w" d="${st.d}"/><path class="w2" d="${st.d}"/>` : `<path class="wf" d="${st.d}"/>`;
+        for (let k = 0; k < st.n; k++) {
+          const L2 = st.len(k), step = big ? (showSide ? 40 : 34) : 15, m = Math.max(2, Math.round(L2 / step));
+          for (let j = big ? 1 : 0; j < m; j++) { const [x, y, a] = st.at(k, (j + (big ? 0 : .5)) / m);
+            if (x < -6 || x > vw + 6 || (showSide && x > pxo - 4 && x < vw - pxo + 4)) continue;   // 被海報蓋住的不畫
+            if (big) { const [fill, rgb] = COL[bi % 4], rot = a * 18 / Math.PI + ((bi % 3) - 1) * 9, sc = showSide ? 1 : .82, td = (x / vw * .9).toFixed(2);
+              bulbsSvg += `<g class="bb" style="--td:${td}s" transform="translate(${n1(x)} ${n1(y)}) rotate(${rot.toFixed(1)}) scale(${sc})"><rect x="-2.6" y="-1" width="5.2" height="5.5" rx="1" fill="#1d3427"/><path d="M-4.2 4.2C-5.4 8.5 -3.4 14.2 0 17.6C3.4 14.2 5.4 8.5 4.2 4.2Z" fill="${fill}"/><path d="M-1.9 6.6C-2.6 9 -1.9 11.6 -.6 13.2" stroke="#fff" stroke-opacity=".55" stroke-width="1.2" fill="none" stroke-linecap="round"/></g>`;
+              const hx = x + Math.sin(-rot * Math.PI / 180) * 11 * sc, hy = y + Math.cos(rot * Math.PI / 180) * 11 * sc;
+              halos += `<i style="left:${n1(hx)}px;top:${n1(hy)}px;--c:${rgb};--td:${td}s;--ad:-${((bi * .53) % 2.6).toFixed(2)}s"></i>`; bi++; }
+            else bulbsSvg += `<circle class="fg" cx="${n1(x)}" cy="${n1(y + 1.5)}" r="3.6"/><circle class="fy" cx="${n1(x)}" cy="${n1(y + 1.5)}" r="1.4"/>`; }
+        }
+      }
+      lights.innerHTML = wires + bulbsSvg; bulbBox.innerHTML = halos;
+    }
+    // 銀幕的紅絨布幕（平塗插畫風）：每一格依拉開程度重畫——靠外側的褶子擠得密、靠中間的鬆，下擺比上緣慢一點跟上，內緣在銀幕上投一道軟影
+    const curs = document.createElement('div'); curs.className = 'kv-curs'; curs.setAttribute('aria-hidden', 'true');
+    const CUR_DEFS = '<defs><linearGradient id="kvcF" x1="0" x2="1"><stop offset="0" stop-color="#561410"/><stop offset=".2" stop-color="#86271f"/><stop offset=".48" stop-color="#b4412e"/><stop offset=".62" stop-color="#c4523c"/><stop offset=".82" stop-color="#93301f" stop-opacity="1"/><stop offset="1" stop-color="#561410"/></linearGradient>'
+      + '<linearGradient id="kvcV" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1e0504" stop-opacity=".62"/><stop offset=".22" stop-color="#1e0504" stop-opacity=".05"/><stop offset=".78" stop-color="#1e0504" stop-opacity="0"/><stop offset="1" stop-color="#1e0504" stop-opacity=".38"/></linearGradient>'
+      + '<linearGradient id="kvcS" x1="0" x2="1"><stop offset="0" stop-color="#240a04" stop-opacity=".5"/><stop offset=".45" stop-color="#240a04" stop-opacity=".16"/><stop offset="1" stop-color="#240a04" stop-opacity="0"/></linearGradient></defs>';
+    function curtainSvg(co){
+      const N = 7, Wp = 52.5 * (1 - co * .84), lag = Math.sin(co * Math.PI) * 6 * (1 - co * .3), a = co * 2.4, B = 98.5;
+      const w = Array.from({ length: N }, (_, k) => 1 + a * k / (N - 1)), sum = w.reduce((x, y) => x + y, 0);
+      const f = [0]; for (let k = 0; k < N; k++) f.push(f[k] + w[k] / sum);
+      const xt = k => f[k] * Wp, xb = k => f[k] * (Wp + lag), sw = (k, y) => (k === N ? Math.sin(y / 100 * Math.PI) * lag * .35 : 0);   // 內緣微微往外鼓
+      const n = v => v.toFixed(2);
+      let folds = '', shade = `M0 0L${n(Wp)} 0`;
+      for (let k = 0; k < N; k++) {
+        const l = k, r = k + 1, dip = 101.5 + (k % 2) * .8;
+        const d = `M${n(xt(l))} 0L${n(xt(r))} 0Q${n((xt(r) + xb(r)) / 2 + sw(r, 50))} 50 ${n(xb(r))} ${B}Q${n((xb(l) + xb(r)) / 2)} ${dip} ${n(xb(l))} ${B}Q${n((xt(l) + xb(l)) / 2 + sw(l, 50))} 50 ${n(xt(l))} 0Z`;
+        folds += `<path d="${d}" fill="url(#kvcF)"/><path d="${d}" fill="url(#kvcV)"/>`;
+      }
+      const ix = Wp + lag * .5, shadow = `<path d="M${n(Wp - 1)} 0L${n(Wp + 7)} 0L${n(Wp + lag + 7)} 100L${n(Wp + lag - 1)} 100Z" fill="url(#kvcS)"/>`;
+      const half = `<g>${shadow}${folds}</g>`;
+      return `<svg viewBox="0 0 100 100" preserveAspectRatio="none">${CUR_DEFS}<rect width="100" height="100" fill="#140806" opacity="${n((1 - co) * .55)}"/>${half}<g transform="translate(100 0) scale(-1 1)">${half}</g></svg>`;
+    }
+    // 倒數結束：銀幕「後面」透出一圈柔和的光（不蓋到銀幕上的字），邊緣飄出幾顆星
+    const glow = document.createElement('div'); glow.className = 'kv-glow'; glow.setAttribute('aria-hidden', 'true');
+    glow.innerHTML = (() => { let st = [], a = 0; const W = [3, 1.6, 2.4, 1.2, 3.4, 1.8, 2.2, 1.4, 2.8, 1.6, 2.6, 1.3, 3, 1.7, 2, 1.5];
+      for (let k = 0; k < W.length; k++) { const g = 360 / W.length, c = a + g * (.35 + (k * 37 % 30) / 100), al = (.5 + (k * 53 % 40) / 100).toFixed(2);
+        st.push(`rgba(255,226,160,0) ${(c - W[k]).toFixed(1)}deg`, `rgba(255,226,160,${al}) ${c.toFixed(1)}deg`, `rgba(255,226,160,0) ${(c + W[k]).toFixed(1)}deg`); a += g; }
+      return `<div class="bloom"></div><div class="ray" style="background:conic-gradient(from 0deg,${st.join(',')})"></div>`; })();
+    const spk = document.createElement('div'); spk.className = 'kv-spk'; spk.setAttribute('aria-hidden', 'true');
+    spk.innerHTML = Array.from({ length: 16 }, (_, i) => { const t = i / 16, side = i % 4, u = ((i * 7919) % 100) / 100 - .5;
+      const [ux, uy, dx, dy] = side === 0 ? [u, -.5, u * 40, -70] : side === 1 ? [.5, u, 80, u * 40] : side === 2 ? [u, .5, u * 40, 50] : [-.5, u, -80, u * 40];
+      return `<i style="--ux:${ux.toFixed(2)};--uy:${uy.toFixed(2)};--dx:${dx.toFixed(0)}px;--dy:${dy.toFixed(0)}px;--s:${(9 + (i % 4) * 4)}px;--ph:${(t * .8).toFixed(2)}"></i>`; }).join('');
+    scene.after(spk);
     const G = {}, imgs = {}, dims = [];
     const mk = (n, src, cls) => { const d = document.createElement('div'); d.className = 'kv-l ' + (cls || ''); d.setAttribute('aria-hidden', 'true'); const im = new Image(); im.alt = ''; im.decoding = 'async'; im.src = src; d.appendChild(im); return d; };
     let dimBox;
@@ -1975,6 +2221,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
         if (dark) { const k = mk(n, `images/kv/${n}_dk.webp`); k.dataset.base = n; box.appendChild(k); dims.push(k); }
       }
     }
+    G.screen.box.before(glow);
     // ---------- 尺寸 ----------
     const SF = L.screen_frame, SI = L.screen_inner;
     const fx = (SF[0] + SF[2] / 2) / 100, fy = (SF[1] + SF[3] / 2) / 100;     // 鏡頭焦點：銀幕中心
@@ -1999,16 +2246,33 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
       for (const g in G) G[g]._t = G[g]._o = null; for (const n in MAGIC) if (imgs[n]) imgs[n]._t = null;
       // 最後一格（首屏）：銀幕寬度、位置；標題放在銀幕上方剩下的空間
       const sfw0 = SF[2] / 100 * pw, ratio = (SF[2] * 4) / (SF[3] * 5), tr = (TB.w * 4) / (TB.h * 5);
-      const sfw = mobile ? vw * .94 : Math.min(vw * .62, vh * .46 * ratio, 960);
-      Zh = sfw / sfw0; FHx = vw / 2; FHy = vh * .5;   // 銀幕下面要放報名鈕、片名、倒數、一行資訊
-      const top = hdr + (mobile ? 2 : 6), avail = FHy - sfw / ratio / 2 - top - 10;
+      let sfw = mobile ? vw * .94 : Math.min(vw * .62, vh * .46 * ratio, 960);
+      FHx = vw / 2; FHy = vh * .5;   // 銀幕下面要放報名鈕、片名、倒數、一行資訊
+      const top = hdr + (mobile ? 2 : 6);
+      // 矮螢幕（小手機、App 內建瀏覽器上下都有工具列、橫拿）：照銀幕下方實際的高度，先把銀幕往上挪，還放不下再縮小，全部都要在畫面內
+      // 再放不下（橫拿手機這種很矮的畫面）：收起倒數和那一行資訊（日期地點銀幕上就有），只留報名鈕和片名
+      kv.classList.remove('kv-tight');
+      // 先把銀幕下方那塊設成最後的寬度再量高度（寬度會影響換行）
+      const bwOf = w => Math.min(vw, Math.max(w, 340)), measure = w => { below.style.width = bwOf(w).toFixed(1) + 'px'; return below.offsetHeight || 0; };
+      const fit = (minT, minS) => { const bh = measure(sfw), ctaOff = mobile ? ctaH * .3 : ctaH * .5 + sfw / ratio * .035, lim = vh - 8 - bh + ctaOff; let sh = sfw / ratio, y = vh * .5, w = sfw;
+        if (bh && y + sh / 2 > lim) { y = Math.max(top + minT + 10 + sh / 2, lim - sh / 2);
+          if (y + sh / 2 > lim) { const need = lim - top - minT - 10; if (need < sh * minS) return null; sh = need; w = sh * ratio; y = top + minT + 10 + sh / 2; } }
+        return [w, y]; };
+      let ft = fit(mobile ? 62 : 80, .5);
+      if (!ft) { kv.classList.add('kv-tight'); ft = fit(40, .3) || fit(30, .2) || [sfw * .3, vh * .5]; }
+      // 銀幕縮小後下面那塊可能變窄、多換一行：用新的寬度再量一次
+      for (let k = 0; k < 2 && ft; k++) { const s0 = sfw; sfw = ft[0]; const f2 = fit(mobile ? 62 : 80, .5) || fit(40, .3) || fit(30, .2); sfw = s0; if (!f2 || Math.abs(f2[0] - ft[0]) < 1) break; ft = f2; }
+      [sfw, FHy] = ft;
+      Zh = sfw / sfw0;
+      const avail = FHy - sfw / ratio / 2 - top - 10;
       Tw = Math.min(vw * (mobile ? .86 : .7), avail * tr, mobile ? 520 : 600); Gx = vw / 2; Gy = top + Tw / tr / 2;
+      buildAmb(top0, bot0);
       rowTop = pyo + ph + 2; hint.style.top = rowTop + 'px';
       // 窄螢幕：提示放在「跳過開場」左邊的空間置中，兩個不會撞在一起
       hint.style.right = mobile ? (skip.offsetWidth || 96) + 22 + 'px' : '0';
       if (full) { skip.style.top = rowTop + 'px'; skip.style.bottom = 'auto'; } else { skip.style.top = ''; skip.style.bottom = ''; }
       ctaH = $('startBtn').offsetHeight || 52;
-      cache.scr = cache.dim = cache.below = cache.dark = null; dirty = true;
+      cache.scr = cache.dim = cache.below = cache.dark = cache.halo = cache.amb = null; dirty = true;
     }
     // ---------- 進度 ----------
     const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v)), seg = (p, a, b) => clamp((p - a) / (b - a));
@@ -2057,24 +2321,40 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
       // 銀幕內容、暗場、銀幕下方資訊：看得到時才更新位置
       const sx = Fx + (SI[0] / 100 - fx) * pw * Z, sy = Fy + (SI[1] / 100 - fy) * ph * Z, sw = SI[2] / 100 * pw * Z, sh = SI[3] / 100 * ph * Z;
       const fX = Fx + (SF[0] / 100 - fx) * pw * Z, fY = Fy + (SF[1] / 100 - fy) * ph * Z, fW = SF[2] / 100 * pw * Z, fH = SF[3] / 100 * ph * Z;
-      const onScreen = p > .38 || !full;
+      const onScreen = p > .335 || !full;
       setCss('scr', scr, onScreen ? `left:${sx.toFixed(1)}px;top:${sy.toFixed(1)}px;width:${sw.toFixed(1)}px;height:${sh.toFixed(1)}px` : 'visibility:hidden');
-      const dimOp = seg(p, .36, .46) - .55 * back;
+      const bk = full ? seg(p, .735, .845) : 0, bOp = bk <= 0 || bk >= 1 ? 0 : (bk < .16 ? ease(bk / .16) : 1 - ease((bk - .16) / .84));
+      const dimOp = seg(p, .36, .46) - .55 * back - bOp * .5;   // 銀幕亮起那一下，整個場子也被照亮一點
       setCss('dim', dimBox, dimOp > .001 ? `left:${fX.toFixed(1)}px;top:${fY.toFixed(1)}px;width:${fW.toFixed(1)}px;height:${fH.toFixed(1)}px;opacity:${dimOp.toFixed(3)}` : 'opacity:0');
       const cOp = full ? seg(p, .78, .86) : 1, show = cOp > .02, bw = Math.min(vw, Math.max(fW, 340));
       // 報名鈕的中心壓在銀幕外框的下緣
       setCss('below', below, show ? `top:${(fY + fH - (mobile ? ctaH * .3 : ctaH * .5 + fH * .035)).toFixed(1)}px;left:${(vw / 2 - bw / 2).toFixed(1)}px;width:${bw.toFixed(1)}px;opacity:${cOp.toFixed(3)};visibility:visible` : 'visibility:hidden;opacity:0');
       setCss('copy', copy, show ? `opacity:${cOp.toFixed(3)};visibility:visible` : 'visibility:hidden;opacity:0');
       if (ctaHidden === show) { ctaHidden = !show; kvCtaHidden = ctaHidden; hbarSync(); }
+      // 華麗版：四周（往前推時一起放大淡出，最後一格再回來）、布幕、星芒
+      const aOp = full ? clamp(1 - seg(p, .06, .26) + seg(p, .8, .92)) : 1, aS = full ? 1 + e1 * .16 * (1 - back) : 1;
+      setCss('amb', amb, `opacity:${aOp.toFixed(3)};transform:scale(${aS.toFixed(4)});visibility:${aOp < .01 ? 'hidden' : 'visible'}`);
+      setCss('side', side, `opacity:${full ? (1 - seg(p, .05, .22)).toFixed(3) : 0}`);
+      setCss('halo', halo, haloPos + `;opacity:${full ? (1 - seg(p, .04, .18)).toFixed(3) : 0}`);
+      // 布幕：海報銀幕上的字淡出時，布幕同時慢慢淡入（不會突然跳出來），再往兩邊收
+      const cf = full ? ease(seg(p, .335, .405)) * (1 - ease(seg(p, .735, .79))) : 0, co = full ? ease(seg(p, .41, .49)) : 1, cv = cf > .005;   // 拉開後留在兩側陪著倒數，倒數結束才慢慢淡掉
+      setCss('curs', curs, cv ? `visibility:visible;opacity:${cf.toFixed(3)}` : 'visibility:hidden');
+      if (cv) { const k = co.toFixed(3); if (curs._k !== k) { curs.innerHTML = curtainSvg(co); curs._k = k; } }
+      const gc = `left:${(sx + sw / 2).toFixed(1)}px;top:${(sy + sh / 2).toFixed(1)}px;--w:${(sw / 2).toFixed(1)}px;--h:${(sh / 2).toFixed(1)}px`;
+      setCss('glow', glow, bOp > .005 ? `visibility:visible;${gc};opacity:${bOp.toFixed(3)}` : 'visibility:hidden');
+      if (bOp > .005) { const r = glow.lastChild, T = `rotate(${(bk * 14).toFixed(2)}deg) scale(${(.85 + ease(bk) * .45).toFixed(3)})`; if (r._t !== T) { r.style.transform = T; r._t = T; } }
+      setCss('spk', spk, bOp > .005 ? `visibility:visible;${gc};opacity:${Math.min(1, bOp * 1.4).toFixed(3)};--k:${bk.toFixed(3)}` : 'visibility:hidden');
       // 放映機的光：從觀眾後方照到銀幕
-      const beamOp = seg(p, .38, .46) * (1 - .55 * back);
+      const beamOp = seg(p, .42, .49) * (1 - .55 * back);
       setCss('beam', beam, beamOp > .001 ? `opacity:${beamOp.toFixed(3)};clip-path:polygon(${vw / 2 - 30}px ${vh + 20}px,${vw / 2 + 30}px ${vh + 20}px,${(sx + sw).toFixed(1)}px ${sy.toFixed(1)}px,${sx.toFixed(1)}px ${sy.toFixed(1)}px)` : 'opacity:0');
-      const lOp = seg(p, .40, .44) * (1 - seg(p, .76, .80));
+      const lOp = seg(p, .39, .41) * (1 - seg(p, .76, .80));
       setCss('leader', leader, `opacity:${lOp.toFixed(3)}`); if (lOp > 0) drawLeader(p, sw, sh);
+      { const pv = Math.max(cf, lOp) > .985 ? '0' : '1', pi = imgs.screen_inner && imgs.screen_inner.firstChild; if (pi && pi._o !== pv) { pi.style.opacity = pv; pi._o = pv; } }   // 布幕或倒數完全蓋住時，把底下的紙藏起來，邊緣只剩一條
       setCss('hint', hint, `top:${hint.style.top};right:${hint.style.right};opacity:${full ? (1 - seg(p, 0, .04)).toFixed(2) : 0}`);
       setCss('snow', snowfx, `opacity:${(1 - seg(p, .38, .44) + seg(p, .8, .9)).toFixed(2)}`);
-      const sk = full ? (p < .86 ? 'skip' : 'none') : (reduce ? 'none' : 'replay');
-      if (cache.skip !== sk) { cache.skip = sk; skip.style.display = sk === 'none' ? 'none' : ''; skip.textContent = sk === 'replay' ? '重看開場' : '跳過開場'; skip.classList.toggle('replay', sk === 'replay'); }
+      // 「跳過開場」只在播的時候出現；看完或看過的人，改成銀幕下方一行小字「重看開場動畫」，不會壓到片名和倒數
+      const sk = full ? (p < .78 ? 'skip' : 'none') : (reduce ? 'none' : 'replay');
+      if (cache.skip !== sk) { cache.skip = sk; skip.style.display = sk === 'skip' ? '' : 'none'; skip.textContent = '跳過開場'; $('kvReplay').hidden = sk !== 'replay'; }
       if (full) for (const q of [25, 50, 75, 100]) if (p * 100 >= q - .5 && !sent[q]) { sent[q] = 1; track('xc_intro_progress', { xc_percent: q }); }
       if (full && p > .985 && !seen) { seen = true; try { localStorage.setItem('xc_kv_seen', '1'); } catch (e) {} }
     }
@@ -2111,6 +2391,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
       for (let i = 0; i < im.data.length; i += 4) { const v = Math.random(); im.data[i] = 70; im.data[i + 1] = 46; im.data[i + 2] = 22; im.data[i + 3] = v < .06 ? 22 + v * 260 : v > .992 ? 46 : 0; }
       x.putImageData(im, 0, 0); kv.style.setProperty('--kvNoise', `url(${c.toDataURL()})`); })();
     ['kv-sfx', 'kv-hot', 'kv-grain'].forEach(c => { const d = document.createElement('div'); d.className = c; d.setAttribute('aria-hidden', 'true'); if (c === 'kv-grain') d.innerHTML = '<i></i><i></i>'; scr.appendChild(d); });
+    scr.insertBefore(curs, scr.querySelector('.kv-sfx'));
     // 雪：用 CSS 動畫的小點（交給顯示卡），不用畫布逐格重畫
     const snowfx = document.createElement('div'); snowfx.className = 'kv-snowfx'; snowfx.setAttribute('aria-hidden', 'true');
     snowfx.innerHTML = Array.from({ length: innerWidth < 600 ? 22 : 36 }, (_, i) => { const r = (i * 9301 + 49297) % 233280 / 233280, q = (i * 4271 + 1663) % 1000 / 1000;
@@ -2134,6 +2415,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     addEventListener('resize', () => { layout(); readScroll(); kick(); });
     if ('ResizeObserver' in window && $('resume')) { let rw = -1; new ResizeObserver(() => { const h = $('resume').classList.contains('hidden') ? 0 : $('resume').offsetHeight; if (h !== rw) { rw = h; layout(); kick(); } }).observe($('resume')); new MutationObserver(() => { layout(); kick(); }).observe($('resume'), { attributes: true, attributeFilter: ['class'] }); }
     addEventListener('popstate', () => setTimeout(() => { layout(); kick(); }, 0));
+    if ('ResizeObserver' in window) { let bh0 = -1; new ResizeObserver(() => { const h = below.offsetHeight; if (Math.abs(h - bh0) > 2) { bh0 = h; layout(); kick(); } }).observe(below); }
     // ---------- 互動 ----------
     let tipT = 0;
     function showTip(text, el){ const r = el.getBoundingClientRect(), s = stage.getBoundingClientRect(); tip.textContent = text; tip.style.left = (r.left + r.width / 2 - s.left) + 'px'; tip.style.top = (r.top - s.top) + 'px'; tip.classList.add('on'); clearTimeout(tipT); tipT = setTimeout(() => tip.classList.remove('on'), 1800); }
@@ -2151,9 +2433,35 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     const jump = y => { const h = document.documentElement, b = h.style.scrollBehavior; h.style.scrollBehavior = 'auto'; scrollTo(0, y); h.style.scrollBehavior = b; };
     skip.onclick = () => {
       if (full) { track('xc_intro_skip', { xc_percent: Math.round(pN * 100) }); const t = $('kvTrack'), y0 = t.getBoundingClientRect().top + scrollY; jump(y0 + t.offsetHeight - innerHeight); pN = pT = 1; dirty = true; render(1); kick(); setTimeout(() => { const b = $('startBtn'); if (!b.disabled) b.focus({ preventScroll: true }); }, 60); return; }
-      full = true; kv.classList.add('full'); for (const q in sent) delete sent[q]; jump($('kvTrack').getBoundingClientRect().top + scrollY); pN = pT = 0; layout(); track('xc_intro_replay'); kick();
+      replay();
     };
+    function replay(){ full = true; kv.classList.add('full'); for (const q in sent) delete sent[q]; jump($('kvTrack').getBoundingClientRect().top + scrollY); pN = pT = 0; layout(); track('xc_intro_replay'); kick(); }
+    $('kvReplay').onclick = replay;
     layout(); readScroll(); pN = pT; render(pN); kick();
+    // 一進來的亮場：第一次來（會播開場）時先暗場，海報亮起、燈串由左到右點亮、灑一陣金粉；再來的人只看燈串亮起
+    (function lightUp(){
+      if (reduce) { amb.classList.add('on'); return; }
+      let veil = null;
+      if (full && pT < .02) { veil = document.createElement('div'); veil.className = 'kv-veil'; veil.setAttribute('aria-hidden', 'true'); stage.insertBefore(veil, hint); }
+      const go = () => {
+        if (go.done) return; go.done = true;
+        if (veil) { requestAnimationFrame(() => veil.classList.add('off')); setTimeout(() => veil.remove(), 1200); }
+        setTimeout(() => amb.classList.add('on'), veil ? 300 : 120);
+        setTimeout(() => amb.classList.add('tw'), veil ? 1500 : 1300);
+        if (!veil) return;
+        setTimeout(() => {   // 金粉從標題附近往外灑
+          const d = document.createElement('div'); d.className = 'kv-dust'; d.setAttribute('aria-hidden', 'true');
+          d.style.left = (pxo + (TB.x + TB.w / 2) * pw) + 'px'; d.style.top = (pyo + (TB.y + TB.h * .6) * ph) + 'px';
+          const N = mobile ? 26 : 40, R = Math.max(pw, 260);
+          d.innerHTML = Array.from({ length: N }, (_, i) => { const a = i / N * 6.283 + (i % 4) * .37, r = R * (.32 + ((i * 7919) % 100) / 100 * .5), st = i % 5 === 0;
+            return `<i class="${st ? 'st' : ''}" style="--x:${(Math.cos(a) * r).toFixed(0)}px;--y:${(Math.sin(a) * r * .75 + 30).toFixed(0)}px;--r:${(i * 47 % 180)}deg;--s:${(2.5 + (i % 4) * 1.3).toFixed(1)}px;--d:${(1.3 + (i % 5) * .18).toFixed(2)}s;--dl:${((i % 6) * .04).toFixed(2)}s"></i>`; }).join('');
+          stage.insertBefore(d, hint); setTimeout(() => d.remove(), 2600);
+        }, 520);
+      };
+      // 等邊框圖載好再亮（最多等 1.2 秒），免得亮起來是空的
+      const fi = imgs.frame && imgs.frame.firstChild;
+      if (fi && !fi.complete) { fi.addEventListener('load', go, { once: true }); fi.addEventListener('error', go, { once: true }); setTimeout(go, 1200); } else setTimeout(go, 60);
+    })();
   })();
 })();
 </script>
