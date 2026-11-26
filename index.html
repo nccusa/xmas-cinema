@@ -1500,7 +1500,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     const s3 = document.querySelector('#steps li[data-s="3"] .lbl'); if (s3) s3.textContent = z ? '完成' : '轉帳';
     $('h_email').textContent = z ? '報名確認和入場資訊會寄到這裡。' : '付款確認通知會寄到這裡。';
     $('cfGo').textContent = z ? '確認免費報名' : '確認送出';
-    $('cfWarnTxt').innerHTML = z ? '<b>送出後就完成報名。</b>之後想點餐，可以在訂單頁取消報名，再重新報名一次。' : '<b>送出後就不能修改餐點。</b>付款前如果想改，只能在訂單頁取消後重新報名；付款後不能修改或加訂。';
+    $('cfWarnTxt').innerHTML = z ? '<b>送出後就完成報名。</b>若需修改訂單，因為網站程序限制，需要在訂單頁面先取消原訂單，再重新報名。' : '<b>送出後就不能修改餐點。</b>付款前如果想改，只能在訂單頁取消後重新報名；付款後不能修改或加訂。';
   }
 
   // ---------- 摘要與步驟 ----------
@@ -1713,17 +1713,17 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
       </div></div>
       <div role="tabpanel" id="pn_qr" aria-labelledby="tb_qr" class="${tab === 'qr' ? '' : 'hidden'}"><div class="qrbox">
         ${r.qr_image_url ? `<img src="${esc(r.qr_image_url)}" alt="收款帳號 QR Code">` : twqr ? `<img src="${twqr}" alt="收款帳號 QR Code" width="220" height="220">` : '<p>收款 QR Code 還沒設定，請改用「複製帳號」。</p>'}
-        <p>用銀行 App 的「掃碼轉帳」掃描；同一支手機請長按圖片儲存，再到銀行 App 從相簿匯入。<b>掃碼通常只會帶入帳號，金額 ${money(r.total_amount)} 和備註「${esc(r.name)}」請自己填。</b></p>
+        <p>QR Code 圖片可以長按儲存，再到銀行 App 從相簿匯入；或直接用銀行 App 的掃描器掃描轉帳。<b>掃描後請記得填寫正確金額 ${money(r.total_amount)} 及備註姓名「${esc(r.name)}」。</b></p>
       </div></div>
       <ol class="after">
-        <li><span class="ic">${icon('send')}</span><div><b>轉帳，記得填備註</b><span>轉完就好，不用回到這個頁面回報。</span></div></li>
+        <li><span class="ic">${icon('send')}</span><div><b>轉帳，記得填備註</b><span>轉帳完成後即報名完成，不需要額外動作。</span></div></li>
         <li><span class="ic">${icon('mail-check')}</span><div><b>收到「付款完成」信</b><span>我們核對入帳後（大約 1 個工作天）寄到你的 Email${guest ? '，信裡有報到用的 QR Code' : ''}。</span></div></li>
-        <li><span class="ic">${icon('ticket')}</span><div><b>活動當天報到、取餐</b><span>${guest ? '付款確認後，這一頁會出現報到用的 QR Code（付款完成信裡也有連結）。' : '帶學生證報到。付款確認後，這一頁也會出現報到用的 QR Code，沒帶學生證時可以用。'}</span></div></li>
+        <li><span class="ic">${icon('ticket')}</span><div><b>活動當天報到、取餐</b><span>${guest ? '付款確認後，這一頁會出現報到用的 QR Code（付款完成信裡也有連結）。' : '活動當天請記得攜帶學生證報到。付款完成並確認後，頁面上也會出現報到用的 QR Code，忘記帶學生證時可以使用。'}</span></div></li>
       </ol>
-      <p class="muted small-help">${icon('circle-help')}<span>轉帳超過 2 個工作天還沒收到「付款完成」信？私訊 IG <a href="https://www.instagram.com/nccu_sa/" target="_blank" rel="noopener">@nccu_sa</a>，告訴我們訂單編號 ${esc(r.order_no)}、轉帳時間和帳號後五碼。</span></p>
+      <p class="muted small-help">${icon('circle-help')}<span>轉帳超過 1 個工作天還沒收到「付款完成」信？私訊 IG <a href="https://www.instagram.com/nccu_sa/" target="_blank" rel="noopener">@nccu_sa</a>，告訴我們<b>訂單編號 ${esc(r.order_no)}</b>、轉帳時間和帳號後五碼。</span></p>
       <div class="more">
         <details><summary>訂單內容${icon('chevron-down')}</summary><div class="in review" style="border:none;padding:0;background:none">${itemsRows(r.items)}</div></details>
-        <details><summary>想修改餐點？${icon('chevron-down')}</summary><div class="in cancelbox"><p>送出後不能直接修改。<b>還沒付款</b>的話，可以先取消這筆報名，再重新報名一次。</p><p>${icon('triangle-alert')}如果你已經轉帳了，請不要取消，私訊學生會處理。付款後不能修改或加訂。</p><button type="button" class="btn danger" id="selfCancel">${icon('circle-x')}取消這筆報名</button></div></details>
+        <details><summary>想修改餐點？${icon('chevron-down')}</summary><div class="in cancelbox"><p>若需修改訂單，因為網站程序限制，<b>請先按以下按鈕取消原訂單，再重新報名！</b></p><p>${icon('triangle-alert')}如果你已經轉帳了，請不要取消，私訊學生會處理。付款後不能修改或加訂。</p><button type="button" class="btn danger" id="selfCancel">${icon('circle-x')}取消這筆報名</button></div></details>
         <details><summary>訂單查詢連結${icon('chevron-down')}</summary><div class="in"><p class="muted" style="margin:0 0 6px;font-size:14px">「已收到報名」確認信裡也有這個連結，可以先存起來。</p><span class="num" style="font-size:13px;word-break:break-all">${esc(link)}</span> ${copyBtn(link, '查詢連結')}</div></details>
       </div>`;
     el.onclick = async e => {
@@ -1745,7 +1745,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
       track('xc_order_cancel', { xc_value: r.total_amount || 0 });
       store.del(ORDER_KEY);
       store.set(DRAFT_KEY, { at: Date.now(), cart: Object.fromEntries((r.items || []).map(i => { const m = lines().find(x => x.name === i.name && x.vendor === i.vendor); return m ? [m.id, i.qty] : null; }).filter(Boolean)), f: { name: r.name || '', sid: r.student_id || '', phone: '', email: '', last5: '' }, ptype: r.participant_type, step: 1 });
-      el.innerHTML = `<div class="state-page" style="margin:24px auto">${glyph()}<h2>已取消訂單 ${esc(r.order_no)}</h2><p class="muted">名額已經釋出。剛剛選的餐點已經幫你帶回去，可以修改後重新報名。</p><button type="button" class="btn" id="againBtn">${icon('arrow-right')}重新報名</button></div>`;
+      el.innerHTML = `<div class="state-page" style="margin:24px auto">${glyph()}<h2>已取消訂單 ${esc(r.order_no)}</h2><p class="muted">名額已經釋出。若有需要，可以重新報名。</p><button type="button" class="btn" id="againBtn">${icon('arrow-right')}重新報名</button></div>`;
       $('againBtn').onclick = () => { location.href = location.pathname + '#order'; location.reload(); };
       history.replaceState(null, '', location.pathname);
     } catch (er) { toast(er.message, 'circle-alert'); sc.disabled = false; sc.dataset.armed = ''; sc.innerHTML = icon('circle-x') + '取消這筆報名'; }
@@ -1755,7 +1755,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     if (r.qr_token && window.qrcode) { const q = qrcode(0, 'M'); q.addData(r.qr_token); q.make(); qr = q.createSvgTag({ cellSize: 5, margin: 2, scalable: true }); }
     if (!qr && r.qr_token) qr = `<div style="padding:12px;border:1px dashed var(--ink);border-radius:8px;text-align:center"><div style="font-size:13px">報到代碼</div><div class="num" style="font-weight:600;word-break:break-all">${esc(r.qr_token)}</div></div>`;
     const done = r.status === 'picked_up', guest = r.participant_type === 'guest';
-    const itemCount = x => (x.items || []).length ? (x.items || []).reduce((s, i) => s + i.qty, 0) + ' 份餐點' : '沒有點餐';
+    const itemCount = x => (x.items || []).length ? (x.items || []).reduce((s, i) => s + i.qty, 0) + ' 份餐點' : '沒有餐點';
     const linkBtn = `<button type="button" class="btn line" id="copyTicketLink" data-copy="${esc(location.origin + location.pathname + '?t=' + (r.lookup_token || ''))}">${icon('copy')}複製這頁連結</button>`;
     const sparks = celebrate && !reduce ? Array.from({ length: 10 }, (_, i) => { const a = i / 10 * 6.283; return `<span class="spark" style="right:40px;top:14px;--x:${(Math.cos(a) * 80).toFixed(0)}px;--y:${(Math.sin(a) * 60).toFixed(0)}px">${'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 1l3 8 8 3-8 3-3 8-3-8-8-3 8-3z"/></svg>'}</span>`; }).join('') : '';
     el.innerHTML = `
@@ -1763,16 +1763,16 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
       <div class="status-line"><span class="pill done">${icon('circle-check')}${done ? '已完成報到與取餐' : r.total_amount === 0 ? '報名完成' : '付款已確認'}</span>${r.is_test ? `<span class="pill test">${icon('flask-conical')}測試訂單</span>` : ''}<span>訂單 <span class="num">${esc(r.order_no)}</span></span></div>
       <h2 tabindex="-1" id="payT" style="margin:0">${done ? '取餐完成，電影好看！' : r.total_amount === 0 ? `報名完成，${esc(evDay)} 見` : `付款確認了，${esc(evDay)} 見`}</h2>
       ${!done ? (guest ? `<div class="ticket${celebrate ? ' print' : ''}"><svg class="band" viewBox="0 0 432 36" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${tileBand(12, 36)}</svg>
-        <div class="tin"><div class="tinfo">${saMark('tmark', '國立政治大學學生會')}<span class="stamp" aria-hidden="true">${r.total_amount === 0 ? '已報名' : '已付款'}</span>${sparks}<div class="who">${esc(r.name)}</div><div class="meta"><span>校外人士</span><span>${itemCount(r)}</span></div><p class="muted" style="margin:12px 0 0">活動當天到報到櫃檯出示這個 QR Code，報到後到取餐區（飲料到餐車）取餐。</p></div>
+        <div class="tin"><div class="tinfo">${saMark('tmark', '國立政治大學學生會')}<span class="stamp" aria-hidden="true">${r.total_amount === 0 ? '已報名' : '已付款'}</span>${sparks}<div class="who">${esc(r.name)}</div><div class="meta"><span>校外人士</span><span>${itemCount(r)}</span></div><p class="muted" style="margin:12px 0 0">活動當天到報到櫃檯出示這個 QR Code。若有餐點，同憑此 QR Code 領取。</p></div>
         <div class="qr" aria-label="報到用 QR Code">${qr}</div></div></div>
       ${r.qr_token ? `<div class="saveqr"><button type="button" class="btn" id="saveQr">${icon('download')}把 QR Code 存到手機</button>${linkBtn}</div>
       <p class="muted" style="font-size:14px;margin:0">這是你的報到憑證，建議現在就存進相簿。之後也可以點報名確認信（或付款完成信）裡的連結，或在報名網站用「查詢訂單」找回來。</p>` : ''}`
       : `<div class="ticket${celebrate ? ' print' : ''}"><svg class="band" viewBox="0 0 432 36" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${tileBand(12, 36)}</svg>
         <div class="tin"><div class="tinfo">${saMark('tmark', '國立政治大學學生會')}<span class="stamp" aria-hidden="true">${r.total_amount === 0 ? '已報名' : '已付款'}</span>${sparks}<div class="who">${esc(r.name)}</div><div class="meta"><span>學號 <span class="num">${esc(r.student_id)}</span></span><span>${itemCount(r)}</span></div>
-        <p class="muted" style="margin:12px 0 0">活動當天帶學生證報到；忘了帶學生證，出示這個 QR Code 也可以。報到後到取餐區（飲料到餐車）取餐。</p></div>
+        <p class="muted" style="margin:12px 0 0">活動當天帶學生證報到；忘了帶學生證，出示這個 QR Code 也可以。若有餐點，同憑此 QR Code 領取。</p></div>
         ${qr ? `<div class="qr" aria-label="報到用 QR Code">${qr}</div>` : ''}</div></div>
       ${r.qr_token ? `<div class="saveqr"><button type="button" class="btn line" id="saveQr">${icon('download')}把 QR Code 存到手機</button>${linkBtn}</div>` : ''}`) : ''}
-      ${r.total_amount === 0 && r.status === 'paid' && !r.checked_in_at ? `<div class="more"><details><summary>想加點餐點？${icon('chevron-down')}</summary><div class="in cancelbox"><p>只報名的訂單可以先取消，再重新報名並選餐點。</p><button type="button" class="btn danger" id="selfCancel">${icon('circle-x')}取消這筆報名</button></div></details></div>` : ''}
+      ${r.total_amount === 0 && r.status === 'paid' && !r.checked_in_at ? `<div class="more"><details><summary>想加點餐點？${icon('chevron-down')}</summary><div class="in cancelbox"><p>若需修改訂單，因為網站程序限制，<b>請先按以下按鈕取消原訂單，再重新報名！</b></p><button type="button" class="btn danger" id="selfCancel">${icon('circle-x')}取消這筆報名</button></div></details></div>` : ''}
       <div class="more"><details open><summary>訂單內容${icon('chevron-down')}</summary><div class="in review" style="border:none;padding:0;background:none">${itemsRows(r.items)}</div></details>
       ${r.event_info ? `<details><summary>活動資訊${icon('chevron-down')}</summary><div class="in">${esc(r.event_info)}</div></details>` : ''}</div>`;
     const sq = el.querySelector('#saveQr'); if (sq) sq.onclick = () => saveTicket(r, sq);
