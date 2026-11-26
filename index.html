@@ -102,14 +102,14 @@
 <link rel="preload" as="image" href="images/kv/frame.webp" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+TC:wght@400;700;900&family=Grenze+Gotisch:wght@800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@600;700;800&family=Noto+Sans+TC:wght@400;700;900&family=Grenze+Gotisch:wght@800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&text=/0123456789%3A%E3%80%81%E3%80%8C%E3%80%8D%E3%83%BB%E4%B8%80%E4%B8%89%E4%B8%8A%E4%B8%8B%E4%B8%8D%E4%BA%86%E4%BB%80%E4%BB%98%E4%BD%A0%E4%BF%AE%E5%80%8B%E5%85%88%E5%85%A5%E5%88%86%E5%88%B0%E5%89%8D%E5%8A%A0%E5%8D%B3%E5%8F%96%E5%90%83%E5%90%8D%E5%92%8C%E5%95%8F%E5%96%AE%E5%9C%96%E5%9C%B0%E5%A0%B1%E5%A1%AB%E5%A4%A7%E5%A4%A9%E5%A5%BD%E5%AD%B8%E5%AE%8C%E5%AF%AB%E5%B0%87%E5%B0%8F%E5%B1%86%E5%B7%B2%E5%B8%B8%E5%B9%BE%E5%BD%B1%E6%80%8E%E6%83%B3%E6%88%90%E6%89%BE%E6%8C%89%E6%8F%AD%E6%94%B9%E6%94%BF%E6%95%B4%E6%96%99%E6%96%B9%E6%98%8E%E6%98%A0%E6%99%82%E6%9B%89%E6%9C%83%E6%9C%89%E6%9F%A5%E6%AC%BE%E6%AD%A5%E6%B2%BB%E6%B3%95%E6%B6%88%E7%84%A1%E7%85%A7%E7%86%B1%E7%89%87%E7%94%9F%E7%9A%84%E7%9B%AE%E7%9C%8B%E7%A2%BA%E7%AC%AC%E7%AD%86%E7%B5%90%E8%81%96%E8%A6%81%E8%A6%8B%E8%A8%82%E8%A9%A2%E8%AA%8D%E8%AA%95%E8%B3%87%E9%80%99%E9%80%A3%E9%81%B8%E9%82%84%E9%95%B7%E9%99%A2%E9%9B%BB%E9%9C%B2%E9%A1%8C%E9%A3%B2%E9%A4%90%E9%BA%BC%E9%BB%9E%EF%BC%81%EF%BC%88%EF%BC%89%EF%BC%8C%EF%BC%9A%EF%BC%9F%E6%9C%AC%E5%A0%B4%E6%94%BE%E5%93%88%E5%88%A9%E6%B3%A2%E7%89%B9%E7%A5%9E%E7%A7%98%E9%AD%94%E7%9F%B3%E3%80%8A%E3%80%8B&display=swap" rel="stylesheet">
 <script src="assets/qrcode.min.js?v=1.4.4"></script>
 <style>
 :root{
   --cream:#F3E8CF; --paper:#F8F0DC; --white:#FFFAF0; --green:#173F48; --green-d:#0F2F36; --green2:#4B7B52; --red:#A8392C; --redtext:#8F2F24; --gold:#B08A43; --ink:#14262B;
   --muted:#5B6466; --line:#DCCFB0; --line2:#E9DFC6; --field:#A99F86;
-  --night:#143F48; --night2:#12353D; --gold-l:#ECD8A4; --r:12px; --rc:16px; --font:"Noto Sans TC","PingFang TC","Heiti TC","Microsoft JhengHei",system-ui,sans-serif; --num:"Inter","Noto Sans TC",system-ui,sans-serif; --serif:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --night:#143F48; --night2:#12353D; --gold-l:#ECD8A4; --r:12px; --rc:16px; --font:"Noto Sans TC","PingFang TC","Heiti TC","Microsoft JhengHei",system-ui,sans-serif; --num:"Noto Serif","Noto Sans TC",serif; --serif:"Noto Serif TC","Songti TC","PMingLiU",serif;
   --ease:cubic-bezier(.2,.8,.2,1);
 }
 *{box-sizing:border-box}
@@ -276,7 +276,7 @@ body:has(#home.hidden) .fmark{color:var(--green)}
 .flinks{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center}
 .flinks a{display:inline-flex;align-items:center;gap:6px;color:var(--gold-l);text-decoration:none;font-weight:700}
 .flinks a:hover{text-decoration:underline}
-.fsmall{flex-basis:100%;margin:0;font-size:12.5px;color:#B9C6C0}
+.fsmall{flex-basis:100%;margin:0;font-size:12.5px;color:#D8CDB0}
 body:has(#home:not(.hidden)) .foot .tiles{display:none}
 body:has(#home:not(.hidden)) .fin{border-top:1px solid rgba(242,239,229,.12)}
 body:has(#home.hidden) .foot{background:var(--cream);color:var(--muted)}
@@ -433,7 +433,7 @@ fieldset.field{border:none;margin:0 0 22px;padding:0}
 .form .check{display:flex;gap:12px;align-items:flex-start;cursor:pointer;font-weight:400}
 .check input{width:22px;height:22px;margin:2px 0 0;accent-color:var(--green);flex:none}
 .privacy{font-size:14px;color:var(--muted);margin:0 0 12px;padding:12px 14px;background:var(--paper);border-radius:var(--r)}
-.errsum{display:flex;gap:12px;border-left:3px solid var(--red);background:#FCEDEC;padding:12px 16px;margin:0 0 24px;border-radius:0 var(--r) var(--r) 0}
+.errsum{display:flex;gap:12px;border:1px solid #E7B7B1;background:#FCEDEC;padding:12px 16px;margin:0 0 24px;border-radius:var(--r)}
 .errsum .i{color:var(--redtext);margin-top:4px}
 .errsum h3{font-size:16px;margin:0 0 4px}
 .errsum ul{margin:0;padding-left:18px}
@@ -458,7 +458,7 @@ fieldset.field{border:none;margin:0 0 22px;padding:0}
 .acct .r{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line2)}
 .acct .r:last-child{border-bottom:0}
 .acct .k{color:var(--muted);font-size:14px}
-.acct .v{font-family:var(--num);font-weight:600;font-size:18px;word-break:break-all}
+.acct .v{font-family:var(--font);font-variant-numeric:tabular-nums;font-weight:600;font-size:18px;word-break:break-all}
 .acct .v.t{font-family:var(--font);font-size:16px;font-weight:500}
 .copy{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:var(--r);border:1px solid var(--line);background:var(--paper);color:var(--green);font-size:14px;font-weight:700;cursor:pointer;transition:all .15s}
 .copy:hover{border-color:var(--green)}
@@ -466,12 +466,12 @@ fieldset.field{border:none;margin:0 0 22px;padding:0}
 .qrbox{padding:20px;text-align:center;border:1px solid var(--line);border-radius:var(--rc);background:var(--white)}
 .qrbox img{width:min(220px,70%);background:#fff;padding:8px;border-radius:var(--r)}
 .qrbox p{font-size:14px;color:var(--muted);margin:10px auto 0;max-width:420px}
-.memo{margin:22px 0;padding:16px 18px;border-radius:var(--rc);background:var(--white);border:1px solid var(--line);box-shadow:inset 5px 0 0 var(--red)}
+.memo{margin:22px 0;padding:16px 18px;border-radius:var(--rc);background:#FBF4E6;border:1px solid #E7CFA9}
 .memo .k{display:flex;align-items:center;gap:8px;font-weight:700}
 .memo .k .i{color:var(--redtext)}
 .memo .small-note{font-size:14px;color:var(--muted,#5b6560);margin-top:6px}
 .memo .row{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:4px}
-.memo .v{font-family:var(--num);font-weight:800;font-size:32px;letter-spacing:.04em}
+.memo .v{font-family:var(--font);font-variant-numeric:tabular-nums;font-weight:800;font-size:32px;letter-spacing:.04em}
 .memo p{margin:2px 0 0;font-size:14px;color:var(--muted)}
 .after{list-style:none;margin:28px 0 0;padding:0}
 .after li{display:grid;grid-template-columns:36px 1fr;gap:12px;padding:0 0 18px;position:relative}
@@ -497,7 +497,7 @@ fieldset.field{border:none;margin:0 0 22px;padding:0}
 .confirm .cf-tot{display:flex;justify-content:space-between;align-items:baseline;padding:12px 0 6px;font-weight:700}
 .confirm .cf-tot .num{font-size:26px;font-weight:800}
 .confirm .cf-who{font-size:14px;color:var(--muted);margin:0 0 4px}
-.cfwarn{display:flex;gap:10px;align-items:flex-start;background:#FDF3E1;border-left:3px solid var(--gold);padding:12px 14px;border-radius:0 var(--r) var(--r) 0;margin:12px 0;font-size:14px}
+.cfwarn{display:flex;gap:10px;align-items:flex-start;background:#FDF3E1;border:1px solid #E6CF9C;padding:12px 14px;border-radius:var(--r);margin:12px 0;font-size:14px}
 .cfwarn svg{flex:none;width:18px;height:18px;margin-top:2px;color:#8a6516}
 .cfacts{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
 .onlyreg{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;margin:12px 0 4px}
@@ -941,7 +941,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     <div class="beam" aria-hidden="true"></div>
     <div class="reel" aria-hidden="true"></div>
     <div class="wrap film">
-      <div class="poster-wrap reveal"><span class="tape t1" aria-hidden="true"></span><div class="poster" id="poster"></div></div>
+      <div class="poster-wrap reveal"><div class="poster" id="poster"></div></div>
       <div>
         <p class="showday hidden" id="showDay"></p>
         <h2 id="filmT">即將上映</h2>
