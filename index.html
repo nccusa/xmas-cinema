@@ -12,7 +12,7 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
   // 裝置資訊（2026-11-26 曹敦閔 要知道同學用什麼裝置）：GA 內建的「裝置類別」會把 iPad 算成 Mac 電腦，也分不出從哪個 App 點開，
-  // 所以每個事件（含瀏覽網頁）都多帶三個參數；要在 GA4「自訂定義」建立同名的自訂維度才看得到。不含任何個人資料。
+  // 所以設成使用者屬性（每個事件含瀏覽網頁都會帶），要在 GA4「自訂定義」建立同名的「使用者」範圍自訂維度才看得到。不含任何個人資料。
   (function(){try{
     var ua = navigator.userAgent || '', tp = navigator.maxTouchPoints || 0;
     var ipad = /iPad/.test(ua) || (/Macintosh/.test(ua) && tp > 1), ios = /iPhone|iPod/.test(ua), and = /Android/.test(ua);
@@ -20,7 +20,9 @@
     var dev = (ipad || (and && !/Mobile/.test(ua))) ? '平板' : (ios || and || /Mobile/.test(ua)) ? '手機' : '電腦';
     var app = /Barcelona/.test(ua) ? 'Threads' : /Instagram/.test(ua) ? 'Instagram' : /FBAN\/Messenger|FB_IAB\/MESSENGER|MessengerForiOS/.test(ua) ? 'Messenger'
       : /FBAN|FBAV|FB_IAB/.test(ua) ? 'Facebook' : / Line\//.test(ua) ? 'LINE' : /Dcard/.test(ua) ? 'Dcard' : '一般瀏覽器';
-    gtag('set', { xc_device: dev, xc_os: os, xc_app: app });
+    // 這個 Google 代碼不接受 gtag('set', {…}) 的自訂參數，要用 user_properties（實測 11-26）；自訂事件另外在 track() 帶同樣三個參數
+    window.__xcEnv = { xc_device: dev, xc_os: os, xc_app: app };
+    gtag('set', 'user_properties', window.__xcEnv);
   }catch(e){}})();
 </script>
 <meta charset="utf-8">
@@ -1302,7 +1304,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
   const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && innerWidth < 1100);
   // GA 事件：用 Google 代碼的 gtag('event')（這個容器是 GA 的 Google 代碼升級來的，會直接送到 GA4，不用另外在 GTM 設觸發條件）
   // 只送步驟、金額、份數這類統計，不送姓名、學號、手機、Email、訂單編號或查詢代碼
-  function track(ev, p){ try { if (typeof window.gtag === 'function') window.gtag('event', ev, p || {}); } catch (e) {} }
+  function track(ev, p){ try { if (typeof window.gtag === 'function') window.gtag('event', ev, Object.assign({}, window.__xcEnv || {}, p || {})); } catch (e) {} }
   function toast(m, ic){ const t = $('toast'); t.innerHTML = icon(ic || 'info') + `<span>${esc(m)}</span>`; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), 2600); }
   function say(m){ $('live').textContent = ''; setTimeout(() => $('live').textContent = m, 30); }
   const all = () => catalog.vendors.flatMap(v => v.items.map(i => ({ ...i, vendor: v.name })));
