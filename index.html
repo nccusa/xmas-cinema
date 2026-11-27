@@ -1869,7 +1869,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
       <p class="muted small-help">${icon('circle-help')}<span>轉帳超過 1 個工作天還沒收到「付款完成」信？私訊 IG <a href="https://www.instagram.com/nccu_sa/" target="_blank" rel="noopener">@nccu_sa</a>，告訴我們<b>訂單編號 ${esc(r.order_no)}</b>、轉帳時間和帳號後五碼。</span></p>
       <div class="more">
         <details><summary>訂單內容${icon('chevron-down')}</summary><div class="in review" style="border:none;padding:0;background:none">${itemsRows(r.items)}</div></details>
-        <details><summary>想修改餐點？${icon('chevron-down')}</summary><div class="in cancelbox"><p>若需修改訂單，因為網站程序限制，<b>請先按以下按鈕取消原訂單，再重新報名！</b></p><p>${icon('triangle-alert')}如果你已經轉帳了，請不要取消，私訊學生會處理。付款後不能修改或加訂。</p><button type="button" class="btn danger" id="selfCancel">${icon('circle-x')}取消這筆報名</button></div></details>
+        <details><summary>想修改訂單？${icon('chevron-down')}</summary><div class="in cancelbox"><p>若需修改訂單，因為網站程序限制，<b>請先按以下按鈕取消原訂單，再重新報名！</b></p><p>${icon('triangle-alert')}如果你已經轉帳了，請不要取消，私訊學生會處理。付款後不能修改或加訂。</p><button type="button" class="btn danger" id="selfCancel">${icon('circle-x')}取消這筆報名</button></div></details>
         <details><summary>訂單查詢連結${icon('chevron-down')}</summary><div class="in"><p class="muted" style="margin:0 0 6px;font-size:14px">「已收到報名」確認信裡也有這個連結，可以先存起來。</p><span class="num" style="font-size:13px;word-break:break-all">${esc(link)}</span> ${copyBtn(link, '查詢連結')}</div></details>
       </div>`;
     el.onclick = async e => {
