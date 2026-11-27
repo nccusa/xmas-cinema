@@ -414,7 +414,6 @@ html[data-dir=back]::view-transition-new(flowstep){animation:vt-in-l .32s var(--
 .who-card b{font-size:16.5px}
 .who-card small{color:var(--muted);font-size:13.5px;line-height:1.5}
 .who-card:has(input:checked){border-color:var(--green);box-shadow:inset 0 0 0 1px var(--green)}
-.form .who-card.full{cursor:not-allowed;background:var(--paper,#F6F1E7);border-style:dashed}.who-card.full b,.who-card.full > span:not(.chk){opacity:.45}.who-card.full small{color:var(--crit,#A8392C);font-weight:600}
 .who-card .chk{position:absolute;right:12px;top:12px;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;color:transparent}
 .who-card:has(input:checked) .chk{background:var(--green);border-color:var(--green);color:var(--cream)}
 .who-card:has(input:focus-visible){outline:2px solid var(--green);outline-offset:2px}
@@ -1404,7 +1403,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     const items = lines();
     Object.entries(d.cart || {}).forEach(([id, q]) => { const it = items.find(i => i.id === id); if (it && q > 0 && it.remaining !== 0) cart[id] = Math.min(q, it.remaining == null ? 10 : it.remaining); });
     FKEYS.forEach(k => { if (d.f && d.f[k]) $('f_' + k).value = d.f[k]; });
-    const r = document.querySelector(`input[name=ptype][value="${d.ptype === 'guest' && !(catalog && catalog.guest_full) ? 'guest' : 'nccu'}"]`); if (r) r.checked = true;
+    const r = document.querySelector(`input[name=ptype][value="${d.ptype === 'guest' ? 'guest' : 'nccu'}"]`); if (r) r.checked = true;
     syncType();
   }
   function clearDraft(){
@@ -2067,8 +2066,6 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     if (orderFull) (catalog.vendors || []).forEach(v => (v.items || []).forEach(i => { i.remaining = 0; }));
     // 每家店可以各自截止預購（後台「菜單」設定）；截止的店品項鎖起來
     (catalog.vendors || []).forEach(v => { if (v.order_closed) (v.items || []).forEach(i => { i.remaining = 0; i.closed = true; }); });
-    // 校外人士名額（後台「設定」的上限）額滿：校外選項關閉，政大學生照常；只回傳「滿了沒」，不公開剩幾名
-    if (catalog.guest_full) { const g = document.querySelector('input[name=ptype][value="guest"]'); if (g) { g.disabled = true; g.checked = false; const n = document.querySelector('input[name=ptype][value="nccu"]'); if (n) n.checked = true; const c = g.closest('.who-card'); c.classList.add('full'); c.querySelector('small').textContent = '校外名額已額滿'; } }
     renderHome();
     if (token) return showLookup(token);
     const d = loadDraft();
