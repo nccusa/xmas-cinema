@@ -680,7 +680,11 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
           <div class="oc2">${payBadge(r)}<small class="num">${r.status === 'cancelled' ? '金額' : r.paid_amount >= r.total_amount ? '已付' : '應付'} ${money(r.total_amount)}</small></div>
           <div class="oc3 sitecell">${siteText(r)}</div>
           <span class="go">${icon('chevron-right')}</span></div>`).join('')}</div>` : `<div class="card empty">${icon('inbox')}${regs.length ? '沒有符合條件的訂單' : '還沒有人報名。可以到「測試工具」產生一批測試報名。'}</div>`}`;
-    $('oq').oninput = e => { oq = e.target.value; clearTimeout(renderOrders._t); renderOrders._t = setTimeout(() => { renderOrders(); const el = $('oq'); el.focus(); el.setSelectionRange(el.value.length, el.value.length); }, 220); };
+    // 注音／倉頡等輸入法組字中（ㄘㄞˋ 還沒選字）不能重畫，不然組字會被打斷；選完字（compositionend）才搜尋（2026-11-27）
+    const oqRun = () => { clearTimeout(renderOrders._t); renderOrders._t = setTimeout(() => { if ($('oq') && $('oq')._ime) return; renderOrders(); const el = $('oq'); el.focus(); el.setSelectionRange(el.value.length, el.value.length); }, 220); };
+    $('oq').oninput = e => { if (e.isComposing || e.target._ime) return; oq = e.target.value; oqRun(); };
+    $('oq').addEventListener('compositionstart', e => { e.target._ime = true; clearTimeout(renderOrders._t); });
+    $('oq').addEventListener('compositionend', e => { e.target._ime = false; oq = e.target.value; oqRun(); });
     $('opay').onchange = e => { opay = e.target.value; renderOrders(); };
     $('osite').onchange = e => { osite = e.target.value; renderOrders(); };
     if ($('onlyTest')) $('onlyTest').onchange = e => { onlyTest = e.target.checked; renderOrders(); };
@@ -979,7 +983,8 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
     page().onclick = reconClick;
     if ($('rerunBtn')) $('rerunBtn').onclick = e => busy(e.currentTarget, async () => { const r = await run(() => Api.rpc('admin_rerun_matching')); toast(`重新比對完成：自動入帳 ${r.matched}、建議 ${r.suggested}、找不到 ${r.unmatched}`); await loadAll(); renderRecon(); });
     $('paySeg').onclick = e => { const b = e.target.closest('[data-pf]'); if (!b) return; payFilter = b.dataset.pf; $('paySeg').querySelectorAll('[data-pf]').forEach(x => x.setAttribute('aria-pressed', x === b)); $('payTable').innerHTML = payTable(); };
-    $('paySearch').oninput = e => { paySearch = e.target.value; $('payTable').innerHTML = payTable(); };
+    $('paySearch').oninput = e => { if (e.isComposing) return; paySearch = e.target.value; $('payTable').innerHTML = payTable(); };
+    $('paySearch').addEventListener('compositionend', e => { paySearch = e.target.value; $('payTable').innerHTML = payTable(); });
     function payRows(k){
       const q = paySearch.trim().toLowerCase();
       return regs.filter(r => r.status !== 'cancelled' && (showTest || !r.is_test) && r.total_amount > 0)
