@@ -386,7 +386,18 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
   if (window.registerSW) registerSW();
   const $ = id => document.getElementById(id);
   let regs = [], menu = { vendors: [], items: [] }, settings = null, dash = null, view = 'dash';
-  let addons = [], tplState = [];   // 加購紀錄（addon_batches）：每次加購一筆，待付款／已付款／已取消
+  let addons = [], tplState = [];
+  // 資料庫每次查詢最多回傳 1000 筆（Supabase 預設上限），超過的會被默默截掉；名單類的資料一律分批讀到拿完為止
+  async function selectAll(table, query){
+    const out = [], seen = new Set(); let off = 0;
+    for (let n = 0; n < 200; n++) {
+      const rows = await Api.select(table, query + '&limit=1000&offset=' + off);
+      if (!rows.length) break;
+      rows.forEach(x => { const k = x.id || JSON.stringify(x); if (!seen.has(k)) { seen.add(k); out.push(x); } });
+      off += rows.length;
+    }
+    return out;
+  }   // 加購紀錄（addon_batches）：每次加購一筆，待付款／已付款／已取消
   const addonPend = r => addons.find(a => a.registration_id === r.id && a.status === 'pending');
   let lastLoad = 0, lastImport = null, pageDirty = false;
   let myRole = 'admin';
@@ -482,12 +493,12 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
 
   async function loadAll(){
     const [r, v, i, s, ib, ad, tp] = await Promise.all([
-      Api.select('registrations', 'select=*,order_items(*),pickups(*)&order=created_at.desc'),
+      selectAll('registrations', 'select=*,order_items(*),pickups(*)&order=created_at.desc,id.desc'),
       Api.select('vendors', 'select=*&order=sort,name'),
       Api.select('menu_items', 'select=*&order=sort,name'),
       Api.select('settings', 'select=*&id=eq.1'),
       Api.select('import_batches', 'select=created_at&order=created_at.desc&limit=1').catch(() => []),
-      Api.select('addon_batches', 'select=*&order=created_at.desc').catch(() => []),
+      selectAll('addon_batches', 'select=*&order=created_at.desc,id.desc').catch(() => []),
       Api.select('email_templates', 'select=key,approved_at,enabled').catch(() => [])
     ]);
     regs = r; addons = ad; tplState = tp; menu = { vendors: v, items: i }; settings = s[0]; lastImport = ib[0] ? ib[0].created_at : null; lastLoad = Date.now();
@@ -945,14 +956,14 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
     if ($('simBtn')) $('simBtn').onclick = e => busy(e.currentTarget, simulate);
     page().innerHTML = `<div class="card empty">${icon('loader-circle', 'spin')}載入中…</div>`;
     const [txns, batches, done] = await Promise.all([
-      Api.select('bank_txns', 'select=*&status=in.(suggested,unmatched)&order=txn_at.desc'),
+      selectAll('bank_txns', 'select=*&status=in.(suggested,unmatched)&order=txn_at.desc,id.desc'),
       Api.select('import_batches', 'select=*&order=created_at.desc&limit=8'),
-      Api.select('bank_txns', 'select=id,registration_id,txn_at,amount,account_last5,memo,match_method,status,match_note,batch_id&status=in.(matched,ignored)&order=txn_at.desc')
+      selectAll('bank_txns', 'select=id,registration_id,txn_at,amount,account_last5,memo,match_method,status,match_note,batch_id&status=in.(matched,ignored)&order=txn_at.desc,id.desc')
     ]);
     const byId = Object.fromEntries(regs.map(r => [r.id, r]));
     // 每筆待處理款項：系統算出的可能訂單（分數＋理由）
     const cands = Object.fromEntries(await Promise.all(txns.map(async t => [t.id, await Api.rpc('admin_txn_candidates', { p_txn: t.id }).catch(() => [])])));
-    const lastTx = batches.length ? await Api.select('bank_txns', 'select=*&batch_id=eq.' + batches[0].id + '&order=txn_at').catch(() => []) : [];
+    const lastTx = batches.length ? await selectAll('bank_txns', 'select=*&batch_id=eq.' + batches[0].id + '&order=txn_at,id').catch(() => []) : [];
     const paidBy = {}; done.filter(t => t.status === 'matched' && t.registration_id).forEach(t => (paidBy[t.registration_id] = paidBy[t.registration_id] || []).push(t));
     const showTest = settings.test_mode;
     const pend = regs.filter(r => r.status === 'pending_payment' && (showTest || !r.is_test));
@@ -1146,11 +1157,16 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
   async function renderMail(){
     pageDirty = false; if (!isAdmin()) mailView = 'queue';
     page().innerHTML = `<div class="card empty">${icon('loader-circle', 'spin')}載入中…</div>`;
-    const [tpls, queue] = await Promise.all([
+    const QCOLS = 'select=id,registration_id,template_key,to_email,subject,body,status,error,created_at,sent_at';
+    const [tpls, active, sentQ, cancQ] = await Promise.all([
       Api.select('email_templates', 'select=*&order=key'),
-      Api.select('email_queue', 'select=id,registration_id,template_key,to_email,subject,body,status,error,created_at,sent_at&order=created_at.desc&limit=500')
+      selectAll('email_queue', QCOLS + '&status=in.(pending_approval,approved,sending,failed,blocked)&order=created_at.desc,id.desc'),
+      Api.select('email_queue', QCOLS + '&status=eq.sent&order=sent_at.desc&limit=500'),
+      Api.select('email_queue', QCOLS + '&status=eq.cancelled&order=created_at.desc&limit=300')
     ]);
+    const queue = active.concat(sentQ, cancQ);
     const counts = {}; queue.forEach(q => counts[q.status] = (counts[q.status] || 0) + 1);
+    if (sentQ.length >= 500) counts.sent = '最近 500'; if (cancQ.length >= 300) counts.cancelled = '最近 300';
     const tabs = [['pending_approval', '待核准'], ['approved', '等待寄出'], ['sent', '已寄出'], ['failed', '寄送失敗'], ['blocked', '被擋下'], ['cancelled', '已取消']];
     const list = queue.filter(q => q.status === mailTab);
     const lbl = Object.fromEntries(tpls.map(t => [t.key, t.label]));
