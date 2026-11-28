@@ -1522,6 +1522,21 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
   // ---------- 首頁 ----------
   function parseInfo(txt){ const o = {}; (txt || '').split(/\s{2,}|　/).forEach(s => { const m = s.match(/^(日期|時間|地點)[:：]\s*(.*)$/); if (m) o[m[1]] = m[2]; }); return o; }
   const real = v => v && !/待公布/.test(v);
+  // 報名截止那一刻：開著頁面的人也會自動切成「報名已截止」或「加購餐點」，不用重新整理
+  function scheduleCloseFlip(){
+    if (!catalog || !catalog.is_open || catalog.test_mode || !catalog.close_at) return;
+    const ms = new Date(catalog.close_at).getTime() - Date.now() + 2000;
+    if (!(ms > 0) || ms > 2 * 864e5) return;
+    setTimeout(async () => {
+      try { const c = await Api.rpc('public_get_catalog'); ['is_open', 'addon_open', 'addon_close_at', 'reg_full', 'close_at'].forEach(k => { catalog[k] = c[k]; }); }
+      catch (e) { catalog.is_open = false; }
+      if (catalog.is_open) return scheduleCloseFlip();   // 伺服器說還開著（例如延長了截止時間）就照新的時間重新排
+      renderHome();
+      $('addonHomeWrap').classList.toggle('hidden', !(catalog.addon_open && ctaMode !== 'addon'));
+      if (catalog.addon_open && !$('addonHome').onclick) { $('addonHome').innerHTML = '已經報名了？加購餐點' + icon('arrow-right'); $('addonHome').onclick = () => addonEntry('home'); }
+      if (step > 0 && !addonCtx) toast('報名已經截止，無法再送出新的報名', 'info');
+    }, ms);
+  }
   function renderHome(){
     const info = parseInfo(catalog.event_info);
     if (real(info['日期'])) { const m = info['日期'].match(/(?:\d{4}\/)?(\d{1,2})\/(\d{1,2})/), w = info['日期'].match(/（(.)）/); if (m) { evDay = `${+m[1]}/${+m[2]}`; evWk = w ? w[1] : ''; $('evDate').querySelector('b').textContent = evDay; $('evDate').querySelector('.wk').textContent = evWk ? '週' + evWk : ''; $('hbarDate').textContent = `${evDay}${evWk ? `（${evWk}）` : ''}`; $('seeYou').textContent = cp('end_h') || `${evDay} 見`; } }
@@ -2357,6 +2372,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     (catalog.vendors || []).forEach(v => { if (v.order_closed) (v.items || []).forEach(i => { i.remaining = 0; i.closed = true; }); });
     renderHome();
     if (catalog.addon_open && ctaMode !== 'addon') { $('addonHome').innerHTML = '已經報名了？加購餐點' + icon('arrow-right'); $('addonHomeWrap').classList.remove('hidden'); $('addonHome').onclick = () => addonEntry('home'); }
+    scheduleCloseFlip();
     if (token) return showLookup(token);
     const d = loadDraft();
     if (d) applyDraft(d);
