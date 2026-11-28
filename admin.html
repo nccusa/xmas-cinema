@@ -560,6 +560,9 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
     const partial = regs.filter(r => !r.is_test && siteState(r) === 'partial').length;
     const apn = regs.filter(r => !r.is_test && r.status !== 'cancelled' && addonPend(r)).length;
     if (apn) todo.push(['info', 'shopping-bag', `${apn} 筆加購等待付款`, '匯入郵局明細後會自動對帳；逾期沒付會自動取消這次加購（報名保留）', 'orders']);
+    if (settings && settings.reg_limit) { const rl = settings.reg_limit, rt = regs.filter(r => !r.is_test && r.status !== 'cancelled').length;
+      if (rt >= rl) todo.push(['caution', 'users', `報名已額滿（${rt}／${rl}），報名頁已自動停止報名`, '有人取消會自動釋出名額；要再開放就到「設定」調高上限或清空', 'settings']);
+      else if (rt >= rl * 0.95) todo.push(['info', 'users', `報名快滿了：${rt}／${rl}`, `再 ${rl - rt} 人就會自動停止報名`, 'settings']); }
     if (settings && settings.film_revealed === false) todo.push(['info', 'film', '電影還沒在網站上公布', '要公布時到「設定」打開「在網站上公布電影」，再按「儲存設定」', 'settings']);
     if (partial) todo.push(['info', 'hand-platter', `${partial} 人已報到但餐點還沒領完`, '到訂單頁用「現場進度」篩選', 'orders']);
     for (let i = todo.length - 1; i >= 0; i--) if (!pageOk(todo[i][4])) todo.splice(i, 1);
@@ -576,7 +579,7 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
     const prepTotal = v => Object.values(prepBy[v]).reduce((s, x) => s + x.amt, 0);
     page().innerHTML = `
       <div class="kpis">
-        ${kpi('users', '有效報名', k.total, '人（只報名不限）')}${kpi('utensils', '餐點預訂名額', k.orders, '／' + cap, k.orders / cap * 100)}
+        ${settings && settings.reg_limit ? kpi('users', '有效報名', k.total, '／' + settings.reg_limit + ' 上限', k.total / settings.reg_limit * 100) : kpi('users', '有效報名', k.total, '人（只報名不限）')}${kpi('utensils', '餐點預訂名額', k.orders, '／' + cap, k.orders / cap * 100)}
         ${kpi('hourglass', '待付款', k.pending)}
         ${kpi('circle-dollar-sign', '已收金額', '<span style="font-size:22px">' + money(k.revenue) + '</span>')}
         ${kpi('user-check', '已報到', k.checked, '／' + k.paid + ' 已付款', k.checked / Math.max(1, k.paid) * 100)}
@@ -1433,11 +1436,12 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
         <div class="grid2">${f('film_title', '放映電影片名', 'text', '還沒確定可以先空白，首頁會顯示「片單待公布」')}<div><label class="field"><span>電影海報</span><input data-s="film_image_url" value="${esc(s.film_image_url || '')}" placeholder="上傳或貼上圖片網址"></label><div class="row" style="margin:-6px 0 12px"><label class="btn sec sm">${icon('upload')}上傳海報<input type="file" accept="image/*" id="posterUp" hidden></label>${s.film_image_url ? `<img src="${esc(s.film_image_url)}" alt="" style="height:56px;border-radius:6px">` : ''}<span class="small muted">海報是片商的著作，請先確認公播授權包含宣傳使用。</span></div></div></div>
         ${f('film_note', '電影介紹', 'textarea')}${f('venue_note', '現場說明（座位、自備物品、雨備）', 'textarea')}${f('pickup_note', '取餐說明（顯示在選餐頁）', 'textarea', '例如：開演前 30 分鐘在草坪入口取餐，熱飲現場製作。空白時會顯示預設說明。')}</div>
       <div class="card"><h2>${icon('calendar')}報名與名額</h2>
-        <div class="grid2">${f('registration_open_at', '開放報名時間（台北時間）', 'datetime-local')}${f('registration_close_at', '報名截止時間', 'datetime-local')}${f('payment_hold_hours', '付款保留時數', 'number', '報名後幾小時內要付款')}${f('auto_cancel_grace_hours', '自動取消前的緩衝時數', 'number', '期限過後，郵局明細要涵蓋到「期限＋這段時間」、而且沒有待處理的款項，才會自動取消（跨行轉帳可能隔天才入帳，預設 24）。取消後會產生「訂單已取消」通知信，要核准才寄')}${f('payment_deadline', '最晚付款期限', 'datetime-local', '保留時數算出來的期限不會超過這個時間。改這裡不會影響已經報名的人；個別延長請到「訂單」')}${f('capacity', '餐點預訂名額上限', 'number', '只算有點餐或加購的報名；只報名的人不佔名額')}${f('expected_attendance', '最佳觀影人數（報名前跳出「現場熱度」）', 'number', '留空就不跳出。報名人數到這個數字的一半以上，按「免費報名」時會先跳出「N 人已報名・最佳觀影體驗為 X 人」和一串燈泡；已報名含只報名，取消的不算')}${f('reg_ip_limit_per_hour', '同一網路每小時報名上限', 'number', '校園 Wi-Fi 很多人共用同一個對外網路，不要設太低（預設 60）')}${f('reg_alert_per_15min', '15 分鐘報名數通知門檻', 'number', '15 分鐘內新報名達到這個數字，會通知 Discord 私人監控頻道')}${f('data_purge_by', '個資刪除期限', 'date', '活動後 30 天；期限前 16 天、前 3 天、當天會在 Discord 提醒')}</div></div>
+        <div class="grid2">${f('registration_open_at', '開放報名時間（台北時間）', 'datetime-local')}${f('registration_close_at', '報名截止時間', 'datetime-local')}${f('reg_limit', '報名人數上限', 'number', '有效報名（不含已取消）到這個數字就自動停止報名，報名頁顯示「報名已額滿」；有人取消會自動釋出名額。空白＝不限')}${f('payment_hold_hours', '付款保留時數', 'number', '報名後幾小時內要付款')}${f('auto_cancel_grace_hours', '自動取消前的緩衝時數', 'number', '期限過後，郵局明細要涵蓋到「期限＋這段時間」、而且沒有待處理的款項，才會自動取消（跨行轉帳可能隔天才入帳，預設 24）。取消後會產生「訂單已取消」通知信，要核准才寄')}${f('payment_deadline', '最晚付款期限', 'datetime-local', '保留時數算出來的期限不會超過這個時間。改這裡不會影響已經報名的人；個別延長請到「訂單」')}${f('capacity', '餐點預訂名額上限', 'number', '只算有點餐或加購的報名；只報名的人不佔名額')}${f('expected_attendance', '最佳觀影人數（報名前跳出「現場熱度」）', 'number', '留空就不跳出。報名人數到這個數字的一半以上，按「免費報名」時會先跳出「N 人已報名・最佳觀影體驗為 X 人」和一串燈泡；已報名含只報名，取消的不算')}${f('reg_ip_limit_per_hour', '同一網路每小時報名上限', 'number', '校園 Wi-Fi 很多人共用同一個對外網路，不要設太低（預設 60）')}${f('reg_alert_per_15min', '15 分鐘報名數通知門檻', 'number', '15 分鐘內新報名達到這個數字，會通知 Discord 私人監控頻道')}${f('data_purge_by', '個資刪除期限', 'date', '活動後 30 天；期限前 16 天、前 3 天、當天會在 Discord 提醒')}</div></div>
       <div class="card"><h2>${icon('shopping-bag')}第二波加購</h2><p>打開並儲存後，已付款或只報名的人會在首頁和自己的訂單頁看到「加購餐點」，可以替原本的報名加點餐點。加購要在「付款保留時數」內轉帳，逾期只取消這次加購，報名保留。</p>
         ${addonTplWarn()}
-        <label class="switch go" style="margin:4px 0 14px"><input type="checkbox" id="addonSw" ${addonOn(s) ? 'checked' : ''}><span class="sw"></span><span><b id="addonSwT">${addonOn(s) ? '加購開放中' : '加購沒有開放'}</b><small id="addonSwS">${addonOn(s) ? `從 ${esc(fmtTime(s.addon_open_at))} 開始` : '關閉時，報名頁看不到加購入口'}</small></span></label>
-        <div class="grid2">${f('addon_close_at', '加購截止時間（台北時間）', 'datetime-local', '空白＝到報名截止時間為止')}</div></div>
+        <label class="switch go" style="margin:4px 0 14px"><input type="checkbox" id="addonSw" ${s.addon_open_at ? 'checked' : ''}><span class="sw"></span><span><b id="addonSwT">${addonOn(s) ? '加購開放中' : s.addon_open_at ? '已排定開放' : '加購沒有開放'}</b><small id="addonSwS">${addonOn(s) ? `從 ${esc(fmtTime(s.addon_open_at))} 開始` : s.addon_open_at ? `${esc(fmtTime(s.addon_open_at))} 自動開放` : '關閉時，報名頁看不到加購入口'}</small></span></label>
+        <div class="grid2"><label class="field"><span>加購開始時間（台北時間）</span><input id="addonStartIn" type="datetime-local" value="${esc(toLocalInput(s.addon_open_at))}"><small>空白＝按下「儲存設定」的當下開始；也可以先填好時間，到時間自動開放</small></label>
+          ${f('addon_close_at', '加購截止時間（台北時間）', 'datetime-local', `空白＝跟報名截止時間一樣（目前是 ${fmtTime(s.registration_close_at)}）。報名提早截止的話這裡一定要填，否則加購會跟著報名一起關掉。餐車的截止時間在「菜單」各店家設定`)}</div></div>
       <div class="card"><h2>${icon('wallet')}收款資訊</h2>
         <div class="grid2">${f('bank_name', '收款銀行')}${f('bank_code', '銀行代碼')}${f('account_no', '收款帳號（郵局 14 碼）')}${f('account_name', '戶名')}</div>${f('qr_image_url', '收款 QR Code 圖片網址', 'text', '通常留空：報名頁會依收款帳號自動產生轉帳 QR Code。郵局 App 的收款碼 24 小時就過期，不要貼在這裡。')}</div>
       <div class="card"><h2>${icon('mail')}信件與其他</h2>
@@ -1450,7 +1454,9 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
     $('saveS').onclick = e => busy(e.currentTarget, async () => {
       const p = { event_info: buildEventInfo($('evD').value, $('evT').value, $('evP').value) }; page().querySelectorAll('[data-s]').forEach(el => { const k = el.dataset.s; p[k] = el.type === 'checkbox' ? el.checked : el.type === 'datetime-local' ? fromLocalInput(el.value) : el.type === 'number' ? parseInt(el.value, 10) : el.value.trim(); });
       if (p.qr_image_url === '') p.qr_image_url = null; if (p.film_image_url === '') p.film_image_url = null;
-      p.addon_open_at = $('addonSw').checked ? (addonOn(settings) ? settings.addon_open_at : new Date().toISOString()) : null;
+      p.addon_open_at = $('addonSw').checked ? (fromLocalInput($('addonStartIn').value) || new Date().toISOString()) : null;
+      if (p.addon_open_at) { const endA = new Date(p.addon_close_at || p.registration_close_at || settings.registration_close_at);
+        if (!(endA > new Date(p.addon_open_at)) || endA < new Date()) { toast(`加購截止時間（${fmtTime(endA)}）要晚於開始時間和現在。報名提早截止的話，請另外填「加購截止時間」`, 'err'); return; } }
       p.updated_at = new Date().toISOString();
       await run(() => Api.patch('settings', 'id=eq.1', p), '設定已儲存'); await loadAll(); renderSettings();
     });

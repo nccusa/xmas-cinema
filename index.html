@@ -215,6 +215,10 @@ body:has(#home.hidden) .fmark{color:var(--green)}
 .btn.hero-cta{background:var(--red);border-color:var(--red);color:#fff;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18),0 0 0 1px rgba(243,210,122,.55),0 10px 28px -8px rgba(217,20,26,.6);min-height:56px;padding:12px 30px;font-size:17.5px}
 .btn.hero-cta:hover{background:#BD1016}
 .btn.hero-cta:disabled{box-shadow:none}
+/* 報名額滿：不用半透明的停用按鈕（會透出後面的插畫），改成實心的米色「額滿」牌子 */
+.btn.hero-cta.is-full,.btn.hero-cta.is-full:hover,.kv .btn.hero-cta.is-full,.kv .btn.hero-cta.is-full:hover{opacity:1;background:#F3E7CC;border-color:#C9A45C;color:#7A2A20;box-shadow:inset 0 0 0 2px #FFF6E0,0 0 0 1px #C9A45C,0 8px 20px -10px rgba(0,0,0,.45);cursor:default}
+.cta-note a{color:inherit;text-decoration:underline;text-underline-offset:3px;font-weight:600;white-space:nowrap}
+.reg-full .cta-sub{display:none}
 .resume{margin:0 0 8px}
 .night .resume{background:rgba(255,253,246,.08);border-color:rgba(255,253,246,.22);color:var(--cream)}
 .night .resume .t span{color:#C9D0C6}
@@ -1316,7 +1320,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     return `<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="${G}"/><path d="M14 28h36v22H14z" fill="${W}"/><path d="M10 28l6-12h32l6 12z" fill="${R}"/><rect x="28" y="36" width="8" height="14" fill="${Y}"/></svg>`;
   }
   document.querySelectorAll('.tiles').forEach(t => t.innerHTML = `<svg viewBox="0 0 1680 28" preserveAspectRatio="xMinYMid slice">${tileBand(60, 28)}</svg>`);
-  let canRegister = false, kvCtaHidden = false, hbarSync = () => {};
+  let canRegister = false, kvCtaHidden = false, hbarSync = () => {}, ctaMode = 'reg';   // ctaMode：reg＝報名、addon＝報名已截止但開放加購（主按鈕變加購）
   // 首頁往下捲、第一顆報名按鈕不在畫面上時，底部出現固定的報名列
   if ('IntersectionObserver' in window) {
     const vis = new Map();
@@ -1539,11 +1543,24 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     const now = new Date(); let note = '', can = false;
     if (!catalog.is_open && now < new Date(catalog.open_at)) note = `${fmtTime(catalog.open_at)} 開放報名`;
     else if (!catalog.is_open) note = '報名已截止。已經報名的人可以用 Email 裡的連結查詢訂單。';
+    else if (catalog.reg_full) note = '報名名額已滿，謝謝大家的熱情！已經報名的人可以用 Email 裡的連結查詢訂單。';
     else if (orderFull) { can = true; note = '餐點預訂名額已滿・還是可以只報名入場'; }
     else { can = true; note = catalog.test_mode ? '測試模式：現在就可以報名' : `報名截止 ${(d => `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`)(new Date(new Date(catalog.close_at).getTime() + (480 + new Date().getTimezoneOffset()) * 6e4))}`; }
     ['openNote', 'openNote2'].forEach(id => $(id).textContent = note);
-    ['startBtn', 'startBtn2', 'hbarBtn'].forEach(id => { $(id).disabled = !can; $(id).innerHTML = icon('ticket') + '免費報名'; });
-    canRegister = can; hbarSync();
+    const full = catalog.is_open && catalog.reg_full, ended = !catalog.is_open && !(now < new Date(catalog.open_at)) && !catalog.offline;
+    ctaMode = ended && catalog.addon_open ? 'addon' : 'reg';
+    const stop = (full || ended) && ctaMode !== 'addon';
+    ['startBtn', 'startBtn2', 'hbarBtn'].forEach(id => {
+      const b = $(id);
+      if (ctaMode === 'addon') { b.disabled = false; b.classList.remove('is-full'); b.innerHTML = icon('shopping-bag') + '加購餐點'; }
+      else { b.disabled = !can; b.classList.toggle('is-full', stop); b.innerHTML = icon('ticket') + (full ? '報名已額滿' : ended ? '報名已截止' : '免費報名'); }
+    });
+    document.body.classList.toggle('reg-full', stop);
+    const findLink = '已經報名的人可以<a href="#" data-find>查詢訂單</a>。';
+    const noteHtml = ctaMode === 'addon' ? `報名已截止，謝謝大家！<br>已經報名的人現在可以加購餐點（到 ${(d => `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`)(new Date(new Date(catalog.addon_close_at).getTime() + (480 + new Date().getTimezoneOffset()) * 6e4))}）。`
+      : full ? '報名名額已滿，謝謝大家的熱情！<br>' + findLink : ended ? '報名已截止，謝謝大家！<br>' + findLink : '';
+    if (noteHtml) ['openNote', 'openNote2'].forEach(id => { $(id).innerHTML = noteHtml; const a = $(id).querySelector('[data-find]'); if (a) a.onclick = e => { e.preventDefault(); track('xc_full_lookup'); showFind(); }; });
+    canRegister = can || ctaMode === 'addon'; hbarSync();
     $('poster').classList.toggle('has', !!catalog.film_image_url); document.querySelector('.poster-wrap').classList.toggle('empty', !catalog.film_image_url); document.querySelector('.film').classList.toggle('nofilm', !catalog.film_image_url);
     $('poster').innerHTML = catalog.film_image_url ? `<img src="${esc(catalog.film_image_url)}" alt="${esc(catalog.film_title || '電影海報')}">` : `<div class="soon"><svg viewBox="0 0 200 200" aria-hidden="true">${star(34, 30, 12, 5, 5, 'tw')}${star(168, 22, 8, 3.5, 5, 'tw')}${star(178, 186, 10, 4, 5, 'tw')}${star(20, 192, 6, 2.5, 5, 'tw')}</svg>${catalog.film_title ? `<b class="ptitle">${catalog.film_title.split(/[：:]/).map(esc).join('<br>')}</b>` : '<span class="q">?</span><b>片單即將揭曉</b>'}</div>`;
     $('filmBody').innerHTML = catalog.film_title ? `<p class="title">${esc(catalog.film_title)}</p>${catalog.film_note ? String(catalog.film_note).replace(/\r/g, '').trim().split(/\n\s*\n+/).map(x => `<p>${esc(x.trim()).replace(/\n/g, '<br>')}</p>`).join('') : ''}` : `<p class="muted">${esc(cp('film_empty'))}</p>`;
@@ -1752,7 +1769,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     }, dir);
     setTimeout(() => { const h = s === 1 ? $('s1t') : s === 2 ? $('s2t') : $('payT'); if (h) h.focus({ preventScroll: true }); }, 60);
   }
-  const start = e => { track('xc_start_registration', { xc_from: ({ startBtn: 'hero', startBtn2: 'closing', hbarBtn: 'sticky_bar' })[e && e.currentTarget && e.currentTarget.id] || 'other' }); const enter = () => { history.pushState({ s: 1 }, '', '#order'); go(1); }; if (!heatGate(enter)) enter(); };
+  const start = e => { if (ctaMode === 'addon') return addonEntry(({ startBtn: 'hero', startBtn2: 'closing', hbarBtn: 'sticky_bar' })[e && e.currentTarget && e.currentTarget.id] || 'cta'); track('xc_start_registration', { xc_from: ({ startBtn: 'hero', startBtn2: 'closing', hbarBtn: 'sticky_bar' })[e && e.currentTarget && e.currentTarget.id] || 'other' }); const enter = () => { history.pushState({ s: 1 }, '', '#order'); go(1); }; if (!heatGate(enter)) enter(); };
   $('startBtn').onclick = start; $('startBtn2').onclick = start; $('hbarBtn').onclick = start;
   const next = () => { if (addonCtx && step === 1) return openAddonConfirm(); if (step === 1) { track('xc_begin_details', { xc_items: count(), xc_value: total() }); history.pushState({ s: 2 }, '', '#order'); go(2); } else if (step === 2) submit(); };
   $('sumNext').onclick = next; $('mNext').onclick = next;
@@ -2339,7 +2356,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     // 每家店可以各自截止預購（後台「菜單」設定）；截止的店品項鎖起來
     (catalog.vendors || []).forEach(v => { if (v.order_closed) (v.items || []).forEach(i => { i.remaining = 0; i.closed = true; }); });
     renderHome();
-    if (catalog.addon_open) { $('addonHome').innerHTML = '已經報名了？加購餐點' + icon('arrow-right'); $('addonHomeWrap').classList.remove('hidden'); $('addonHome').onclick = () => addonEntry('home'); }
+    if (catalog.addon_open && ctaMode !== 'addon') { $('addonHome').innerHTML = '已經報名了？加購餐點' + icon('arrow-right'); $('addonHomeWrap').classList.remove('hidden'); $('addonHome').onclick = () => addonEntry('home'); }
     if (token) return showLookup(token);
     const d = loadDraft();
     if (d) applyDraft(d);
