@@ -386,6 +386,8 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
   if (window.registerSW) registerSW();
   const $ = id => document.getElementById(id);
   let regs = [], menu = { vendors: [], items: [] }, settings = null, dash = null, view = 'dash';
+  let addons = [], tplState = [];   // 加購紀錄（addon_batches）：每次加購一筆，待付款／已付款／已取消
+  const addonPend = r => addons.find(a => a.registration_id === r.id && a.status === 'pending');
   let lastLoad = 0, lastImport = null, pageDirty = false;
   let myRole = 'admin';
   const ROLE_NAME = { admin: '管理員', accountant: '會計', viewer: '唯讀', ops: '活動執行', staff: '現場人員' };
@@ -479,14 +481,16 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
   $('installBtn').onclick = async () => { if (deferred) { deferred.prompt(); deferred = null; return; } await ask({ title: '安裝成 App', body: /iPhone|iPad/.test(navigator.userAgent) ? 'iPhone／iPad：用 Safari 打開，點「分享」→「加入主畫面」。' : '電腦版 Chrome／Edge：點網址列右邊的「安裝」圖示。\n手機 Chrome：右上角選單 →「安裝應用程式」。', ok: '知道了', cancel: '關閉' }); };
 
   async function loadAll(){
-    const [r, v, i, s, ib] = await Promise.all([
+    const [r, v, i, s, ib, ad, tp] = await Promise.all([
       Api.select('registrations', 'select=*,order_items(*),pickups(*)&order=created_at.desc'),
       Api.select('vendors', 'select=*&order=sort,name'),
       Api.select('menu_items', 'select=*&order=sort,name'),
       Api.select('settings', 'select=*&id=eq.1'),
-      Api.select('import_batches', 'select=created_at&order=created_at.desc&limit=1').catch(() => [])
+      Api.select('import_batches', 'select=created_at&order=created_at.desc&limit=1').catch(() => []),
+      Api.select('addon_batches', 'select=*&order=created_at.desc').catch(() => []),
+      Api.select('email_templates', 'select=key,approved_at,enabled').catch(() => [])
     ]);
-    regs = r; menu = { vendors: v, items: i }; settings = s[0]; lastImport = ib[0] ? ib[0].created_at : null; lastLoad = Date.now();
+    regs = r; addons = ad; tplState = tp; menu = { vendors: v, items: i }; settings = s[0]; lastImport = ib[0] ? ib[0].created_at : null; lastLoad = Date.now();
     try { dash = await Api.rpc('admin_dashboard'); } catch (e) { dash = null; }
     paintChrome();
   }
@@ -543,6 +547,8 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
     if (d.email_blocked) todo.push(['crit', 'mail-warning', `${d.email_blocked} 封信寄送失敗或被擋下`, '通常是範本變數沒代入或 Email 錯誤', 'mail']);
     if (od) todo.push(['crit', 'clock', `${od} 筆逾期未付款`, '先匯入最新明細，確認沒付再設定新期限', 'orders']);
     const partial = regs.filter(r => !r.is_test && siteState(r) === 'partial').length;
+    const apn = regs.filter(r => !r.is_test && r.status !== 'cancelled' && addonPend(r)).length;
+    if (apn) todo.push(['info', 'shopping-bag', `${apn} 筆加購等待付款`, '匯入郵局明細後會自動對帳；逾期沒付會自動取消這次加購（報名保留）', 'orders']);
     if (settings && settings.film_revealed === false) todo.push(['info', 'film', '電影還沒在網站上公布', '要公布時到「設定」打開「在網站上公布電影」，再按「儲存設定」', 'settings']);
     if (partial) todo.push(['info', 'hand-platter', `${partial} 人已報到但餐點還沒領完`, '到訂單頁用「現場進度」篩選', 'orders']);
     for (let i = todo.length - 1; i >= 0; i--) if (!pageOk(todo[i][4])) todo.splice(i, 1);
@@ -610,6 +616,7 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
   function payState(r){
     if (r.status === 'cancelled') return 'cancelled';
     if (r.status === 'pending_payment') return overdue(r) ? 'overdue' : 'pending';
+    if (addonPend(r)) return 'addon';
     return r.total_amount !== r.paid_amount ? 'balance' : 'paid';
   }
   function siteState(r){
@@ -618,9 +625,9 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
     if (!r.checked_in_at) return 'none';
     return pickedOf(r) >= vendorsOf(r).length ? 'done' : 'partial';
   }
-  const PAY = { all: '全部付款狀態', pending: '待付款', overdue: '逾期未付', paid: '已入帳', balance: '金額有差額', cancelled: '已取消' };
+  const PAY = { all: '全部付款狀態', pending: '待付款', overdue: '逾期未付', addon: '加購待付款', paid: '已入帳', balance: '金額有差額', cancelled: '已取消' };
   const SITE = { all: '全部現場進度', none: '還沒報到', partial: '已報到・餐點還沒領完', done: '報到取餐都完成' };
-  const payBadge = r => ({ pending: `<span class="badge b-caution">${icon('hourglass')}待付款</span>`, overdue: `<span class="badge b-crit">${icon('clock')}逾期未付</span>`, paid: `<span class="badge b-ok">${icon('circle-check')}已入帳</span>`, balance: `<span class="badge b-crit">${icon('triangle-alert')}${r.total_amount > r.paid_amount ? '需補 ' + (r.total_amount - r.paid_amount) : '需退 ' + (r.paid_amount - r.total_amount)}</span>`, cancelled: `<span class="badge b-neu">已取消</span>` })[payState(r)];
+  const payBadge = r => ({ pending: `<span class="badge b-caution">${icon('hourglass')}待付款</span>`, overdue: `<span class="badge b-crit">${icon('clock')}逾期未付</span>`, paid: `<span class="badge b-ok">${icon('circle-check')}已入帳</span>`, addon: `<span class="badge b-caution">${icon('shopping-bag')}加購待付 ${(addonPend(r) || {}).amount || ''}</span>`, balance: `<span class="badge b-crit">${icon('triangle-alert')}${r.total_amount > r.paid_amount ? '需補 ' + (r.total_amount - r.paid_amount) : '需退 ' + (r.paid_amount - r.total_amount)}</span>`, cancelled: `<span class="badge b-neu">已取消</span>` })[payState(r)];
   function siteText(r){
     const st = siteState(r), nv = vendorsOf(r).length;
     if (st === 'na') return '<span class="muted">—</span>';
@@ -657,7 +664,7 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
       <div class="row small muted" style="margin:-4px 0 12px">顯示 ${list.length}／${regs.length} 筆${regs.some(r => r.is_test) ? `<label class="row" style="margin-left:auto"><input type="checkbox" id="onlyTest" ${onlyTest ? 'checked' : ''}>只看測試資料</label>` : ''}</div>
       ${opay === 'overdue' && list.length ? `<div class="note caution">${icon('triangle-alert')}<div class="grow">這些人已經超過付款期限。<b>先匯入最新的郵局明細</b>，確認還是沒付，再設定新期限（會產生「延長期限通知」信，核准後才寄出）。</div><button class="btn sm" type="button" id="extendAll">為 ${list.length} 人設定新期限</button></div>` : ''}
       ${picked.length ? `<div class="bulkbar" role="region" aria-label="批次操作">
-        <div class="grow"><b>已選 ${picked.length} 筆</b><span class="bsum">${[['pending', '待付款'], ['overdue', '逾期'], ['paid', '已入帳'], ['balance', '有差額'], ['cancelled', '已取消']].filter(([k]) => sum(k)).map(([k, t]) => `${t} ${sum(k)}`).join('・')}</span></div>
+        <div class="grow"><b>已選 ${picked.length} 筆</b><span class="bsum">${[['pending', '待付款'], ['overdue', '逾期'], ['addon', '加購待付'], ['paid', '已入帳'], ['balance', '有差額'], ['cancelled', '已取消']].filter(([k]) => sum(k)).map(([k, t]) => `${t} ${sum(k)}`).join('・')}</span></div>
         ${picked.some(r => r.status === 'pending_payment') ? `<button class="btn sm sec" type="button" data-bulk="deadline">${icon('calendar')}設定付款期限</button>` : ''}
         ${picked.some(r => r.status !== 'cancelled') ? `<button class="btn sm sec" type="button" data-bulk="cancel">${icon('circle-x')}取消報名</button>` : ''}
         <details class="moremenu"><summary class="btn sm sec">${icon('ellipsis')}更多</summary><div class="mm">${picked.some(r => !r.is_test) ? `<p>幹部或同學測試留下的正式訂單，可以標成測試資料：不再計入總覽，之後用「測試工具 → 清除全部測試資料」連同款項一起刪除。</p><button class="btn sm sec" type="button" data-bulk="mark_test">${icon('flask-conical')}標記為測試資料</button><hr>` : ''}<p>永久刪除只會刪測試資料，或已取消且沒收過款的訂單（目前選取中 ${deletable.length} 筆可刪）。</p><button class="btn sm danger" type="button" data-bulk="delete" ${deletable.length ? '' : 'disabled'}>${icon('trash-2')}永久刪除 ${deletable.length} 筆</button></div></details>
@@ -792,6 +799,7 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
     const left = vs.filter(v => r.status !== 'picked_up' && !pv.has(v));
     const alert = ps === 'overdue' ? ['crit', `已超過付款期限（${fmtTime(r.payment_deadline)}），還沒確認到付款。`]
       : ps === 'pending' ? ['caution', `待付款，期限 ${fmtTime(r.payment_deadline)}。`]
+      : ps === 'addon' ? ['caution', `有一筆加購待付款 ${addonPend(r).amount} 元，期限 ${fmtTime(addonPend(r).payment_deadline)}。付款確認前加購的餐點不算訂購成功；逾期會自動取消這次加購，報名保留。`]
       : ps === 'balance' ? ['crit', owe > 0 ? `餐點改過，還要補 ${owe} 元。` : `多收了 ${-owe} 元，需要退款。`]
       : ss === 'partial' ? ['caution', `已報到，還有 ${left.length} 家餐點待領取（${left.join('、')}）。`]
       : ss === 'done' && r.status !== 'cancelled' ? ['ok', vs.length ? '報到、取餐都完成了。' : '已報到。'] : null;
@@ -800,7 +808,7 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
       <div class="dhead">
         <div class="row"><div class="grow"><h2 id="dTitle">${esc(r.name)}</h2><div class="sub"><span class="num">${esc(r.order_no)}</span>・${r.participant_type === 'guest' ? '校外人士' : '政大學生 <span class="num">' + esc(r.student_id) + '</span>'}${r.is_test ? `・<span class="mini test">${icon('flask-conical')}測試資料</span>` : ''}</div><a class="dphone num" href="tel:${esc(r.phone)}">${icon('phone')}${esc(r.phone)}</a></div>
         <button class="btn quiet sm" type="button" id="dClose" aria-label="關閉">${icon('x')}</button></div>
-        <div class="tri">${cell('付款', { pending: '待付款', overdue: '逾期未付', paid: '已入帳', balance: '有差額', cancelled: '已取消' }[ps], r.paid_at ? fmtTime(r.paid_at).slice(5) : '')}${cell('報到', r.checked_in_at ? '已報到' : '還沒', r.checked_in_at ? fmtTime(r.checked_in_at).slice(5) : '')}${cell('取餐', vs.length ? `${pickedOf(r)}／${vs.length} 家` : '沒有點餐', '')}</div>
+        <div class="tri">${cell('付款', { pending: '待付款', overdue: '逾期未付', addon: '加購待付', paid: '已入帳', balance: '有差額', cancelled: '已取消' }[ps], r.paid_at ? fmtTime(r.paid_at).slice(5) : '')}${cell('報到', r.checked_in_at ? '已報到' : '還沒', r.checked_in_at ? fmtTime(r.checked_in_at).slice(5) : '')}${cell('取餐', vs.length ? `${pickedOf(r)}／${vs.length} 家` : '沒有點餐', '')}</div>
         ${alert ? `<div class="dalert ${alert[0]}">${esc(alert[1])}</div>` : ''}
       </div>
       <div class="dbody">
@@ -809,7 +817,7 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
         ${r.status === 'pending_payment' || owe > 0 ? `<details class="card fold"><summary>${icon('wallet')}人工入帳${icon('chevron-down')}</summary><div class="row" style="margin-top:10px"><input class="in num" id="payAmt" type="number" style="width:110px" value="${Math.max(owe, 0)}" aria-label="入帳金額"><input class="in grow" id="payNote" placeholder="原因（必填），例如：現金補繳"><button class="btn" type="button" id="markPaid">${icon('check')}入帳</button></div></details>` : ''}
         <div class="dtabs" role="tablist"><button type="button" role="tab" data-dt="items" aria-selected="${tab !== 'log'}">已訂餐點</button><button type="button" role="tab" data-dt="log" aria-selected="${tab === 'log'}">處理紀錄</button></div>
         <div id="dtItems" class="${tab === 'log' ? 'hidden' : ''}">
-          ${(r.order_items || []).length ? (r.order_items || []).map(o => `<div class="oline"><div><b>${esc(o.item_name)}</b><small>${esc(o.vendor_name)}・$${o.unit_price}／份${pv.has(o.vendor_name) || r.status === 'picked_up' ? '・<span class="okc">已領</span>' : ''}</small></div><div class="r"><b class="num">× ${o.qty}</b><small class="num">${money(o.unit_price * o.qty)}</small></div></div>`).join('') : '<p class="muted">只報名，沒有點餐。</p>'}
+          ${(r.order_items || []).length ? (r.order_items || []).map(o => `<div class="oline"><div><b>${esc(o.item_name)}</b>${o.addon_batch_id ? (st => `<span class="mini ${st === 'pending' ? 'caution' : 'ok'}" style="margin-left:6px">${st === 'pending' ? '加購・待付款' : '加購'}</span>`)((addons.find(a => a.id === o.addon_batch_id) || {}).status) : ''}<small>${esc(o.vendor_name)}・$${o.unit_price}／份${pv.has(o.vendor_name) || r.status === 'picked_up' ? '・<span class="okc">已領</span>' : ''}</small></div><div class="r"><b class="num">× ${o.qty}</b><small class="num">${money(o.unit_price * o.qty)}</small></div></div>`).join('') : '<p class="muted">只報名，沒有點餐。</p>'}
           ${editable ? `<button class="btn sec" type="button" id="editItems" style="margin-top:12px">${icon('pencil')}修改餐點</button><div id="itemEditor" class="hidden"></div>` : ''}
         </div>
         <div id="dtLog" class="${tab === 'log' ? '' : 'hidden'}"><div class="empty small">${icon('loader-circle', 'spin')}載入中…</div></div>
@@ -1134,7 +1142,7 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
     cancelled: '已作廢，不會寄出。如果是誤作廢，勾選後按「重新產生」。'
   };
   const MAIL_ACTIONS = { pending_approval: ['cancel', 'approve'], failed: ['cancel', 'retry'], blocked: ['cancel', 'rerender'], cancelled: ['rerender'] };
-  const VARS = ['姓名','學號','附言代碼','身分','訂單編號','餐點明細','總金額','已付金額','付款期限','收款銀行','收款帳號','戶名','查詢連結','活動名稱','活動資訊','聯絡方式','收據明細','付款時間','付款方式'];
+  const VARS = ['姓名','學號','附言代碼','身分','訂單編號','餐點明細','總金額','已付金額','付款期限','收款銀行','收款帳號','戶名','查詢連結','活動名稱','活動資訊','聯絡方式','收據明細','付款時間','付款方式','加購明細','加購金額','加購付款期限'];
   async function renderMail(){
     pageDirty = false; if (!isAdmin()) mailView = 'queue';
     page().innerHTML = `<div class="card empty">${icon('loader-circle', 'spin')}載入中…</div>`;
@@ -1385,6 +1393,12 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
     if (date) { const [y, m, dd] = date.split('-').map(Number), wk = '日一二三四五六'[new Date(y, m - 1, dd).getDay()]; d = `${y}/${m}/${dd}（${wk}）`; }
     return `日期：${d}　時間：${time.trim() || '待公布'}　地點：${place.trim() || '待公布'}`;
   }
+  // 加購開關：開＝addon_open_at 設成按下儲存的時間；關＝清空。截止時間空白就到報名截止
+  const addonOn = s => !!(s.addon_open_at && new Date(s.addon_open_at) <= new Date());
+  function addonTplWarn(){
+    const need = tplState.filter(t => /^addon_/.test(t.key) && !t.approved_at).length;
+    return need ? `<div class="note caution">${icon('triangle-alert')}<span>還有 ${need} 封加購通知信的範本沒核准，加購的確認信、收據會寄不出去。請先到「信件」核准範本。</span></div>` : '';
+  }
   function renderSettings(){
     pageDirty = false;
     const s = settings, evParts = parseEventInfo(s.event_info);
@@ -1404,17 +1418,23 @@ body[data-role]:not([data-role="admin"]) .selc,body[data-role]:not([data-role="a
         ${f('film_note', '電影介紹', 'textarea')}${f('venue_note', '現場說明（座位、自備物品、雨備）', 'textarea')}${f('pickup_note', '取餐說明（顯示在選餐頁）', 'textarea', '例如：開演前 30 分鐘在草坪入口取餐，熱飲現場製作。空白時會顯示預設說明。')}</div>
       <div class="card"><h2>${icon('calendar')}報名與名額</h2>
         <div class="grid2">${f('registration_open_at', '開放報名時間（台北時間）', 'datetime-local')}${f('registration_close_at', '報名截止時間', 'datetime-local')}${f('payment_hold_hours', '付款保留時數', 'number', '報名後幾小時內要付款')}${f('auto_cancel_grace_hours', '自動取消前的緩衝時數', 'number', '期限過後，郵局明細要涵蓋到「期限＋這段時間」、而且沒有待處理的款項，才會自動取消（跨行轉帳可能隔天才入帳，預設 24）。取消後會產生「訂單已取消」通知信，要核准才寄')}${f('payment_deadline', '最晚付款期限', 'datetime-local', '保留時數算出來的期限不會超過這個時間。改這裡不會影響已經報名的人；個別延長請到「訂單」')}${f('capacity', '餐點預訂名額上限', 'number', '只算有點餐或加購的報名；只報名的人不佔名額')}${f('expected_attendance', '最佳觀影人數（報名前跳出「現場熱度」）', 'number', '留空就不跳出。報名人數到這個數字的一半以上，按「免費報名」時會先跳出「N 人已報名・最佳觀影體驗為 X 人」和一串燈泡；已報名含只報名，取消的不算')}${f('reg_ip_limit_per_hour', '同一網路每小時報名上限', 'number', '校園 Wi-Fi 很多人共用同一個對外網路，不要設太低（預設 60）')}${f('reg_alert_per_15min', '15 分鐘報名數通知門檻', 'number', '15 分鐘內新報名達到這個數字，會通知 Discord 私人監控頻道')}${f('data_purge_by', '個資刪除期限', 'date', '活動後 30 天；期限前 16 天、前 3 天、當天會在 Discord 提醒')}</div></div>
+      <div class="card"><h2>${icon('shopping-bag')}第二波加購</h2><p>打開並儲存後，已付款或只報名的人會在首頁和自己的訂單頁看到「加購餐點」，可以替原本的報名加點餐點。加購要在「付款保留時數」內轉帳，逾期只取消這次加購，報名保留。</p>
+        ${addonTplWarn()}
+        <label class="switch go" style="margin:4px 0 14px"><input type="checkbox" id="addonSw" ${addonOn(s) ? 'checked' : ''}><span class="sw"></span><span><b id="addonSwT">${addonOn(s) ? '加購開放中' : '加購沒有開放'}</b><small id="addonSwS">${addonOn(s) ? `從 ${esc(fmtTime(s.addon_open_at))} 開始` : '關閉時，報名頁看不到加購入口'}</small></span></label>
+        <div class="grid2">${f('addon_close_at', '加購截止時間（台北時間）', 'datetime-local', '空白＝到報名截止時間為止')}</div></div>
       <div class="card"><h2>${icon('wallet')}收款資訊</h2>
         <div class="grid2">${f('bank_name', '收款銀行')}${f('bank_code', '銀行代碼')}${f('account_no', '收款帳號（郵局 14 碼）')}${f('account_name', '戶名')}</div>${f('qr_image_url', '收款 QR Code 圖片網址', 'text', '通常留空：報名頁會依收款帳號自動產生轉帳 QR Code。郵局 App 的收款碼 24 小時就過期，不要貼在這裡。')}</div>
       <div class="card"><h2>${icon('mail')}信件與其他</h2>
-        <div class="grid2">${f('contact_info', '聯絡方式')}${f('site_url', '報名頁網址', 'text', '信件裡的查詢連結會用到')}${f('email_cap_24h', '每 24 小時寄信上限', 'number', '一般 Gmail 上限是 500，建議 450')}</div>${f('privacy_notice', '個人資料蒐集告知', 'textarea')}</div>
+        <div class="grid2">${f('contact_info', '聯絡方式')}${f('site_url', '報名頁網址', 'text', '信件裡的查詢連結會用到')}${f('email_cap_24h', '每 24 小時寄信上限', 'number', '一般 Gmail 上限是 500，建議 450')}${f('email_reserve_24h', '保留給付款相關信件的額度', 'number', '政大生的「免費報名完成」信最多只用到「上限 − 這個數字」，剩下的留給付款、校外人士和加購的信。建議 150')}</div>${f('privacy_notice', '個人資料蒐集告知', 'textarea')}</div>
       <div class="savebar"><button class="btn" type="button" id="saveS">${icon('check')}儲存設定</button></div>`;
+    $('addonSw').onchange = e => { $('addonSwT').textContent = e.target.checked ? '儲存後就開放加購' : '儲存後就關閉加購'; $('addonSwS').textContent = e.target.checked ? '已報名的人會馬上看到「加購餐點」' : '已經送出、還沒付款的加購不受影響'; };
     $('filmRev').onchange = e => { $('filmRevT').textContent = e.target.checked ? '儲存後，網站就會公布電影' : '儲存後，網站上會先藏起片名、海報和介紹'; };
     $('posterUp').onchange = async e => { const f0 = e.target.files[0]; if (!f0) return; const lab = e.target.closest('label'); lab.classList.add('busy');
       try { const url = await Api.upload('poster/' + Date.now().toString(36) + '.jpg', await shrink(f0)); page().querySelector('[data-s="film_image_url"]').value = url; toast('海報已上傳，記得按「儲存設定」'); } catch (er) { toast('上傳失敗：' + er.message, 'err'); } finally { lab.classList.remove('busy'); e.target.value = ''; } };
     $('saveS').onclick = e => busy(e.currentTarget, async () => {
       const p = { event_info: buildEventInfo($('evD').value, $('evT').value, $('evP').value) }; page().querySelectorAll('[data-s]').forEach(el => { const k = el.dataset.s; p[k] = el.type === 'checkbox' ? el.checked : el.type === 'datetime-local' ? fromLocalInput(el.value) : el.type === 'number' ? parseInt(el.value, 10) : el.value.trim(); });
       if (p.qr_image_url === '') p.qr_image_url = null; if (p.film_image_url === '') p.film_image_url = null;
+      p.addon_open_at = $('addonSw').checked ? (addonOn(settings) ? settings.addon_open_at : new Date().toISOString()) : null;
       p.updated_at = new Date().toISOString();
       await run(() => Api.patch('settings', 'id=eq.1', p), '設定已儲存'); await loadAll(); renderSettings();
     });

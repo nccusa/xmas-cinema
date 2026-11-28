@@ -467,6 +467,19 @@ fieldset.field{border:none;margin:0 0 22px;padding:0}
 .qrbox img{width:min(220px,70%);background:#fff;padding:8px;border-radius:var(--r)}
 .qrbox p{font-size:14px;color:var(--muted);margin:10px auto 0;max-width:420px}
 .memo{margin:22px 0;padding:16px 18px;border-radius:var(--rc);background:#FBF4E6;border:1px solid #E7CFA9}
+/* 加購（2026-11-28）：訂單頁的加購入口、待付款加購卡、加購模式的選餐頁 */
+.addon-cta{display:flex;align-items:center;gap:14px;margin:18px 0 6px;padding:16px 18px;border-radius:var(--rc);background:linear-gradient(135deg,#FBF4E6,#F3E7CC);border:1px solid #E2C98F}
+.addon-cta .ac-ic{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--green);color:#fff}.addon-cta .ac-ic .i{width:22px;height:22px}
+.addon-cta .ac-t{flex:1;min-width:0}.addon-cta .ac-t b{display:block;font-size:16px}.addon-cta .ac-t span{display:block;font-size:14px;color:var(--muted);line-height:1.6}
+.addon-cta .btn{flex:none}
+@media (max-width:520px){.addon-cta{flex-wrap:wrap}.addon-cta .btn{width:100%}}
+.addpay{margin:18px 0 8px;padding:18px 18px 8px;border-radius:var(--rc);border:1.5px solid #E2C98F;background:var(--white)}
+.addpay h3{margin:8px 0 4px;font-size:20px}.addpay .pay-amount{margin:14px 0 2px}.addpay .memo{margin:16px 0}
+.addpay .more{margin-top:8px}
+.tag-ad{display:inline-block;margin-left:6px;padding:0 7px;border-radius:999px;font-size:12px;font-weight:700;line-height:1.7;vertical-align:1px;background:#F6EBD2;color:#6E5418}.tag-ad.paid{background:#DDF0E8;color:var(--green)}
+.addon-mode #steps,.addon-mode .onlyreg{display:none!important}
+.addon-bar{display:none}.addon-mode .addon-bar{display:flex;align-items:center;gap:8px;margin:0 0 14px;padding:10px 14px;border-radius:var(--rc);background:#FBF4E6;border:1px solid #E7CFA9;font-size:14px;line-height:1.6}
+.addon-bar .i{width:18px;height:18px;flex:none;color:#86672A}
 .memo .k{display:flex;align-items:center;gap:8px;font-weight:700}
 .memo .k .i{color:var(--redtext)}
 .memo .small-note{font-size:14px;color:var(--muted,#5b6560);margin-top:6px}
@@ -615,12 +628,19 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:70;opa
 .loaded .beam{animation:projector .6s steps(1) 1 .1s}
 @keyframes projector{0%{opacity:.2}20%{opacity:.9}35%{opacity:.35}55%{opacity:1}100%{opacity:.8}}
 .hero-art svg .tier{will-change:transform}
+/* 首頁「已經報名了？加購餐點」（加購開放期間才出現） */
+.kv-addon{margin:10px 0 0;text-align:center}
+.kv-addon button{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:4px 10px;border:0;background:none;color:#F2E3BC;font:inherit;font-size:15px;font-weight:600;text-decoration:underline;text-underline-offset:4px;text-decoration-color:rgba(242,227,188,.5);cursor:pointer}
+.kv-addon button:hover{text-decoration-color:currentColor}.kv-addon .i{width:18px;height:18px}
+.errsum .dupacts{margin:12px 0 2px}.errsum .dupacts .btn .i{color:inherit;margin:0}
+.errsum.soft{border-color:#E2C98F;background:#FBF4E6}.errsum.soft #errIcon .i{color:#86672A}.errsum.soft ul{padding-left:0;list-style:none}
 /* 「上次的進度」細橫條 */
 #resume.resume{margin:0;border:0;border-radius:0;background:var(--green-d);color:var(--cream);padding:8px max(20px,calc((100% - 1120px) / 2));gap:10px;font-size:14px}
 #resume .i{color:var(--gold-l)}
 #resume .t{min-width:0}#resume .t b{display:inline;font-size:14px}#resume .t span{display:none}
 #resume .btn{min-height:36px;padding:0 14px;font-size:14px;box-shadow:none}
 #resume .btn.line{color:var(--cream);border-color:rgba(242,239,229,.4)}
+#resume.two .t{flex:1 1 220px}
 /* 海報、紙條 */
 .poster-wrap{position:relative;transform:rotate(-2deg);transition:transform .2s linear}
 .film.nofilm{grid-template-columns:minmax(0,300px) minmax(0,1fr)}
@@ -1088,6 +1108,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
         </div>
         <div class="kv-below" id="kvBelow">
           <div class="cta"><button class="btn hero-cta" type="button" id="startBtn" disabled>免費報名</button></div>
+          <p class="kv-addon hidden" id="addonHomeWrap"><button type="button" id="addonHome"></button></p>
           <p class="kv-film hidden" id="kvFilm"><span class="k">本場放映</span><span class="showing" id="showing"></span></p>
           <p class="countdown" id="countdown"></p>
           <div class="kv-meta"><p class="hero-meta" id="evMeta" aria-busy="true"><span class="skl" aria-hidden="true"></span></p><div class="cta-note" id="openNote">載入中…</div></div>
@@ -1177,6 +1198,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
       <div class="stepview" id="stepview">
         <section id="step1" aria-labelledby="s1t">
           <h2 id="s1t" tabindex="-1">想吃點什麼？</h2>
+          <p class="addon-bar" id="addonBar"><span data-icon="shopping-bag"></span><span id="addonBarTxt"></span></p>
           <div class="onlyreg"><button type="button" class="btn line sm" id="onlyReg"></button><span id="onlyRegNote"></span></div>
           <div id="addons"></div>
           <h3 class="subh hidden" id="foodSubT">想吃點什麼？</h3>
@@ -1212,9 +1234,9 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
       </div>
       <aside class="summary-col" id="summaryCol" aria-label="訂單摘要">
         <div class="summary">
-          <h3><span data-icon="shopping-bag"></span>你的訂單</h3>
+          <h3><span data-icon="shopping-bag"></span><span id="sumH">你的訂單</span></h3>
           <ul class="sum-list" id="sumList"></ul>
-          <div class="sum-total"><span>總金額</span><span class="num" id="sumTotal">NT$ 0</span></div>
+          <div class="sum-total"><span id="sumTotL">總金額</span><span class="num" id="sumTotal">NT$ 0</span></div>
           <button class="btn full" type="button" id="sumNext">下一步</button>
           <p class="hint" id="sumHint"></p>
         </div>
@@ -1423,6 +1445,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
   const wasPrice = i => i && i.list_price > i.price ? `<s class="was"><span aria-hidden="true">原價 </span><span class="sr">原價</span>$${esc(i.list_price)}</s>` : '';
   const closeNote = v => v.order_closed ? '預購已截止' : v.order_close_at ? `預購到 ${twTime(v.order_close_at)}` : '';   // 餐點預訂名額滿了：還是可以只報名
   let catalog = null, step = 0, evDay = '12/9', evWk = '三'; const cart = {};
+  let addonCtx = null;   // 加購模式（訂單頁按「加購餐點」進來時才有值）
   // 暫存：填到一半的報名（24 小時）、這台裝置最近的訂單（方便回來看 QR Code）
   const DRAFT_KEY = 'xc_draft_v1', ORDER_KEY = 'xc_order_v1', DRAFT_TTL = 24 * 3600e3, ORDER_TTL = 60 * 24 * 3600e3;
   const store = {
@@ -1433,7 +1456,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
   const FKEYS = ['name', 'sid', 'phone', 'email', 'last5'];
   let draftTimer = null, draftReady = false;
   function saveDraft(){
-    if (!draftReady) return;
+    if (!draftReady || addonCtx) return;
     clearTimeout(draftTimer);
     draftTimer = setTimeout(() => {
       const f = {}; FKEYS.forEach(k => { const el = $('f_' + k); f[k] = el ? el.value : ''; });
@@ -1460,12 +1483,13 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     const el = $('resume'); const o = store.get(ORDER_KEY);
     const order = o && Date.now() - (o.at || 0) < ORDER_TTL && /^[0-9a-f]{48}$/.test(o.token || '') ? o : null;
     if (order) {
-      el.innerHTML = `<span data-icon="ticket"></span><div class="t"><b>你在這台裝置報名過：訂單 ${esc(order.order_no || '')}</b><span>付款資訊和報到方式都在訂單頁。</span></div><div class="acts"><a class="btn" href="?t=${esc(order.token)}">${icon('arrow-right')}查看我的訂單</a></div>`;
+      el.innerHTML = `<span data-icon="ticket"></span><div class="t"><b>你在這台裝置報名過：訂單 ${esc(order.order_no || '')}</b><span>付款資訊和報到方式都在訂單頁。</span></div><div class="acts"><a class="btn" href="?t=${esc(order.token)}">${icon('arrow-right')}查看我的訂單</a>${catalog && catalog.addon_open ? `<button type="button" class="btn line" id="resumeAddon">${icon('plus')}加購餐點</button>` : ''}</div>`;
     } else if (d) {
       el.innerHTML = `<span data-icon="rotate-ccw"></span><div class="t"><b>上次的報名還沒送出，已經幫你保留</b><span>${esc(draftSummary(d))}</span></div><div class="acts"><button type="button" class="btn" id="resumeGo">${icon('arrow-right')}繼續填寫</button><button type="button" class="btn line" id="resumeClear">清除重填</button></div>`;
     } else { el.classList.add('hidden'); return; }
     if (window.hydrateIcons) hydrateIcons(el); else el.querySelectorAll('[data-icon]').forEach(x => x.outerHTML = icon(x.dataset.icon));
     el.classList.remove('hidden');
+    const ra = $('resumeAddon'); el.classList.toggle('two', !!ra); if (ra) ra.onclick = () => addonEntry('resume');
     const g = $('resumeGo'); if (g) g.onclick = () => { history.pushState({ s: d.step }, '', '#order'); go(d.step === 2 ? 2 : 1); };
     const c = $('resumeClear'); if (c) c.onclick = () => { clearDraft(); renderMenu(); updateSummary(false); el.classList.add('hidden'); toast('已清除，可以重新填寫', 'check'); };
   }
@@ -1631,7 +1655,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
 
   // 改數量：act 是 plus／minus／remove；回傳新的份數（被擋下時回傳 null）
   // 加購品（addon_for）要搭配同一組的主餐（combo_key），每份主餐可以加購 1 份；伺服器也會檢查
-  const mainQty = key => all().filter(x => x.combo_key === key).reduce((s, x) => s + baseQty(x.id), 0);
+  const mainQty = key => all().filter(x => x.combo_key === key).reduce((s, x) => s + baseQty(x.id), 0) + (addonCtx && addonCtx.mains[key] || 0);
   function trimAddons(key){
     let room = mainQty(key), cut = false;
     all().filter(x => x.addon_for === key).forEach(a => {
@@ -1694,16 +1718,16 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
   function updateSummary(animate){
     saveDraft(); syncOnlyReg(); syncZero();
     const l = list(), t = total();
-    const items = l.length ? l.map(i => `<li><span>${esc(i.name)} × ${i.qty}</span><span class="num">$${i.price * i.qty}</span></li>`).join('') : '<li class="empty">免費入場・無加購</li>';
+    const items = l.length ? l.map(i => `<li><span>${esc(i.name)} × ${i.qty}</span><span class="num">$${i.price * i.qty}</span></li>`).join('') : `<li class="empty">${addonCtx ? '還沒選要加購的餐點' : '免費入場・無加購'}</li>`;
     $('sumList').innerHTML = items;
     $('cartList').innerHTML = l.length ? l.map(i => `<li class="crow"><span class="cn">${esc(i.name)}<small class="num">$${i.price} × ${i.qty}　小計 $${i.price * i.qty}</small></span>
       <span class="qty" role="group" aria-label="${esc(i.name)} 數量"><button type="button" data-cq="minus" data-id="${esc(i.id)}" aria-label="減少 ${esc(i.name)}">${icon(i.qty === 1 ? 'trash-2' : 'minus')}</button><output>${i.qty}</output><button type="button" data-cq="plus" data-id="${esc(i.id)}" aria-label="增加 ${esc(i.name)}">${icon('plus')}</button></span></li>`).join('') : '<li class="empty">免費入場・無加購</li>';
     $('sumTotal').textContent = money(t); $('cartTotal').textContent = money(t);
-    $('mMeta').innerHTML = `<span class="bag">${icon('shopping-bag')}${count() ? `<em>${count()}</em>` : ''}</span><span>${step === 1 ? (count() ? `已選 ${count()} 份` : '免費入場・無加購') : '總金額'}<b id="mTotal">${money(t)}</b></span>`;
+    $('mMeta').innerHTML = `<span class="bag">${icon('shopping-bag')}${count() ? `<em>${count()}</em>` : ''}</span><span>${step === 1 ? (count() ? `已選 ${count()} 份` : addonCtx ? '還沒選餐點' : '免費入場・無加購') : '總金額'}<b id="mTotal">${money(t)}</b></span>`;
     if (animate && t !== lastTotal && !reduce) { [$('sumTotal'), $('mTotal')].forEach(el => { el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }); }
     lastTotal = t;
-    const label = step === 1 ? '下一步' : total() === 0 ? '確認免費報名' : '確認送出';
-    $('sumNext').innerHTML = label + icon(step === 1 ? 'arrow-right' : 'check'); $('mNext').innerHTML = label + icon(step === 1 ? 'arrow-right' : 'check');
+    const label = addonCtx ? '確認加購' : step === 1 ? '下一步' : total() === 0 ? '確認免費報名' : '確認送出';
+    const nic = addonCtx ? 'check' : step === 1 ? 'arrow-right' : 'check'; $('sumNext').innerHTML = label + icon(nic); $('mNext').innerHTML = label + icon(nic);
     $('sumHint').textContent = step !== 2 ? '' : t === 0 ? '免費入場・無加購：送出就完成報名，不用轉帳。' : '按下「確認送出」後才會建立訂單、顯示轉帳資訊；這時還沒有付款。';
   }
   function swap(fn, dir){
@@ -1730,10 +1754,11 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
   }
   const start = e => { track('xc_start_registration', { xc_from: ({ startBtn: 'hero', startBtn2: 'closing', hbarBtn: 'sticky_bar' })[e && e.currentTarget && e.currentTarget.id] || 'other' }); const enter = () => { history.pushState({ s: 1 }, '', '#order'); go(1); }; if (!heatGate(enter)) enter(); };
   $('startBtn').onclick = start; $('startBtn2').onclick = start; $('hbarBtn').onclick = start;
-  const next = () => { if (step === 1) { track('xc_begin_details', { xc_items: count(), xc_value: total() }); history.pushState({ s: 2 }, '', '#order'); go(2); } else if (step === 2) submit(); };
+  const next = () => { if (addonCtx && step === 1) return openAddonConfirm(); if (step === 1) { track('xc_begin_details', { xc_items: count(), xc_value: total() }); history.pushState({ s: 2 }, '', '#order'); go(2); } else if (step === 2) submit(); };
   $('sumNext').onclick = next; $('mNext').onclick = next;
   $('backBtn').onclick = () => history.back();
   addEventListener('popstate', () => {
+    if (addonCtx) { const t = addonCtx.token; exitAddon(); step = 0; showLookup(t); return; }
     if (step === 2) go(1);
     else if (step === 1) swap(() => { $('flow').classList.add('hidden'); $('mbar').classList.remove('on'); $('home').classList.remove('hidden'); step = 0; scrollTo({ top: 0 }); }, 'back');
   });
@@ -1888,6 +1913,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     if (!errs.some(([id]) => id === 'f_email') && mailPending()) { showMailHint(); errs.push(['f_email', 'Email 可能打錯了，請看 Email 下面的提示']); }
     const agree = $('f_agree').checked; $('w_agree').classList.toggle('bad', !agree); $('e_agree').innerHTML = agree ? '' : icon('circle-alert') + '請勾選同意個人資料蒐集告知'; if (!agree) errs.push(['f_agree', '請勾選同意個人資料蒐集告知']);
     $('errlist').innerHTML = errs.map(([id, m]) => `<li><a href="#${id}" data-f="${id}">${esc(m)}</a></li>`).join('');
+    $('errsum').classList.remove('soft'); $('errsum').querySelector('h3').textContent = '還有幾個地方要修改';
     $('errsum').classList.toggle('hidden', !errs.length);
     if (errs.length) $('errsum').focus();
     return !errs.length;
@@ -1903,11 +1929,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
       <div class="cf-tot"><span>總金額</span><span class="num">${money(total())}</span></div>`;
     // 付款期限＝送出後 N 小時（payment_hold_hours），最晚不超過 payment_deadline；
     // 但離現在不到 6 小時時（接近或超過付款期限才下單），給到下單後 12 小時、最晚報名截止後一天。和資料庫 calc_payment_deadline 一致
-    const dl = catalog.test_mode ? new Date(Math.max(new Date(catalog.payment_deadline || 0), Date.now() + 3 * 864e5)) : (() => {
-      const now = Date.now(), H = 36e5, g = catalog.payment_deadline ? new Date(catalog.payment_deadline).getTime() : Infinity;
-      let b = Math.min(now + (catalog.payment_hold_hours || 24) * H, g);
-      if (b < now + 6 * H) { const c = new Date(catalog.close_at || catalog.payment_deadline || now).getTime(); b = Math.max(b, Math.min(now + 12 * H, c + 24 * H)); }
-      return new Date(b); })();
+    const dl = payDeadline();
     $('cfDl').innerHTML = total() > 0 && dl ? `${icon('clock')}<span>送出後請在 <b>${esc(fmtTime(dl))}</b> 前轉帳 <b class="num">${money(total())}</b>，逾期訂單會取消、名額釋出。</span>` : '';
     $('cfDl').classList.toggle('hidden', !(total() > 0 && dl));
     $('cfPick').innerHTML = count() ? `${icon('hand-platter')}<span><b>取餐：</b>${esc(catalog.pickup_note || '活動當天報到後，到取餐區出示學生證（校外人士出示 QR Code）取餐。')}</span>` : '';
@@ -1915,9 +1937,94 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     $('scrim').classList.add('on'); $('confirmSheet').classList.add('on');
     setTimeout(() => $('cfGo').focus(), 50);
   }
+  function payDeadline(){
+    return catalog.test_mode ? new Date(Math.max(new Date(catalog.payment_deadline || 0), Date.now() + 3 * 864e5)) : (() => {
+      const now = Date.now(), H = 36e5, g = catalog.payment_deadline ? new Date(catalog.payment_deadline).getTime() : Infinity;
+      let b = Math.min(now + (catalog.payment_hold_hours || 24) * H, g);
+      if (b < now + 6 * H) { const c = new Date(catalog.close_at || catalog.payment_deadline || now).getTime(); b = Math.max(b, Math.min(now + 12 * H, c + 24 * H)); }
+      return new Date(b); })();
+  }
+
+  // ---------- 加購（2026-11-28）----------
+  // 訂單頁按「加購餐點」→ 沿用第一步的菜單選餐 → 確認視窗 → public_add_items → 回訂單頁顯示加購的轉帳資訊
+  // 從首頁進來：這台裝置有訂單就直接打開，沒有就先用學號＋手機找訂單
+  function addonEntry(from){
+    track('xc_addon_entry', { xc_from: from });
+    const o = store.get(ORDER_KEY), mine = o && /^[0-9a-f]{48}$/.test(o.token || '') ? o : null;
+    if (mine) { history.pushState(null, '', location.pathname + '#t=' + mine.token); step = 0; showLookup(mine.token).then(r => { if (r) landAddon(r); }); }
+    else showFind({ addon: true });
+  }
+  // 找到訂單後：能加購就直接進選餐，不能的話留在訂單頁並說明原因
+  function landAddon(r, keep){
+    if (r.addon_open) return startAddon(r, keep);
+    const why = r.addon_pending ? '你已經有一筆加購還沒付款，付款確認後才能再加購' : r.status === 'pending_payment' ? '這筆訂單還沒付款，請先完成付款，確認後就能加購' : r.checked_in_at ? '已經完成報到，不能再加購' : '目前沒有開放加購';
+    toast(why, 'info');
+  }
+  function showOrderObj(r){
+    store.set(ORDER_KEY, { token: r.lookup_token, order_no: r.order_no, status: r.status, at: Date.now() });
+    history.pushState(null, '', location.pathname + '#t=' + r.lookup_token); step = 0;
+    showState(''); const box = document.createElement('div'); box.style.cssText = 'max-width:620px;margin:16px auto 96px';
+    $('lookupBody').appendChild(box); renderPayment(box, r, false); scrollTo({ top: 0 });
+  }
+  // 報名時被擋「已經報名過」：用剛剛填的學號＋手機找原本的訂單，把選好的餐點帶過去加購
+  async function dupToAddon(p){
+    const keep = count() > 0, guest = p.participant_type === 'guest';
+    track('xc_addon_entry', { xc_from: 'duplicate' });
+    if (!guest && p.student_id) {
+      try { const r = await Api.rpc('public_find_registration', { p_code: p.student_id, p_phone: p.phone }); if (r) { showOrderObj(r); landAddon(r, keep); return; } } catch (e) {}
+    }
+    showFind({ addon: true, keep, code: guest ? '' : p.student_id, phone: p.phone,
+      note: guest ? '校外人士請填確認信裡的訂單編號（XC 開頭）和報名時的手機。' : '用剛剛的學號和手機找不到，可能報名時填的是另一支手機，請改一下再查。' });
+  }
+  function startAddon(r, keep){
+    const byId = {}; (catalog.vendors || []).forEach(v => (v.items || []).forEach(m => { byId[m.id] = m; }));
+    const mains = {}; (r.items || []).forEach(i => { const m = byId[i.menu_item_id]; if (m && m.combo_key) mains[m.combo_key] = (mains[m.combo_key] || 0) + i.qty; });
+    addonCtx = { token: r.lookup_token, r, mains };
+    if (!keep) Object.keys(cart).forEach(id => { cart[id] = 0; });
+    renderMenu();   // 從訂單連結直接打開時，選餐頁還沒畫過
+    document.body.classList.add('addon-mode'); $('s1t').textContent = '想加購什麼？';
+    $('sumH').textContent = '這次加購'; $('sumTotL').textContent = '加購金額'; $('cartT').textContent = '這次加購'; $('cfT').textContent = '確認這次加購';
+    $('addonBarTxt').innerHTML = `加購到訂單 <b class="num">${esc(r.order_no)}</b>（${esc(r.name)}）。原本的報名不受影響，加購的餐點付款後才算訂購成功。`;
+    track('xc_addon_start', { xc_keep: keep ? 1 : 0 });
+    history.pushState({ s: 1, addon: 1 }, '', '#addon'); go(1); renderTabs(); updateSummary(false);
+    if (keep && count()) toast(`已帶入你剛剛選的 ${count()} 份餐點`, 'circle-check');
+  }
+  function exitAddon(){
+    addonCtx = null; document.body.classList.remove('addon-mode'); $('s1t').textContent = '想吃點什麼？';
+    $('sumH').textContent = '你的訂單'; $('sumTotL').textContent = '總金額'; $('cartT').textContent = '你的訂單'; $('cfT').textContent = '確認一下你的訂單';
+    Object.keys(cart).forEach(id => { cart[id] = 0; });
+  }
+  function openAddonConfirm(){
+    if (!count()) { toast('請先選要加購的餐點', 'info'); return; }
+    const l = list(), r = addonCtx.r, dl = payDeadline();
+    $('cfBody').innerHTML = `<p class="cf-who">加購到訂單 <span class="num">${esc(r.order_no)}</span>・${esc(r.name)}</p>
+      <div class="cf-rows">${l.map(i => `<div class="rw"><span>${esc(i.name)} × ${i.qty}<br><small class="muted">${esc(i.vendor)}</small></span><span class="num">$${i.price * i.qty}</span></div>`).join('')}</div>
+      <div class="cf-tot"><span>這次加購要付</span><span class="num">${money(total())}</span></div>`;
+    $('cfDl').innerHTML = `${icon('clock')}<span>送出後請在 <b>${esc(fmtTime(dl))}</b> 前轉帳 <b class="num">${money(total())}</b>，逾期這次加購的餐點會取消（報名保留）。</span>`; $('cfDl').classList.remove('hidden');
+    $('cfPick').innerHTML = `${icon('hand-platter')}<span><b>取餐：</b>${esc(catalog.pickup_note || '活動當天報到後，到取餐區出示學生證（校外人士出示 QR Code）取餐。')}</span>`; $('cfPick').classList.remove('hidden');
+    $('cfWarnTxt').innerHTML = '<b>送出後就不能修改這次加購。</b>付款前如果想改，可以在訂單頁取消這次加購，再重新加購。';
+    $('cfGo').textContent = '確認加購';
+    $('scrim').classList.add('on'); $('confirmSheet').classList.add('on');
+    setTimeout(() => $('cfGo').focus(), 50);
+  }
+  async function submitAddon(){
+    if (sending || !addonCtx) return;
+    sending = true; [$('sumNext'), $('mNext')].forEach(b => { b.disabled = true; b.innerHTML = icon('loader-circle', 'spin') + '送出中…'; });
+    const items = list().map(i => (i.option ? { id: i.base, qty: i.qty, option: i.option } : { id: i.base, qty: i.qty }));
+    try {
+      const r = await Api.rpc('public_add_items', { p_token: addonCtx.token, p_items: items });
+      track('xc_addon_submitted', { xc_items: items.reduce((s, i) => s + i.qty, 0), xc_value: r.addon_pending ? r.addon_pending.amount : 0, value: r.addon_pending ? r.addon_pending.amount : 0, currency: 'TWD' });
+      const t = addonCtx.token; exitAddon(); clearDraft();   // 從「已經報名過」轉來的話，報名表的暫存一起清掉
+      history.replaceState(null, '', location.pathname + '#t=' + t); step = 0; await showLookup(t); scrollTo({ top: 0 });
+    } catch (e) {
+      const net = /Failed to fetch|NetworkError|連線/.test(e.message);
+      track('xc_addon_error', { xc_reason: net ? '網路連線失敗' : String(e.message || '').slice(0, 100) });
+      toast(net ? '網路連線失敗，請確認網路後再按一次「確認加購」' : e.message, 'circle-alert');
+    } finally { sending = false; [$('sumNext'), $('mNext')].forEach(b => b.disabled = false); updateSummary(false); }
+  }
   function closeConfirm(){ $('confirmSheet').classList.remove('on'); $('scrim').classList.remove('on'); }
   $('cfBack').onclick = closeConfirm;
-  $('cfGo').onclick = () => { closeConfirm(); submit(true); };
+  $('cfGo').onclick = () => { closeConfirm(); if (addonCtx) submitAddon(); else submit(true); };
   async function submit(confirmed){
     if (sending || !validate()) return;
     if (!confirmed) return openConfirm();
@@ -1935,12 +2042,18 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
       const net = /Failed to fetch|NetworkError|連線/.test(e.message);
       track('xc_registration_error', { xc_reason: net ? '網路連線失敗' : String(e.message || '').slice(0, 100) });
       $('errlist').innerHTML = `<li>${esc(net ? '網路連線失敗，資料都還在，請確認網路後再按一次「確認送出」。不確定是否已經送出時，再送一次會提示「已經報名過了」，不會重複建立訂單。' : e.message)}</li>`;
+      const dup = !net && /已經報名過/.test(e.message) && catalog.addon_open;
+      $('errsum').classList.toggle('soft', dup); $('errsum').querySelector('h3').textContent = dup ? '你已經報名過了' : '還有幾個地方要修改';
+      if (dup) {
+        $('errlist').innerHTML = `<li>不用再報名一次。${count() ? `剛剛選的 ${count()} 份餐點，可以直接加購到原本的訂單。` : '想加購餐點的話，可以從原本的訂單加購。'}<div class="dupacts"><button type="button" class="btn sm" id="dupAddon">${icon('shopping-bag')}${count() ? '加購到我原本的訂單' : '找到我的訂單'}</button></div></li>`;
+        $('dupAddon').onclick = () => dupToAddon(p);
+      }
       $('errsum').classList.remove('hidden'); $('errsum').focus();
     } finally { sending = false; [$('sumNext'), $('mNext')].forEach(b => b.disabled = false); updateSummary(false); }
   }
 
   // ---------- 轉帳 ----------
-  const itemsRows = items => items.length ? items.map(i => `<div class="rw"><span>${esc(i.name)} × ${esc(i.qty)}<div class="s">${esc(i.vendor)}</div></span><span class="num">$${i.price * i.qty}</span></div>`).join('') : '<div class="rw"><span>不點餐，只報名活動</span><span></span></div>';
+  const itemsRows = items => items.length ? items.map(i => `<div class="rw"><span>${esc(i.name)} × ${esc(i.qty)}${i.addon === 'pending' ? '<span class="tag-ad">加購・待付款</span>' : i.addon === 'paid' ? '<span class="tag-ad paid">加購</span>' : ''}<div class="s">${esc(i.vendor)}</div></span><span class="num">$${i.price * i.qty}</span></div>`).join('') : '<div class="rw"><span>不點餐，只報名活動</span><span></span></div>';
   const copyBtn = (v, label) => `<button type="button" class="copy" data-copy="${esc(v)}">${icon('copy')}複製<span class="sr">${label}</span></button>`;
   // 台灣 Pay／TWQR 轉帳碼：帶入收款銀行與帳號（部分銀行也會帶入金額）。不需要郵局 App 產生的臨時碼。
   function payQr(r){
@@ -2016,7 +2129,32 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
       history.replaceState(null, '', location.pathname);
     } catch (er) { toast(er.message, 'circle-alert'); sc.disabled = false; sc.dataset.armed = ''; sc.innerHTML = icon('circle-x') + '取消這筆報名'; }
   }
+  function addonHtml(r){
+    if (r.status === 'picked_up') return '';
+    const ap = r.addon_pending;
+    if (ap) {
+      const late = new Date(ap.deadline) < new Date();
+      return `<section class="addpay" aria-labelledby="apT">
+        <div class="status-line">${late ? `<span class="pill late">${icon('clock')}加購付款期限已過</span>` : `<span class="pill wait">${icon('hourglass')}加購待付款</span>`}</div>
+        <h3 id="apT">這次加購還差轉帳</h3>
+        <p class="muted" style="margin:0">你的報名仍然有效；加購的餐點要付款確認後才算訂購成功。</p>
+        <div class="pay-amount"><span class="sr">加購應付金額</span><span class="num">${money(ap.amount)}</span></div>
+        ${late ? `<div class="notice">${icon('circle-alert')}<span>如果你已經在期限內轉帳，請不要重複付款。私訊學生會，提供轉帳時間和帳號後五碼，我們會協助確認。</span></div>` : `<p class="pay-deadline">${icon('clock')}請在 ${esc(fmtTime(ap.deadline))} 前，轉帳剛好這個金額</p>`}
+        <div class="memo"><div class="k">${icon('triangle-alert')}轉帳時，請在「備註」欄填你的姓名</div><div class="row"><span class="v">${esc(r.name)}</span>${copyBtn(r.name, '轉帳備註')}</div></div>
+        <div class="acct">
+          <div class="r"><span class="k">銀行</span><span class="v t">${esc(r.bank_name)}　<span class="num">${esc(r.bank_code)}</span></span>${copyBtn(r.bank_code, '銀行代碼')}</div>
+          <div class="r"><span class="k">帳號</span><span class="v">${esc(r.account_no)}</span>${copyBtn(String(r.account_no).replace(/\D/g, ''), '帳號')}</div>
+          <div class="r"><span class="k">戶名</span><span class="v t">${esc(r.account_name)}</span><span></span></div>
+        </div>
+        <p class="muted" style="font-size:14px;margin:12px 0 0">已經轉帳的話，系統大約 1 個工作天內會更新，請不要重複付款。</p>
+        <div class="more"><details><summary>不想加購了？${icon('chevron-down')}</summary><div class="in cancelbox"><p>付款前可以取消這次加購，原本的報名會保留。</p><button type="button" class="btn danger" id="addonCancel">${icon('circle-x')}取消這次加購</button></div></details></div>
+      </section>`;
+    }
+    if (r.addon_open) return `<section class="addon-cta"><span class="ac-ic">${icon('shopping-bag')}</span><span class="ac-t"><b>餐點加購開放中</b><span>想邊看電影邊吃點東西？現在可以替這筆報名加購餐點，原本的報名不受影響。</span></span><button type="button" class="btn" id="addonStart">${icon('plus')}加購餐點</button></section>`;
+    return '';
+  }
   function renderTicket(el, r, celebrate){
+    if (r.addon_pending) celebrate = false;
     let qr = '';
     if (r.qr_token && window.qrcode) { const q = qrcode(0, 'M'); q.addData(r.qr_token); q.make(); qr = q.createSvgTag({ cellSize: 5, margin: 2, scalable: true }); }
     if (!qr && r.qr_token) qr = `<div style="padding:12px;border:1px dashed var(--ink);border-radius:8px;text-align:center"><div style="font-size:13px">報到代碼</div><div class="num" style="font-weight:600;word-break:break-all">${esc(r.qr_token)}</div></div>`;
@@ -2026,15 +2164,16 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     const sparks = celebrate && !reduce ? Array.from({ length: 10 }, (_, i) => { const a = i / 10 * 6.283; return `<span class="spark" style="right:40px;top:14px;--x:${(Math.cos(a) * 80).toFixed(0)}px;--y:${(Math.sin(a) * 60).toFixed(0)}px">${'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 1l3 8 8 3-8 3-3 8-3-8-8-3 8-3z"/></svg>'}</span>`; }).join('') : '';
     el.innerHTML = `
       ${celebrate ? glyph('celebrate') : ''}
-      <div class="status-line"><span class="pill done">${icon('circle-check')}${done ? '已完成報到與取餐' : r.total_amount === 0 ? '報名完成' : '付款已確認'}</span>${r.is_test ? `<span class="pill test">${icon('flask-conical')}測試訂單</span>` : ''}<span>訂單 <span class="num">${esc(r.order_no)}</span></span></div>
-      <h2 tabindex="-1" id="payT" style="margin:0">${done ? '取餐完成，電影好看！' : r.total_amount === 0 ? `報名完成，${esc(evDay)} 見` : `付款確認了，${esc(evDay)} 見`}</h2>
+      <div class="status-line"><span class="pill done">${icon('circle-check')}${done ? '已完成報到與取餐' : r.paid_amount === 0 ? '報名完成' : '付款已確認'}</span>${r.is_test ? `<span class="pill test">${icon('flask-conical')}測試訂單</span>` : ''}<span>訂單 <span class="num">${esc(r.order_no)}</span></span></div>
+      <h2 tabindex="-1" id="payT" style="margin:0">${done ? '取餐完成，電影好看！' : r.paid_amount === 0 ? `報名完成，${esc(evDay)} 見` : `付款確認了，${esc(evDay)} 見`}</h2>
+      ${addonHtml(r)}
       ${!done ? (guest ? `<div class="ticket${celebrate ? ' print' : ''}"><svg class="band" viewBox="0 0 432 36" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${tileBand(12, 36)}</svg>
-        <div class="tin"><div class="tinfo">${saMark('tmark', '國立政治大學學生會')}<span class="stamp" aria-hidden="true">${r.total_amount === 0 ? '已報名' : '已付款'}</span>${sparks}<div class="who">${esc(r.name)}</div><div class="meta"><span>校外人士</span><span>${itemCount(r)}</span></div><p class="muted" style="margin:12px 0 0">活動當天到報到櫃檯出示這個 QR Code。若有餐點，同憑此 QR Code 領取。</p></div>
+        <div class="tin"><div class="tinfo">${saMark('tmark', '國立政治大學學生會')}<span class="stamp" aria-hidden="true">${r.paid_amount === 0 ? '已報名' : '已付款'}</span>${sparks}<div class="who">${esc(r.name)}</div><div class="meta"><span>校外人士</span><span>${itemCount(r)}</span></div><p class="muted" style="margin:12px 0 0">活動當天到報到櫃檯出示這個 QR Code。若有餐點，同憑此 QR Code 領取。</p></div>
         <div class="qr" aria-label="報到用 QR Code">${qr}</div></div></div>
       ${r.qr_token ? `<div class="saveqr"><button type="button" class="btn" id="saveQr">${icon('download')}把 QR Code 存到手機</button>${linkBtn}</div>
       <p class="muted" style="font-size:14px;margin:0">這是你的報到憑證，建議現在就存進相簿。之後也可以點報名確認信（或付款完成信）裡的連結，或在報名網站用「查詢訂單」找回來。</p>` : ''}`
       : `<div class="ticket${celebrate ? ' print' : ''}"><svg class="band" viewBox="0 0 432 36" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${tileBand(12, 36)}</svg>
-        <div class="tin"><div class="tinfo">${saMark('tmark', '國立政治大學學生會')}<span class="stamp" aria-hidden="true">${r.total_amount === 0 ? '已報名' : '已付款'}</span>${sparks}<div class="who">${esc(r.name)}</div><div class="meta"><span>學號 <span class="num">${esc(r.student_id)}</span></span><span>${itemCount(r)}</span></div>
+        <div class="tin"><div class="tinfo">${saMark('tmark', '國立政治大學學生會')}<span class="stamp" aria-hidden="true">${r.paid_amount === 0 ? '已報名' : '已付款'}</span>${sparks}<div class="who">${esc(r.name)}</div><div class="meta"><span>學號 <span class="num">${esc(r.student_id)}</span></span><span>${itemCount(r)}</span></div>
         <p class="muted" style="margin:12px 0 0">活動當天帶學生證報到；忘了帶學生證，出示這個 QR Code 也可以。若有餐點，同憑此 QR Code 領取。</p></div>
         ${qr ? `<div class="qr" aria-label="報到用 QR Code">${qr}</div>` : ''}</div></div>
       ${r.qr_token ? `<div class="saveqr"><button type="button" class="btn line" id="saveQr">${icon('download')}把 QR Code 存到手機</button>${linkBtn}</div>` : ''}`) : ''}
@@ -2044,6 +2183,15 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     const sq = el.querySelector('#saveQr'); if (sq) sq.onclick = () => saveTicket(r, sq);
     const zc = el.querySelector('#selfCancel'); if (zc) zc.onclick = () => selfCancel(el, r, zc);
     const cl = el.querySelector('#copyTicketLink'); if (cl) cl.onclick = async () => { const ok = await copyText(cl.dataset.copy); const o = cl.innerHTML; cl.innerHTML = ok ? icon('check') + '已複製' : '請長按複製'; setTimeout(() => cl.innerHTML = o, 1800); };
+    el.querySelectorAll('.addpay [data-copy]').forEach(c => { c.onclick = async () => { track('xc_copy', { xc_what: '加購' + ((c.querySelector('.sr') || {}).textContent || '').trim() }); const ok = await copyText(c.dataset.copy); const o = c.innerHTML; c.classList.toggle('done', ok); c.innerHTML = ok ? icon('check') + '已複製' : '請長按複製'; setTimeout(() => { c.innerHTML = o; c.classList.remove('done'); }, 1800); }; });
+    const as = el.querySelector('#addonStart'); if (as) as.onclick = () => startAddon(r);
+    const ac = el.querySelector('#addonCancel');
+    if (ac) ac.onclick = async () => {
+      if (ac.dataset.armed !== '1') { ac.dataset.armed = '1'; ac.innerHTML = icon('triangle-alert') + '確定取消這次加購嗎？再按一次'; setTimeout(() => { if (ac.isConnected) { ac.dataset.armed = ''; ac.innerHTML = icon('circle-x') + '取消這次加購'; } }, 5000); return; }
+      ac.disabled = true; ac.innerHTML = icon('loader-circle', 'spin') + '取消中…';
+      try { const r2 = await Api.rpc('public_cancel_addon', { p_token: r.lookup_token }); track('xc_addon_cancel'); toast('已取消這次加購，原本的報名還在', 'circle-check'); renderTicket(el, r2, false); scrollTo({ top: 0 }); }
+      catch (er) { toast(er.message, 'circle-alert'); ac.disabled = false; ac.dataset.armed = ''; ac.innerHTML = icon('circle-x') + '取消這次加購'; }
+    };
   }
 
   // 報到憑證圖片：在手機上產生 PNG（姓名、訂單編號、QR Code），不經過伺服器
@@ -2106,14 +2254,15 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
       store.set(ORDER_KEY, { token, order_no: r.order_no, status: r.status, at: Date.now() });
       const box = document.createElement('div'); box.style.cssText = 'max-width:620px;margin:16px auto 96px';
       $('lookupBody').innerHTML = ''; $('lookupBody').appendChild(box); renderPayment(box, r, fresh);
+      return r;
     } catch (e) { showState(`<div class="state-page">${glyph()}<h2>目前無法查詢</h2><p class="muted">可能是網路不穩，請稍後再試。</p><button class="btn" type="button" onclick="location.reload()">${icon('refresh-cw')}重新整理</button></div>`); }
   }
   $('lookupLink').onclick = e => { e.preventDefault(); showFind(); };
   window.__xcDemo = (t, f) => { scrollTo(0, 0); if (t) showLookup(t, f); else location.reload(); };
-  function showFind(){
+  function showFind(opt = {}){
     const o = store.get(ORDER_KEY), mine = o && /^[0-9a-f]{48}$/.test(o.token || '') ? o : null;
-    showState(`<div class="state-page">${glyph()}<h2>查詢訂單</h2>
-      ${mine ? `<p><a class="btn" href="?t=${esc(mine.token)}">${icon('ticket')}查看這台裝置的訂單 ${esc(mine.order_no || '')}</a></p><p class="muted" style="margin:16px 0 0">不是這筆？用下面的方式查詢。</p>` : '<p class="muted">輸入報名時填的資料就能找到你的訂單。</p>'}
+    showState(`<div class="state-page">${glyph()}<h2>${opt.addon ? '先找到你的訂單' : '查詢訂單'}</h2>${opt.addon ? `<p class="muted">${esc(opt.note || '輸入報名時填的學號和手機號碼，找到訂單後就能直接加購餐點。')}</p>` : ''}
+      ${opt.addon ? '' : mine ? `<p><a class="btn" href="?t=${esc(mine.token)}">${icon('ticket')}查看這台裝置的訂單 ${esc(mine.order_no || '')}</a></p><p class="muted" style="margin:16px 0 0">不是這筆？用下面的方式查詢。</p>` : '<p class="muted">輸入報名時填的資料就能找到你的訂單。</p>'}
       <form id="findForm" class="lkform" novalidate>
         <div class="row2">
           <div class="field"><label for="fdCode">學號<span class="muted" style="font-weight:400">（校外人士填訂單編號）</span></label><div class="ipt">${icon('id-card')}<input id="fdCode" autocomplete="off" placeholder="例如 112xxxxxx 或 XC0012" maxlength="12" autocapitalize="characters" autocorrect="off" spellcheck="false"></div></div>
@@ -2139,9 +2288,12 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
         history.pushState(null, '', location.pathname + '#t=' + r.lookup_token);
         const box = document.createElement('div'); box.style.cssText = 'max-width:620px;margin:16px auto 96px';
         $('lookupBody').innerHTML = ''; $('lookupBody').appendChild(box); renderPayment(box, r, false); scrollTo({ top: 0 });
+        step = 0; if (opt.addon) landAddon(r, opt.keep);
       } catch (er) { track('xc_order_lookup', { xc_result: 'error' }); $('fdErr').innerHTML = icon('circle-alert') + esc(er.message); }
-      finally { if (bt.isConnected) { bt.disabled = false; bt.innerHTML = icon('search') + '查詢'; } }
+      finally { if (bt.isConnected) { bt.disabled = false; bt.innerHTML = icon('search') + (opt.addon ? '找訂單，開始加購' : '查詢'); } }
     };
+    if (opt.code) $('fdCode').value = opt.code; if (opt.phone) $('fdPhone').value = opt.phone;
+    if (opt.addon) { $('fdGo').innerHTML = icon('search') + '找訂單，開始加購'; setTimeout(() => (opt.code ? $('fdPhone') : $('fdCode')).focus(), 50); }
     $('lkForm').onsubmit = ev => { ev.preventDefault(); const v = $('lkIn').value.trim(), m = v.match(/[?&#]t=([0-9a-f]{48})/) || v.match(/^([0-9a-f]{48})$/); if (m) { history.pushState(null, '', location.pathname + '#t=' + m[1]); showLookup(m[1]); } else toast('連結格式不正確，請貼上完整的查詢連結', 'circle-alert'); };
   }
 
@@ -2187,6 +2339,7 @@ body:has(#home:not(.hidden)) .topwrap{position:absolute;left:0;right:0;top:auto;
     // 每家店可以各自截止預購（後台「菜單」設定）；截止的店品項鎖起來
     (catalog.vendors || []).forEach(v => { if (v.order_closed) (v.items || []).forEach(i => { i.remaining = 0; i.closed = true; }); });
     renderHome();
+    if (catalog.addon_open) { $('addonHome').innerHTML = '已經報名了？加購餐點' + icon('arrow-right'); $('addonHomeWrap').classList.remove('hidden'); $('addonHome').onclick = () => addonEntry('home'); }
     if (token) return showLookup(token);
     const d = loadDraft();
     if (d) applyDraft(d);
